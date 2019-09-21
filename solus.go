@@ -31,7 +31,8 @@ func NewClient(baseURL *url.URL, email, password string) *Client {
 		Email:     email,
 		Password:  password,
 		Headers: map[string][]string{
-			"Accept": {"application/json"},
+			"Accept":       {"application/json"},
+			"Content-Type": {"application/json"},
 		},
 		HttpClient: &http.Client{
 			Timeout: 35,
@@ -42,15 +43,16 @@ func NewClient(baseURL *url.URL, email, password string) *Client {
 }
 
 func (c *Client) request(ctx context.Context, method, path string, body interface{}) ([]byte, int, error) {
+	var bodyByte []byte
 	var reqBody io.ReadWriter
 	if body != nil {
-		reqBody = bytes.NewBuffer([]byte{})
-		if err := json.NewEncoder(reqBody).Encode(body); err != nil {
+		var err error
+		bodyByte, err = json.Marshal(body)
+		if err != nil {
 			return nil, 0, err
 		}
+		reqBody = bytes.NewBuffer(bodyByte)
 	}
-
-	c.Logger.Println(method, c.BaseURL.String()+path, reqBody)
 
 	req, err := http.NewRequestWithContext(ctx, method, c.BaseURL.String()+path, reqBody)
 	if err != nil {
@@ -75,6 +77,9 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 		}
 	}()
 
+	c.Logger.Printf("%#v", req)
+	c.Logger.Println(method, c.BaseURL.String()+path, string(bodyByte))
+
 	code := resp.StatusCode
 
 	respBody, err := ioutil.ReadAll(resp.Body)
@@ -82,11 +87,7 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 		return nil, 0, err
 	}
 
-	if code == 404 {
-		return respBody, code, fmt.Errorf("HTTP %d: %s", code, respBody)
-	}
-
-	if code >= 500 {
+	if code >= 404 {
 		return respBody, code, fmt.Errorf("HTTP %d: %s", code, respBody)
 	}
 
