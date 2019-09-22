@@ -14,18 +14,18 @@ import (
 )
 
 type Client struct {
-	BaseURL    *url.URL
-	UserAgent  string
-	Email      string
-	Password   string
-	Token      string
-	Headers    http.Header
-	HttpClient *http.Client
-	Logger     *log.Logger
+	BaseURL     *url.URL
+	UserAgent   string
+	Email       string
+	Password    string
+	Credentials Credentials
+	Headers     http.Header
+	HttpClient  *http.Client
+	Logger      *log.Logger
 }
 
-func NewClient(baseURL *url.URL, email, password string) *Client {
-	return &Client{
+func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
+	client := &Client{
 		BaseURL:   baseURL,
 		UserAgent: "solus.io Go client",
 		Email:     email,
@@ -40,6 +40,20 @@ func NewClient(baseURL *url.URL, email, password string) *Client {
 		Logger: log.New(os.Stderr, "", 0),
 	}
 
+	authRequest := AuthLoginRequest{
+		Email:    email,
+		Password: password,
+	}
+
+	resp, err := client.AuthLogin(context.Background(), authRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	client.Credentials = resp.Credentials
+	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
+
+	return client, nil
 }
 
 func (c *Client) request(ctx context.Context, method, path string, body interface{}) ([]byte, int, error) {
@@ -54,7 +68,12 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 		reqBody = bytes.NewBuffer(bodyByte)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, c.BaseURL.String()+path, reqBody)
+	fullUrl, err := c.BaseURL.Parse(path)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, fullUrl.String(), reqBody)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -67,6 +86,8 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 
 	req.Header.Set("User-Agent", c.UserAgent)
 
+	c.Logger.Println(method, fullUrl.String(), string(bodyByte))
+
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, 0, err
@@ -76,9 +97,6 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 			c.Logger.Println("failed to close body", method, path)
 		}
 	}()
-
-	c.Logger.Printf("%#v", req)
-	c.Logger.Println(method, c.BaseURL.String()+path, string(bodyByte))
 
 	code := resp.StatusCode
 
@@ -95,7 +113,7 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 }
 
 func (c *Client) AuthLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
-	body, code, err := c.request(ctx, "POST", "/auth/login", data)
+	body, code, err := c.request(ctx, "POST", "auth/login", data)
 	if err != nil {
 		return AuthLoginResponse{}, err
 	}
