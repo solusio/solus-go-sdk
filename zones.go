@@ -25,19 +25,6 @@ type Zone struct {
 	ComputeResources []ComputeResource `json:"compute_resources"`
 }
 
-type ComputeResource struct {
-	Id                   int    `json:"id"`
-	Name                 string `json:"name"`
-	CanRetryInstallation bool   `json:"can_retry_installation"`
-	Host                 string `json:"host"`
-	AgentPort            string `json:"agent_port"`
-	Status               Status `json:"status"`
-}
-
-type Status struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-}
 type ZoneCreateResponse struct {
 	Data Zone `json:"data"`
 }
