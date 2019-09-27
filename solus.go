@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 type Client struct {
@@ -35,7 +36,7 @@ func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
 			"Content-Type": {"application/json"},
 		},
 		HttpClient: &http.Client{
-			Timeout: 35,
+			Timeout: time.Second * 35,
 		},
 		Logger: log.New(os.Stderr, "", 0),
 	}
