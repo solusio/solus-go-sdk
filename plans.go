@@ -31,7 +31,7 @@ type PlansResponse struct {
 }
 
 func (c *Client) Plans(ctx context.Context) ([]Plan, error) {
-	body, code, err := c.request(ctx, "POST", "plans", nil)
+	body, code, err := c.request(ctx, "GET", "plans", nil)
 	if err != nil {
 		return []Plan{}, err
 	}
