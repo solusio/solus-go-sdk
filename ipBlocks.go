@@ -7,14 +7,14 @@ import (
 )
 
 type IpBlockCreateRequest struct {
-	Name             string  `json:"name"`
-	Gateway          string  `json:"gateway"`
-	Netmask          string  `json:"netmask"`
-	Ns1              string  `json:"ns_1"`
-	Ns2              string  `json:"ns_2"`
-	ComputeResources []int32 `json:"compute_resources"`
-	From             string  `json:"from"`
-	To               string  `json:"to"`
+	Name             string `json:"name"`
+	Gateway          string `json:"gateway"`
+	Netmask          string `json:"netmask"`
+	Ns1              string `json:"ns_1"`
+	Ns2              string `json:"ns_2"`
+	ComputeResources []int  `json:"compute_resources"`
+	From             string `json:"from"`
+	To               string `json:"to"`
 }
 
 type IpBlock struct {
