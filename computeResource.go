@@ -5,7 +5,7 @@ type ComputeResource struct {
 	Name                 string                 `json:"name"`
 	CanRetryInstallation bool                   `json:"can_retry_installation"`
 	Host                 string                 `json:"host"`
-	AgentPort            string                 `json:"agent_port"`
+	AgentPort            int                    `json:"agent_port"`
 	Status               ComputerResourceStatus `json:"status"`
 }
 
