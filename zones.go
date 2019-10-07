@@ -30,7 +30,7 @@ type ZoneCreateResponse struct {
 }
 
 func (c *Client) ZoneCreate(ctx context.Context, data ZoneCreateRequest) (Zone, error) {
-	body, code, err := c.request(ctx, "POST", "locations", data)
+	body, code, err := c.request(ctx, "POST", "zones", data)
 	if err != nil {
 		return Zone{}, err
 	}
