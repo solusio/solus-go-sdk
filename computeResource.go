@@ -127,7 +127,7 @@ func (c *Client) ComputerResourceSetUpNetwork(ctx context.Context, id int, netwo
 		return err
 	}
 
-	if code != 201 {
+	if code != 200 {
 		return fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
