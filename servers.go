@@ -6,6 +6,12 @@ import (
 	"fmt"
 )
 
+const (
+	ServerStatusProcessing = "processing"
+	ServerStatusRunning    = "running"
+	ServerStatusStopped    = "stopped"
+)
+
 type ServerResponse struct {
 	Data Server `json:"data"`
 }
