@@ -9,9 +9,6 @@ type Task struct {
 	Output            string `json:"output"`
 	Progress          int    `json:"progress"`
 	Duration          int    `json:"duration"`
-	StartedAt         Date   `json:"started_at"`
-	CreatedAt         Date   `json:"created_at"`
-	FinishedAt        Date   `json:"finished_at"`
 }
 
 type Date struct {
