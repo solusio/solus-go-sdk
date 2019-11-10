@@ -24,6 +24,17 @@ type ComputeResource struct {
 	Zones                []Zone                 `json:"zones"`
 }
 
+type ComputeResourceNetwork struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	// AddrConfType for 'static' or 'dhcp'
+	AddrConfType string `json:"addr_conf_type"`
+	IpVersion    int    `json:"ip_version"`
+	Ip           string `json:"ip"`
+	Mask         string `json:"mask"`
+	MaskSize     int    `json:"mask_size"`
+}
+
 type ComputerResourceStatus struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
@@ -45,6 +56,10 @@ type ComputerResourceCreateRequest struct {
 
 type ComputerResourceResponse struct {
 	Data ComputeResource `json:"data"`
+}
+
+type ComputerResourceNetworksResponse struct {
+	Data []ComputeResourceNetwork `json:"data"`
 }
 
 func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
@@ -81,4 +96,40 @@ func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource,
 	}
 
 	return resp.Data, nil
+}
+
+func (c *Client) ComputerResourceNetworks(ctx context.Context, id int) ([]ComputeResourceNetwork, error) {
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if code != 200 {
+		return nil, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp ComputerResourceNetworksResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return nil, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
+}
+
+func (c *Client) ComputerResourceSetUpNetwork(ctx context.Context, id int, networkId string) error {
+	data := struct {
+		Id string `json:"id"`
+	}{
+		Id: networkId,
+	}
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), data)
+	if err != nil {
+		return err
+	}
+
+	if code != 201 {
+		return fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	return nil
 }
