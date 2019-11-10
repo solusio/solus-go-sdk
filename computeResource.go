@@ -64,3 +64,21 @@ func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResour
 
 	return resp.Data, nil
 }
+
+func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource, error) {
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id), nil)
+	if err != nil {
+		return ComputeResource{}, err
+	}
+
+	if code != 200 {
+		return ComputeResource{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp ComputerResourceResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return ComputeResource{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
+}
