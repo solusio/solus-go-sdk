@@ -6,6 +6,14 @@ import (
 	"fmt"
 )
 
+const (
+	ComputeResourceStatusActive           = "active"
+	ComputeResourceStatusCommissioning    = "commissioning"
+	ComputeResourceStatusConfigureNetwork = "configure_network"
+	ComputeResourceStatusFailed           = "failed"
+	ComputeResourceStatusUnavailable      = "unavailable"
+)
+
 type ComputeResource struct {
 	Id                   int                    `json:"id"`
 	Name                 string                 `json:"name"`
