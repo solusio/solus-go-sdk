@@ -39,6 +39,10 @@ type IpBlockIpAddress struct {
 	Ip string `json:"ip"`
 }
 
+type IpBlockIpAddressCreateResponse struct {
+	Data IpBlockIpAddress `json:"data"`
+}
+
 func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
 	body, code, err := c.request(ctx, "POST", "ip_blocks", data)
 	if err != nil {
@@ -52,6 +56,24 @@ func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (
 	var resp IpBlockCreateResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return IpBlock{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
+}
+
+func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
+	body, code, err := c.request(ctx, "POST", "ip_blocks/%d/ips", ipBlockId)
+	if err != nil {
+		return IpBlockIpAddress{}, err
+	}
+
+	if code != 201 {
+		return IpBlockIpAddress{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp IpBlockIpAddressCreateResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return IpBlockIpAddress{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
 	return resp.Data, nil
