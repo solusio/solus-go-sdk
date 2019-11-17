@@ -62,7 +62,7 @@ func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (
 }
 
 func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
-	body, code, err := c.request(ctx, "POST", "ip_blocks/%d/ips", ipBlockId)
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId), nil)
 	if err != nil {
 		return IpBlockIpAddress{}, err
 	}
