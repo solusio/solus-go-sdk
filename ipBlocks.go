@@ -78,3 +78,16 @@ func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpB
 
 	return resp.Data, nil
 }
+
+func (c *Client) IpBlockIpAddressDelete(ctx context.Context, ipId int) error {
+	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId), nil)
+	if err != nil {
+		return err
+	}
+
+	if code != 204 {
+		return fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	return nil
+}
