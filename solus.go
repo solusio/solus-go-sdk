@@ -1,12 +1,9 @@
 package solus
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,6 +20,7 @@ type Client struct {
 	Headers     http.Header
 	HttpClient  *http.Client
 	Logger      *log.Logger
+	Retries     int
 }
 
 func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
@@ -38,7 +36,8 @@ func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
 		HttpClient: &http.Client{
 			Timeout: time.Second * 35,
 		},
-		Logger: log.New(os.Stderr, "", 0),
+		Logger:  log.New(os.Stderr, "", 0),
+		Retries: 5,
 	}
 
 	authRequest := AuthLoginRequest{
@@ -55,62 +54,6 @@ func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
 	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
 
 	return client, nil
-}
-
-func (c *Client) request(ctx context.Context, method, path string, body interface{}) ([]byte, int, error) {
-	var bodyByte []byte
-	var reqBody io.ReadWriter
-	if body != nil {
-		var err error
-		bodyByte, err = json.Marshal(body)
-		if err != nil {
-			return nil, 0, err
-		}
-		reqBody = bytes.NewBuffer(bodyByte)
-	}
-
-	fullUrl, err := c.BaseURL.Parse(path)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, fullUrl.String(), reqBody)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	for k, values := range c.Headers {
-		for _, v := range values {
-			req.Header.Add(k, v)
-		}
-	}
-
-	req.Header.Set("User-Agent", c.UserAgent)
-
-	c.Logger.Println(method, fullUrl.String(), string(bodyByte))
-
-	resp, err := c.HttpClient.Do(req)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.Logger.Println("failed to close body", method, path)
-		}
-	}()
-
-	code := resp.StatusCode
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	if code >= 404 {
-		return respBody, code, fmt.Errorf("HTTP %d: %s", code, respBody)
-	}
-
-	return respBody, code, nil
 }
 
 func (c *Client) AuthLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
