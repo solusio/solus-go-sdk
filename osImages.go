@@ -6,10 +6,17 @@ import (
 	"fmt"
 )
 
+type Icon struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Url  string `json:"url"`
+}
+
 type OsImage struct {
 	Id        int              `json:"id"`
 	Name      string           `json:"name"`
-	Icon      string           `json:"icon"`
+	Icon      Icon             `json:"icon"`
 	Versions  []OsImageVersion `json:"versions,omitempty"`
 	IsDefault bool             `json:"is_default,omitempty"`
 }
