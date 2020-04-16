@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-type ZoneCreateRequest struct {
+type LocationCreateRequest struct {
 	Name             string `json:"name"`
 	Description      string `json:"description"`
 	Icon             string `json:"icon"`
@@ -15,7 +15,7 @@ type ZoneCreateRequest struct {
 	ComputeResources []int  `json:"compute_resources"`
 }
 
-type Zone struct {
+type Location struct {
 	Id               int               `json:"id"`
 	Name             string            `json:"name"`
 	Icon             string            `json:"icon"`
@@ -25,23 +25,23 @@ type Zone struct {
 	ComputeResources []ComputeResource `json:"compute_resources"`
 }
 
-type ZoneCreateResponse struct {
-	Data Zone `json:"data"`
+type LocationCreateResponse struct {
+	Data Location `json:"data"`
 }
 
-func (c *Client) ZoneCreate(ctx context.Context, data ZoneCreateRequest) (Zone, error) {
-	body, code, err := c.request(ctx, "POST", "zones", data)
+func (c *Client) LocationCreate(ctx context.Context, data LocationCreateRequest) (Location, error) {
+	body, code, err := c.request(ctx, "POST", "locations", data)
 	if err != nil {
-		return Zone{}, err
+		return Location{}, err
 	}
 
 	if code != 201 {
-		return Zone{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return Location{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ZoneCreateResponse
+	var resp LocationCreateResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return Zone{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return Location{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
 	return resp.Data, nil

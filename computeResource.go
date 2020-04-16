@@ -15,12 +15,12 @@ const (
 )
 
 type ComputeResource struct {
-	Id                   int                    `json:"id"`
-	Name                 string                 `json:"name"`
-	Host                 string                 `json:"host"`
-	AgentPort            int                    `json:"agent_port"`
-	Status               ComputerResourceStatus `json:"status"`
-	Zones                []Zone                 `json:"zones"`
+	Id        int                    `json:"id"`
+	Name      string                 `json:"name"`
+	Host      string                 `json:"host"`
+	AgentPort int                    `json:"agent_port"`
+	Status    ComputerResourceStatus `json:"status"`
+	Locations []Location             `json:"locations"`
 }
 
 type ComputeResourceNetwork struct {
