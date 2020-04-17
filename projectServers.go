@@ -9,7 +9,7 @@ import (
 type ProjectServersCreateRequest struct {
 	Name             string `json:"name"`
 	PlanId           int    `json:"plan_id"`
-	LocationId       int    `json:"zone_id"`
+	LocationId       int    `json:"location_id"`
 	OsImageVersionId int    `json:"os_image_version_id"`
 	SshKeys          []int  `json:"ssh_keys,omitempty"`
 	UserData         string `json:"user_data,omitempty"`
