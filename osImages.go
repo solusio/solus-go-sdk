@@ -29,6 +29,27 @@ type OsImageVersion struct {
 	CloudInitVersion string `json:"cloud_init_version"`
 }
 
+type OsImageRequest struct {
+	Name      string `json:"name"`
+	Icon      string `json:"icon"`
+	IsVisible bool   `json:"is_visible"`
+}
+
+type OsImageVersionRequest struct {
+	Position         int    `json:"position"`
+	Version          string `json:"version"`
+	Url              string `json:"url"`
+	CloudInitVersion string `json:"cloud_init_version"`
+}
+
+type OsImageResponse struct {
+	Data OsImage `json:"data"`
+}
+
+type OsImageVersionResponse struct {
+	Data OsImageVersion `json:"data"`
+}
+
 type GetOsImageResponse struct {
 	Data  []OsImage     `json:"data"`
 	Links ResponseLinks `json:"links"`
@@ -48,6 +69,42 @@ func (c *Client) GetOsImages(ctx context.Context) ([]OsImage, error) {
 	var resp GetOsImageResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return []OsImage{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
+}
+
+func (c *Client) OsImageCreate(ctx context.Context, data OsImageRequest) (OsImage, error) {
+	body, code, err := c.request(ctx, "POST", "os_images", data)
+	if err != nil {
+		return OsImage{}, err
+	}
+
+	if code != 201 {
+		return OsImage{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp OsImageResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return OsImage{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
+}
+
+func (c *Client) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), data)
+	if err != nil {
+		return OsImageVersion{}, err
+	}
+
+	if code != 201 {
+		return OsImageVersion{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp OsImageVersionResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return OsImageVersion{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
 	return resp.Data, nil
