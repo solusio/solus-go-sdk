@@ -15,7 +15,8 @@ type Plan struct {
 	IsDefault           bool       `json:"is_default"`
 	IsSnapshotAvailable bool       `json:"is_snapshot_available"`
 	IsSnapshotEnabled   bool       `json:"is_snapshot_enabled"`
-	TokenValue          string     `json:"token_value"`
+	TokenPerHour        string     `json:"token_per_hour"`
+	TokenPerMonth       string     `json:"token_per_month"`
 }
 
 type PlanParams struct {
