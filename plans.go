@@ -32,21 +32,21 @@ type Plan struct {
 	IsSnapshotAvailable bool       `json:"is_snapshot_available"`
 	IsSnapshotEnabled   bool       `json:"is_snapshot_enabled"`
 	Limits              PlanLimits `json:"limits"`
-	TokenPerHour        string     `json:"token_per_hour"`
-	TokenPerMonth       string     `json:"token_per_month"`
+	TokenPerHour        int        `json:"token_per_hour"`
+	TokenPerMonth       int        `json:"token_per_month"`
 }
 
 type PlanCreateRequest struct {
 	Name               string     `json:"name"`
 	Type               string     `json:"type"`
-	PlanParams         string     `json:"params"`
+	Params             PlanParams `json:"params"`
 	StorageType        string     `json:"storage_type"`
-	ImageFormat        bool       `json:"image_format"`
+	ImageFormat        string     `json:"image_format"`
 	IsVisible          bool       `json:"is_visible"`
 	IsSnapshotsEnabled bool       `json:"is_snapshots_enabled"`
 	Limits             PlanLimits `json:"limits"`
-	TokenPerHour       string     `json:"token_per_hour"`
-	TokenPerMonth      string     `json:"token_per_month"`
+	TokenPerHour       int        `json:"token_per_hour"`
+	TokenPerMonth      int        `json:"token_per_month"`
 }
 
 type PlansResponse struct {
