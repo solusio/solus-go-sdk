@@ -32,8 +32,6 @@ type Plan struct {
 	IsSnapshotAvailable bool       `json:"is_snapshot_available"`
 	IsSnapshotEnabled   bool       `json:"is_snapshot_enabled"`
 	Limits              PlanLimits `json:"limits"`
-	TokenPerHour        float64    `json:"token_per_hour"`
-	TokenPerMonth       float64    `json:"token_per_month"`
 }
 
 type PlanCreateRequest struct {
