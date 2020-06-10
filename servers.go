@@ -12,6 +12,10 @@ const (
 	ServerStatusStopped    = "stopped"
 )
 
+type ServersResponse struct {
+	Data []Server `json:"data"`
+}
+
 type ServerResponse struct {
 	Data Server `json:"data"`
 }
@@ -22,6 +26,24 @@ type ServerRestartResponse struct {
 
 type ServerDeleteResponse struct {
 	Data Task `json:"data"`
+}
+
+func (c *Client) Servers(ctx context.Context) ([]Server, error) {
+	body, code, err := c.request(ctx, "GET", "servers", nil)
+	if err != nil {
+		return []Server{}, err
+	}
+
+	if code != 200 {
+		return []Server{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp ServersResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return []Server{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp.Data, nil
 }
 
 func (c *Client) Server(ctx context.Context, serverId int) (Server, error) {
