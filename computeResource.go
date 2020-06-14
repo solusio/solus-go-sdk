@@ -62,7 +62,9 @@ type ComputerResourceNetworksResponse struct {
 }
 
 func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
-	body, code, err := c.request(ctx, "POST", "compute_resources", data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", "compute_resources", withBody(opts))
 	if err != nil {
 		return ComputeResource{}, err
 	}
@@ -80,7 +82,7 @@ func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResour
 }
 
 func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id), nil)
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id))
 	if err != nil {
 		return ComputeResource{}, err
 	}
@@ -98,7 +100,7 @@ func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource,
 }
 
 func (c *Client) ComputerResourceNetworks(ctx context.Context, id int) ([]ComputeResourceNetwork, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id), nil)
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +123,9 @@ func (c *Client) ComputerResourceSetUpNetwork(ctx context.Context, id int, netwo
 	}{
 		Id: networkId,
 	}
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(opts))
 	if err != nil {
 		return err
 	}

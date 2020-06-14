@@ -57,7 +57,7 @@ type GetOsImageResponse struct {
 }
 
 func (c *Client) GetOsImages(ctx context.Context) ([]OsImage, error) {
-	body, code, err := c.request(ctx, "GET", "os_images", nil)
+	body, code, err := c.request(ctx, "GET", "os_images")
 	if err != nil {
 		return []OsImage{}, err
 	}
@@ -75,7 +75,9 @@ func (c *Client) GetOsImages(ctx context.Context) ([]OsImage, error) {
 }
 
 func (c *Client) OsImageCreate(ctx context.Context, data OsImageRequest) (OsImage, error) {
-	body, code, err := c.request(ctx, "POST", "os_images", data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", "os_images", withBody(opts))
 	if err != nil {
 		return OsImage{}, err
 	}
@@ -93,7 +95,9 @@ func (c *Client) OsImageCreate(ctx context.Context, data OsImageRequest) (OsImag
 }
 
 func (c *Client) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(opts))
 	if err != nil {
 		return OsImageVersion{}, err
 	}

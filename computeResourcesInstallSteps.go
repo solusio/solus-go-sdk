@@ -20,7 +20,7 @@ type ComputerResourceInstallSteps struct {
 }
 
 func (c *Client) ComputerResourceInstallSteps(ctx context.Context, id int) ([]ComputerResourceInstallSteps, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id), nil)
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id))
 	if err != nil {
 		return nil, err
 	}

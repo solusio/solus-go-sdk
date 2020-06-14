@@ -24,7 +24,7 @@ type Project struct {
 }
 
 func (c *Client) Projects(ctx context.Context) (ProjectsResponse, error) {
-	body, code, err := c.request(ctx, "GET", "projects", nil)
+	body, code, err := c.request(ctx, "GET", "projects")
 	if err != nil {
 		return ProjectsResponse{}, err
 	}

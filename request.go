@@ -19,12 +19,42 @@ var errMaxRetriesReached = errors.New("exceeded retry limit")
 // Func represents functions that can be retried.
 type retryFunc func(attempt int) (retry bool, err error)
 
-func (c *Client) request(ctx context.Context, method, path string, body interface{}) ([]byte, int, error) {
+type requestOpts struct {
+	params map[string][]string
+	body   interface{}
+}
+
+func newRequestOpts() requestOpts {
+	return requestOpts{}
+}
+
+type requestWithOpt func(requestOpts) requestOpts
+
+func withParams(params requestOpts) func(requestOpts) requestOpts {
+	return func(o requestOpts) requestOpts {
+		o.params = params.params
+		return o
+	}
+}
+
+func withBody(body requestOpts) func(requestOpts) requestOpts {
+	return func(o requestOpts) requestOpts {
+		o.body = body.body
+		return o
+	}
+}
+
+func (c *Client) request(ctx context.Context, method, path string, opts ...requestWithOpt) ([]byte, int, error) {
+	reqOpts := newRequestOpts()
+	for _, o := range opts {
+		reqOpts = o(reqOpts)
+	}
+
 	var bodyByte []byte
 	var reqBody io.ReadWriter
-	if body != nil {
+	if reqOpts.body != nil {
 		var err error
-		bodyByte, err = json.Marshal(body)
+		bodyByte, err = json.Marshal(reqOpts.body)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -34,6 +64,17 @@ func (c *Client) request(ctx context.Context, method, path string, body interfac
 	fullUrl, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, 0, err
+	}
+
+	if reqOpts.params != nil {
+		query := fullUrl.Query()
+		for param, values := range reqOpts.params {
+			for _, value := range values {
+				query.Add(param, value)
+			}
+		}
+
+		fullUrl.RawQuery = query.Encode()
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, fullUrl.String(), reqBody)
@@ -102,4 +143,15 @@ func Retry(fn retryFunc) error {
 		}
 	}
 	return err
+}
+
+func filterToParams(filter map[string]string) map[string][]string {
+	var params map[string][]string
+	if filter != nil {
+		params = map[string][]string{}
+		for field, value := range filter {
+			params[field] = append(params[field], value)
+		}
+	}
+	return params
 }

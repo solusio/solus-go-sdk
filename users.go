@@ -9,6 +9,8 @@ import (
 type User struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
+	// CreatedAt for date in RFC3339Nano format
+	CreatedAt string `json:"created_at"`
 }
 
 type UsersResponse struct {
@@ -25,8 +27,10 @@ type UserCreateResponse struct {
 	Data User `json:"data"`
 }
 
-func (c *Client) Users(ctx context.Context) ([]User, error) {
-	body, code, err := c.request(ctx, "GET", "users", nil)
+func (c *Client) Users(ctx context.Context, filter *FilterUsers) ([]User, error) {
+	opts := newRequestOpts()
+	opts.params = filterToParams(filter.Get())
+	body, code, err := c.request(ctx, "GET", "users", withParams(opts))
 	if err != nil {
 		return []User{}, err
 	}
@@ -44,7 +48,9 @@ func (c *Client) Users(ctx context.Context) ([]User, error) {
 }
 
 func (c *Client) UserCreate(ctx context.Context, data UserCreateRequest) (User, error) {
-	body, code, err := c.request(ctx, "POST", "users", data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", "users", withBody(opts))
 	if err != nil {
 		return User{}, err
 	}
@@ -62,13 +68,13 @@ func (c *Client) UserCreate(ctx context.Context, data UserCreateRequest) (User, 
 }
 
 func (c *Client) UserDelete(ctx context.Context, userId int) error {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("users/%d", userId), nil)
+	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("users/%d", userId))
 	if err != nil {
 		return err
 	}
 
 	if code != 204 {
-		return fmt.Errorf("HTTP %d: %s", code, body)
+		return wrapError(code, body)
 	}
 
 	return nil
