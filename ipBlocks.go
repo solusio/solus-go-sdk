@@ -6,20 +6,29 @@ import (
 	"fmt"
 )
 
+type NetworkType string
+
+const (
+	Routed  NetworkType = "routed"
+	Bridged NetworkType = "bridged"
+)
+
 type IpBlockCreateRequest struct {
-	Name             string `json:"name"`
-	Gateway          string `json:"gateway"`
-	Netmask          string `json:"netmask"`
-	Ns1              string `json:"ns_1"`
-	Ns2              string `json:"ns_2"`
-	ComputeResources []int  `json:"compute_resources"`
-	From             string `json:"from"`
-	To               string `json:"to"`
+	Name             string      `json:"name"`
+	NetworkType      NetworkType `json:"network_type"`
+	Gateway          string      `json:"gateway"`
+	Netmask          string      `json:"netmask"`
+	Ns1              string      `json:"ns_1"`
+	Ns2              string      `json:"ns_2"`
+	ComputeResources []int       `json:"compute_resources"`
+	From             string      `json:"from"`
+	To               string      `json:"to"`
 }
 
 type IpBlock struct {
 	Id               int                `json:"id"`
 	Name             string             `json:"name"`
+	NetworkType      NetworkType        `json:"network_type"`
 	Gateway          string             `json:"gateway"`
 	Netmask          string             `json:"netmask"`
 	Ns1              string             `json:"ns_1"`
