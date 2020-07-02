@@ -30,7 +30,9 @@ type LocationCreateResponse struct {
 }
 
 func (c *Client) LocationCreate(ctx context.Context, data LocationCreateRequest) (Location, error) {
-	body, code, err := c.request(ctx, "POST", "locations", data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", "locations", withBody(opts))
 	if err != nil {
 		return Location{}, err
 	}

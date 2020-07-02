@@ -53,7 +53,9 @@ type IpBlockIpAddressCreateResponse struct {
 }
 
 func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
-	body, code, err := c.request(ctx, "POST", "ip_blocks", data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", "ip_blocks", withBody(opts))
 	if err != nil {
 		return IpBlock{}, err
 	}
@@ -71,7 +73,7 @@ func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (
 }
 
 func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId), nil)
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
 	if err != nil {
 		return IpBlockIpAddress{}, err
 	}
@@ -89,7 +91,7 @@ func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpB
 }
 
 func (c *Client) IpBlockIpAddressDelete(ctx context.Context, ipId int) error {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId), nil)
+	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId))
 	if err != nil {
 		return err
 	}

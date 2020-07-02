@@ -35,7 +35,9 @@ type Server struct {
 }
 
 func (c *Client) ProjectServerCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), data)
+	opts := newRequestOpts()
+	opts.body = data
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(opts))
 	if err != nil {
 		return Server{}, err
 	}
@@ -61,7 +63,7 @@ func (c *Client) ProjectServersAll(ctx context.Context, projectId int) ([]Server
 	servers := resp.Data
 	nextPageUrl := resp.Links.Next
 	for nextPageUrl != "" {
-		body, code, err := c.request(ctx, "GET", nextPageUrl, nil)
+		body, code, err := c.request(ctx, "GET", nextPageUrl)
 		if err != nil {
 			return servers, err
 		}
@@ -86,7 +88,7 @@ func (c *Client) ProjectServersAll(ctx context.Context, projectId int) ([]Server
 }
 
 func (c *Client) ProjectServers(ctx context.Context, projectId int) (ProjectServersResponse, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId), nil)
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId))
 	if err != nil {
 		return ProjectServersResponse{}, err
 	}

@@ -28,8 +28,11 @@ type ServerDeleteResponse struct {
 	Data Task `json:"data"`
 }
 
-func (c *Client) Servers(ctx context.Context) ([]Server, error) {
-	body, code, err := c.request(ctx, "GET", "servers", nil)
+// Servers return list of server, filter can be nil
+func (c *Client) Servers(ctx context.Context, filter *FilterServers) ([]Server, error) {
+	opts := newRequestOpts()
+	opts.params = filterToParams(filter.Get())
+	body, code, err := c.request(ctx, "GET", "servers", withParams(opts))
 	if err != nil {
 		return []Server{}, err
 	}
@@ -47,7 +50,7 @@ func (c *Client) Servers(ctx context.Context) ([]Server, error) {
 }
 
 func (c *Client) Server(ctx context.Context, serverId int) (Server, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("servers/%d", serverId), nil)
+	body, code, err := c.request(ctx, "GET", fmt.Sprintf("servers/%d", serverId))
 	if err != nil {
 		return Server{}, err
 	}
@@ -65,7 +68,7 @@ func (c *Client) Server(ctx context.Context, serverId int) (Server, error) {
 }
 
 func (c *Client) ServerRestart(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("servers/%d/restart", serverId), nil)
+	body, code, err := c.request(ctx, "POST", fmt.Sprintf("servers/%d/restart", serverId))
 	if err != nil {
 		return Task{}, err
 	}
@@ -83,7 +86,7 @@ func (c *Client) ServerRestart(ctx context.Context, serverId int) (Task, error) 
 }
 
 func (c *Client) ServerDelete(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("servers/%d", serverId), nil)
+	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("servers/%d", serverId))
 	if err != nil {
 		return Task{}, err
 	}
