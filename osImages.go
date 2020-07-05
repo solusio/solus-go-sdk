@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type OsImagesService service
+
 type Icon struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
@@ -56,8 +58,8 @@ type GetOsImageResponse struct {
 	Meta  ResponseMeta  `json:"meta"`
 }
 
-func (c *Client) GetOsImages(ctx context.Context) ([]OsImage, error) {
-	body, code, err := c.request(ctx, "GET", "os_images")
+func (s *OsImagesService) List(ctx context.Context) ([]OsImage, error) {
+	body, code, err := s.client.request(ctx, "GET", "os_images")
 	if err != nil {
 		return []OsImage{}, err
 	}
@@ -74,10 +76,10 @@ func (c *Client) GetOsImages(ctx context.Context) ([]OsImage, error) {
 	return resp.Data, nil
 }
 
-func (c *Client) OsImageCreate(ctx context.Context, data OsImageRequest) (OsImage, error) {
+func (s *OsImagesService) Create(ctx context.Context, data OsImageRequest) (OsImage, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "os_images", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "os_images", withBody(opts))
 	if err != nil {
 		return OsImage{}, err
 	}
@@ -94,10 +96,10 @@ func (c *Client) OsImageCreate(ctx context.Context, data OsImageRequest) (OsImag
 	return resp.Data, nil
 }
 
-func (c *Client) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
+func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(opts))
 	if err != nil {
 		return OsImageVersion{}, err
 	}

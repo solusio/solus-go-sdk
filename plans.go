@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type PlansService service
+
 type PlanParams struct {
 	Hdd int `json:"hdd"`
 	Ram int `json:"ram"`
@@ -59,8 +61,8 @@ type PlanCreateResponse struct {
 	Data Plan `json:"data"`
 }
 
-func (c *Client) Plans(ctx context.Context) ([]Plan, error) {
-	body, code, err := c.request(ctx, "GET", "plans")
+func (s *PlansService) List(ctx context.Context) ([]Plan, error) {
+	body, code, err := s.client.request(ctx, "GET", "plans")
 	if err != nil {
 		return []Plan{}, err
 	}
@@ -77,10 +79,10 @@ func (c *Client) Plans(ctx context.Context) ([]Plan, error) {
 	return resp.Data, nil
 }
 
-func (c *Client) PlanCreate(ctx context.Context, data PlanCreateRequest) (Plan, error) {
+func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "plans", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "plans", withBody(opts))
 	if err != nil {
 		return Plan{}, err
 	}

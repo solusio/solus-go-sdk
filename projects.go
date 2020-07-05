@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type ProjectsService service
+
 type ProjectsResponse struct {
 	Data  []Project     `json:"data"`
 	Links ResponseLinks `json:"links"`
@@ -23,8 +25,8 @@ type Project struct {
 	Servers     []Server `json:"servers"`
 }
 
-func (c *Client) Projects(ctx context.Context) (ProjectsResponse, error) {
-	body, code, err := c.request(ctx, "GET", "projects")
+func (s *ProjectsService) List(ctx context.Context) (ProjectsResponse, error) {
+	body, code, err := s.client.request(ctx, "GET", "projects")
 	if err != nil {
 		return ProjectsResponse{}, err
 	}

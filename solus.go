@@ -21,6 +21,22 @@ type Client struct {
 	HttpClient  *http.Client
 	Logger      *log.Logger
 	Retries     int
+
+	s service
+
+	ComputeResources *ComputeResourcesService
+	IpBlocks         *IpBlocksService
+	Locations        *LocationsService
+	OsImages         *OsImagesService
+	Plans            *PlansService
+	Projects         *ProjectsService
+	Servers          *ServersService
+	Tasks            *TasksService
+	Users            *UsersService
+}
+
+type service struct {
+	client *Client
 }
 
 func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
@@ -52,6 +68,17 @@ func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
 
 	client.Credentials = resp.Credentials
 	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
+
+	client.s.client = client
+	client.ComputeResources = (*ComputeResourcesService)(&client.s)
+	client.IpBlocks = (*IpBlocksService)(&client.s)
+	client.Locations = (*LocationsService)(&client.s)
+	client.OsImages = (*OsImagesService)(&client.s)
+	client.Plans = (*PlansService)(&client.s)
+	client.Projects = (*ProjectsService)(&client.s)
+	client.Servers = (*ServersService)(&client.s)
+	client.Tasks = (*TasksService)(&client.s)
+	client.Users = (*UsersService)(&client.s)
 
 	return client, nil
 }

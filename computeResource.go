@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type ComputeResourcesService service
+
 const (
 	ComputeResourceStatusActive           = "active"
 	ComputeResourceStatusCommissioning    = "commissioning"
@@ -61,10 +63,10 @@ type ComputerResourceNetworksResponse struct {
 	Data []ComputeResourceNetwork `json:"data"`
 }
 
-func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
+func (s *ComputeResourcesService) Create(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "compute_resources", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "compute_resources", withBody(opts))
 	if err != nil {
 		return ComputeResource{}, err
 	}
@@ -81,8 +83,8 @@ func (c *Client) ComputerResourceCreate(ctx context.Context, data ComputerResour
 	return resp.Data, nil
 }
 
-func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id))
+func (s *ComputeResourcesService) Get(ctx context.Context, id int) (ComputeResource, error) {
+	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id))
 	if err != nil {
 		return ComputeResource{}, err
 	}
@@ -99,8 +101,8 @@ func (c *Client) ComputerResource(ctx context.Context, id int) (ComputeResource,
 	return resp.Data, nil
 }
 
-func (c *Client) ComputerResourceNetworks(ctx context.Context, id int) ([]ComputeResourceNetwork, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id))
+func (s *ComputeResourcesService) Networks(ctx context.Context, id int) ([]ComputeResourceNetwork, error) {
+	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id))
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +119,7 @@ func (c *Client) ComputerResourceNetworks(ctx context.Context, id int) ([]Comput
 	return resp.Data, nil
 }
 
-func (c *Client) ComputerResourceSetUpNetwork(ctx context.Context, id int, networkId string) error {
+func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, networkId string) error {
 	data := struct {
 		Id string `json:"id"`
 	}{
@@ -125,7 +127,7 @@ func (c *Client) ComputerResourceSetUpNetwork(ctx context.Context, id int, netwo
 	}
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(opts))
 	if err != nil {
 		return err
 	}

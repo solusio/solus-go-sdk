@@ -19,8 +19,8 @@ type ComputerResourceInstallSteps struct {
 	Progress          int    `json:"progress"`
 }
 
-func (c *Client) ComputerResourceInstallSteps(ctx context.Context, id int) ([]ComputerResourceInstallSteps, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id))
+func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputerResourceInstallSteps, error) {
+	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id))
 	if err != nil {
 		return nil, err
 	}
