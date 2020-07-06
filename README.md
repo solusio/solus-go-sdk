@@ -9,3 +9,19 @@ fast, on-demand VMs, a simple API, and an easy-to-use self-service control
 panel for your customers to unleash your full potential for growth.
 
 [Official site](https://www.solus.io/)
+
+Usage
+-----
+
+```go
+client, err := solus.NewClient(baseURL, solus.EmailAndPasswordAuthenticator{
+    Email: "email@example.com",
+    Password: "12345678",
+})
+```
+
+Or
+
+```go
+client, err := solus.NewClient(baseURL, solus.ApiTokenAuthenticator{Token: "api token"})
+```

@@ -2,6 +2,7 @@ package solus
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,8 +15,6 @@ import (
 type Client struct {
 	BaseURL     *url.URL
 	UserAgent   string
-	Email       string
-	Password    string
 	Credentials Credentials
 	Headers     http.Header
 	HttpClient  *http.Client
@@ -23,12 +22,67 @@ type Client struct {
 	Retries     int
 }
 
-func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
+// Authenticator interface for client authentication.
+type Authenticator interface {
+	// Authenticate authenticate client on SOLUS IO and return credentials
+	// which should be used for making further API calls.
+	// The Client is fully initialized. Any endpoints which is not requires
+	// authentication may be called.
+	Authenticate(c *Client) (Credentials, error)
+}
+
+// EmailAndPasswordAuthenticator authenticate at SOLUS IO with specified email
+// and password.
+type EmailAndPasswordAuthenticator struct {
+	Email    string
+	Password string
+}
+
+func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, error) {
+	authRequest := AuthLoginRequest{
+		Email:    a.Email,
+		Password: a.Password,
+	}
+
+	resp, err := c.authLogin(context.Background(), authRequest)
+	if err != nil {
+		return Credentials{}, err
+	}
+
+	return resp.Credentials, nil
+}
+
+// ApiTokenAuthenticator authenticate at SOLUS IO by provided API token.
+type ApiTokenAuthenticator struct {
+	Token string
+}
+
+func (a ApiTokenAuthenticator) Authenticate(*Client) (Credentials, error) {
+	return Credentials{
+		AccessToken: a.Token,
+		TokenType:   "Bearer",
+		ExpiresAt:   "",
+	}, nil
+}
+
+// ClientOption represent client initialization options.
+type ClientOption func(c *Client)
+
+// AllowInsecure allow to skip certificate verify.
+func AllowInsecure() ClientOption {
+	return func(c *Client) {
+		if c.HttpClient.Transport == nil {
+			c.HttpClient.Transport = http.DefaultTransport
+		}
+		c.HttpClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+}
+
+// NewClient create and initialize Client instance.
+func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client, error) {
 	client := &Client{
 		BaseURL:   baseURL,
 		UserAgent: "solus.io Go client",
-		Email:     email,
-		Password:  password,
 		Headers: map[string][]string{
 			"Accept":       {"application/json"},
 			"Content-Type": {"application/json"},
@@ -40,23 +94,22 @@ func NewClient(baseURL *url.URL, email, password string) (*Client, error) {
 		Retries: 5,
 	}
 
-	authRequest := AuthLoginRequest{
-		Email:    email,
-		Password: password,
+	for _, o := range opts {
+		o(client)
 	}
 
-	resp, err := client.AuthLogin(context.Background(), authRequest)
+	c, err := a.Authenticate(client)
 	if err != nil {
 		return nil, err
 	}
 
-	client.Credentials = resp.Credentials
+	client.Credentials = c
 	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
 
 	return client, nil
 }
 
-func (c *Client) AuthLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
+func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
 	opts := newRequestOpts()
 	opts.body = data
 	body, code, err := c.request(ctx, "POST", "auth/login", withBody(opts))
