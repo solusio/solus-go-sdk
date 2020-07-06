@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type ServersService service
+
 const (
 	ServerStatusProcessing = "processing"
 	ServerStatusRunning    = "running"
@@ -29,10 +31,10 @@ type ServerDeleteResponse struct {
 }
 
 // Servers return list of server, filter can be nil
-func (c *Client) Servers(ctx context.Context, filter *FilterServers) ([]Server, error) {
+func (s *ServersService) List(ctx context.Context, filter *FilterServers) ([]Server, error) {
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
-	body, code, err := c.request(ctx, "GET", "servers", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "servers", withParams(opts))
 	if err != nil {
 		return []Server{}, err
 	}
@@ -49,8 +51,8 @@ func (c *Client) Servers(ctx context.Context, filter *FilterServers) ([]Server, 
 	return resp.Data, nil
 }
 
-func (c *Client) Server(ctx context.Context, serverId int) (Server, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("servers/%d", serverId))
+func (s *ServersService) Get(ctx context.Context, serverId int) (Server, error) {
+	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("servers/%d", serverId))
 	if err != nil {
 		return Server{}, err
 	}
@@ -67,8 +69,8 @@ func (c *Client) Server(ctx context.Context, serverId int) (Server, error) {
 	return resp.Data, nil
 }
 
-func (c *Client) ServerRestart(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("servers/%d/restart", serverId))
+func (s *ServersService) Restart(ctx context.Context, serverId int) (Task, error) {
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("servers/%d/restart", serverId))
 	if err != nil {
 		return Task{}, err
 	}
@@ -85,8 +87,8 @@ func (c *Client) ServerRestart(ctx context.Context, serverId int) (Task, error) 
 	return resp.Data, nil
 }
 
-func (c *Client) ServerDelete(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("servers/%d", serverId))
+func (s *ServersService) Delete(ctx context.Context, serverId int) (Task, error) {
+	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("servers/%d", serverId))
 	if err != nil {
 		return Task{}, err
 	}

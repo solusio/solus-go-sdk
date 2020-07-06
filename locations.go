@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type LocationsService service
+
 type LocationCreateRequest struct {
 	Name             string `json:"name"`
 	Description      string `json:"description"`
@@ -29,10 +31,10 @@ type LocationCreateResponse struct {
 	Data Location `json:"data"`
 }
 
-func (c *Client) LocationCreate(ctx context.Context, data LocationCreateRequest) (Location, error) {
+func (s *LocationsService) Create(ctx context.Context, data LocationCreateRequest) (Location, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "locations", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "locations", withBody(opts))
 	if err != nil {
 		return Location{}, err
 	}

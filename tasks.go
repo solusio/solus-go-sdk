@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type TasksService service
+
 const (
 	// status
 	TaskStatusPending  = "pending"
@@ -49,10 +51,10 @@ type Date struct {
 }
 
 // Tasks return list of Task, filter can be nil
-func (c *Client) Tasks(ctx context.Context, filter *FilterTasks) ([]Task, error) {
+func (s *TasksService) List(ctx context.Context, filter *FilterTasks) ([]Task, error) {
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
-	body, code, err := c.request(ctx, "GET", "tasks", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "tasks", withParams(opts))
 	if err != nil {
 		return []Task{}, err
 	}

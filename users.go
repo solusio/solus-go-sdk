@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type UsersService service
+
 type User struct {
 	Id    int    `json:"id"`
 	Email string `json:"email"`
@@ -27,10 +29,10 @@ type UserCreateResponse struct {
 	Data User `json:"data"`
 }
 
-func (c *Client) Users(ctx context.Context, filter *FilterUsers) ([]User, error) {
+func (s *UsersService) List(ctx context.Context, filter *FilterUsers) ([]User, error) {
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
-	body, code, err := c.request(ctx, "GET", "users", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "users", withParams(opts))
 	if err != nil {
 		return []User{}, err
 	}
@@ -47,10 +49,10 @@ func (c *Client) Users(ctx context.Context, filter *FilterUsers) ([]User, error)
 	return resp.Data, nil
 }
 
-func (c *Client) UserCreate(ctx context.Context, data UserCreateRequest) (User, error) {
+func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "users", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "users", withBody(opts))
 	if err != nil {
 		return User{}, err
 	}
@@ -67,8 +69,8 @@ func (c *Client) UserCreate(ctx context.Context, data UserCreateRequest) (User, 
 	return resp.Data, nil
 }
 
-func (c *Client) UserDelete(ctx context.Context, userId int) error {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("users/%d", userId))
+func (s *UsersService) Delete(ctx context.Context, userId int) error {
+	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("users/%d", userId))
 	if err != nil {
 		return err
 	}

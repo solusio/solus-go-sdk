@@ -34,10 +34,10 @@ type Server struct {
 	Ip          string `json:"ip"`
 }
 
-func (c *Client) ProjectServerCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
+func (s *ProjectsService) ServersCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(opts))
 	if err != nil {
 		return Server{}, err
 	}
@@ -54,8 +54,8 @@ func (c *Client) ProjectServerCreate(ctx context.Context, projectId int, data Pr
 	return resp.Data, nil
 }
 
-func (c *Client) ProjectServersAll(ctx context.Context, projectId int) ([]Server, error) {
-	resp, err := c.ProjectServers(ctx, projectId)
+func (s *ProjectsService) ServersListAll(ctx context.Context, projectId int) ([]Server, error) {
+	resp, err := s.Servers(ctx, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *Client) ProjectServersAll(ctx context.Context, projectId int) ([]Server
 	servers := resp.Data
 	nextPageUrl := resp.Links.Next
 	for nextPageUrl != "" {
-		body, code, err := c.request(ctx, "GET", nextPageUrl)
+		body, code, err := s.client.request(ctx, "GET", nextPageUrl)
 		if err != nil {
 			return servers, err
 		}
@@ -87,8 +87,8 @@ func (c *Client) ProjectServersAll(ctx context.Context, projectId int) ([]Server
 	return servers, nil
 }
 
-func (c *Client) ProjectServers(ctx context.Context, projectId int) (ProjectServersResponse, error) {
-	body, code, err := c.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId))
+func (s *ProjectsService) Servers(ctx context.Context, projectId int) (ProjectServersResponse, error) {
+	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId))
 	if err != nil {
 		return ProjectServersResponse{}, err
 	}

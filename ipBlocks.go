@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+type IpBlocksService service
+
 type NetworkType string
 
 const (
@@ -52,10 +54,10 @@ type IpBlockIpAddressCreateResponse struct {
 	Data IpBlockIpAddress `json:"data"`
 }
 
-func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
+func (s *IpBlocksService) Create(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
 	opts := newRequestOpts()
 	opts.body = data
-	body, code, err := c.request(ctx, "POST", "ip_blocks", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "ip_blocks", withBody(opts))
 	if err != nil {
 		return IpBlock{}, err
 	}
@@ -72,8 +74,8 @@ func (c *Client) IpBlockCreate(ctx context.Context, data IpBlockCreateRequest) (
 	return resp.Data, nil
 }
 
-func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
-	body, code, err := c.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
+func (s *IpBlocksService) IpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
 	if err != nil {
 		return IpBlockIpAddress{}, err
 	}
@@ -90,8 +92,8 @@ func (c *Client) IpBlockIpAddressCreate(ctx context.Context, ipBlockId int) (IpB
 	return resp.Data, nil
 }
 
-func (c *Client) IpBlockIpAddressDelete(ctx context.Context, ipId int) error {
-	body, code, err := c.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId))
+func (s *IpBlocksService) IpAddressDelete(ctx context.Context, ipId int) error {
+	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId))
 	if err != nil {
 		return err
 	}
