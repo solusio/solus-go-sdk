@@ -54,6 +54,8 @@ type EmailAndPasswordAuthenticator struct {
 	Password string
 }
 
+var _ Authenticator = EmailAndPasswordAuthenticator{}
+
 func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, error) {
 	authRequest := AuthLoginRequest{
 		Email:    a.Email,
@@ -72,6 +74,8 @@ func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, err
 type ApiTokenAuthenticator struct {
 	Token string
 }
+
+var _ Authenticator = ApiTokenAuthenticator{}
 
 func (a ApiTokenAuthenticator) Authenticate(*Client) (Credentials, error) {
 	return Credentials{

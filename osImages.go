@@ -8,13 +8,6 @@ import (
 
 type OsImagesService service
 
-type Icon struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Url  string `json:"url"`
-}
-
 type OsImage struct {
 	Id        int              `json:"id"`
 	Name      string           `json:"name"`
