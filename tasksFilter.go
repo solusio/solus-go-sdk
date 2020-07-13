@@ -21,7 +21,7 @@ func (f *FilterTasks) FilterByAction(action string) *FilterTasks {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["action"] = action
+	f.filter["filter[action]"] = action
 
 	return f
 }
@@ -31,7 +31,7 @@ func (f *FilterTasks) FilterByStatus(status string) *FilterTasks {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["status"] = status
+	f.filter["filter[status]"] = status
 
 	return f
 }
@@ -41,7 +41,7 @@ func (f *FilterTasks) FilterByComputeResourceID(id int) *FilterTasks {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["compute_resource_id"] = strconv.Itoa(id)
+	f.filter["filter[compute_resource_id]"] = strconv.Itoa(id)
 
 	return f
 }
@@ -51,7 +51,7 @@ func (f *FilterTasks) FilterByComputeResourceVmID(id int) *FilterTasks {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["compute_resource_vm_id"] = strconv.Itoa(id)
+	f.filter["filter[compute_resource_vm_id]"] = strconv.Itoa(id)
 
 	return f
 }

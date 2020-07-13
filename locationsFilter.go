@@ -7,7 +7,7 @@ func NewFilterLocations() *FilterLocations {
 type FilterLocations = filter
 
 func (f *FilterLocations) FilterByName(name string) *FilterLocations {
-	f.add("search", name)
+	f.add("filter[search]", name)
 
 	return f
 }

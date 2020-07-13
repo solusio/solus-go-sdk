@@ -21,7 +21,7 @@ func (f *FilterServers) FilterByUserID(id int) *FilterServers {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["user_id"] = strconv.Itoa(id)
+	f.filter["filter[user_id]"] = strconv.Itoa(id)
 
 	return f
 }
@@ -31,7 +31,7 @@ func (f *FilterServers) FilterByComputeResourceID(id int) *FilterServers {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["compute_resource_id"] = strconv.Itoa(id)
+	f.filter["filter[compute_resource_id]"] = strconv.Itoa(id)
 
 	return f
 }
@@ -41,7 +41,7 @@ func (f *FilterServers) FilterByStatus(status string) *FilterServers {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["status"] = status
+	f.filter["filter[status]"] = status
 
 	return f
 }
