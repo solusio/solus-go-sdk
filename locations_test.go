@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/guregu/null.v4"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -67,7 +68,7 @@ func TestLocationsService_Create(t *testing.T) {
 	data := LocationCreateRequest{
 		Name:        "name",
 		Description: "description",
-		IconId:      1,
+		IconId:      null.IntFrom(1),
 		IsDefault:   false,
 		IsVisible:   true,
 	}
@@ -107,7 +108,7 @@ func TestLocationsService_Update(t *testing.T) {
 	data := LocationCreateRequest{
 		Name:        "name",
 		Description: "description",
-		IconId:      1,
+		IconId:      null.IntFrom(1),
 		IsDefault:   false,
 		IsVisible:   true,
 	}

@@ -4,17 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/guregu/null.v4"
 )
 
 type LocationsService service
 
 type LocationCreateRequest struct {
-	Name             string `json:"name"`
-	Description      string `json:"description"`
-	IconId           int    `json:"icon_id"`
-	IsDefault        bool   `json:"is_default"`
-	IsVisible        bool   `json:"is_visible"`
-	ComputeResources []int  `json:"compute_resources"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	IconId           null.Int `json:"icon_id"`
+	IsDefault        bool     `json:"is_default"`
+	IsVisible        bool     `json:"is_visible"`
+	ComputeResources []int    `json:"compute_resources"`
 }
 
 type Location struct {
