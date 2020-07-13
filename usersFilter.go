@@ -19,7 +19,7 @@ func (f *FilterUsers) FilterByStatus(status string) *FilterUsers {
 		f.filter = map[string]string{}
 	}
 
-	f.filter["status"] = status
+	f.filter["filter[status]"] = status
 
 	return f
 }

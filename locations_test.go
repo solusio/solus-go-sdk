@@ -17,7 +17,7 @@ func TestLocationsService_List(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/locations", r.URL.Path)
 		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t, "search=test", r.URL.Query().Encode())
+		require.Equal(t, url.QueryEscape("filter[search]")+"=test", r.URL.Query().Encode())
 
 		b, err := json.Marshal(expected)
 		require.NoError(t, err)
