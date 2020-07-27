@@ -6,6 +6,12 @@ import (
 	"fmt"
 )
 
+const (
+	UserStatusActive    = "active"
+	UserStatusLocked    = "locked"
+	UserStatusSuspended = "suspended"
+)
+
 type UsersService service
 
 type User struct {
@@ -20,9 +26,11 @@ type UsersResponse struct {
 }
 
 type UserCreateRequest struct {
-	Password string `json:"password,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Roles    []int  `json:"roles,omitempty"`
+	Password   string `json:"password,omitempty"`
+	Email      string `json:"email,omitempty"`
+	Status     string `json:"status,omitempty"`
+	LanguageId int    `json:"language_id,omitempty"`
+	Roles      []int  `json:"roles,omitempty"`
 }
 
 type UserCreateResponse struct {
