@@ -8,26 +8,37 @@ import (
 
 type IpBlocksService service
 
+type IPVersion string
+
+const (
+	IPv4 IPVersion = "IPv4"
+	IPv6 IPVersion = "IPv6"
+)
+
 type IpBlockCreateRequest struct {
-	Name             string `json:"name"`
-	Gateway          string `json:"gateway"`
-	Netmask          string `json:"netmask"`
-	Ns1              string `json:"ns_1"`
-	Ns2              string `json:"ns_2"`
-	ComputeResources []int  `json:"compute_resources"`
-	From             string `json:"from"`
-	To               string `json:"to"`
+	Name             string    `json:"name"`
+	Type             IPVersion `json:"type"`
+	Gateway          string    `json:"gateway"`
+	Netmask          string    `json:"netmask"`
+	Ns1              string    `json:"ns_1"`
+	Ns2              string    `json:"ns_2"`
+	ComputeResources []int     `json:"compute_resources"`
+	From             string    `json:"from"`
+	To               string    `json:"to"`
+	Subnet           int       `json:"subnet"`
 }
 
 type IpBlock struct {
 	Id               int                `json:"id"`
 	Name             string             `json:"name"`
+	Type             IPVersion          `json:"type"`
 	Gateway          string             `json:"gateway"`
 	Netmask          string             `json:"netmask"`
 	Ns1              string             `json:"ns_1"`
 	Ns2              string             `json:"ns_2"`
 	From             string             `json:"from"`
 	To               string             `json:"to"`
+	Subnet           string             `json:"subnet"`
 	ComputeResources []ComputeResource  `json:"compute_resources[]"`
 	Ips              []IpBlockIpAddress `json:"ips[]"`
 }
