@@ -48,8 +48,9 @@ type IpBlockCreateResponse struct {
 }
 
 type IpBlockIpAddress struct {
-	Id int    `json:"id"`
-	Ip string `json:"ip"`
+	Id      int     `json:"id"`
+	Ip      string  `json:"ip"`
+	IpBlock IpBlock `json:"ip_block"`
 }
 
 type IpBlockIpAddressCreateResponse struct {
