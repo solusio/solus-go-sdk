@@ -26,12 +26,12 @@ type ProjectServersResponse struct {
 }
 
 type Server struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	UUID        string `json:"uuid"`
-	Status      string `json:"status"`
-	Ip          string `json:"ip"`
+	Id          int                `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	UUID        string             `json:"uuid"`
+	Status      string             `json:"status"`
+	Ips         []IpBlockIpAddress `json:"ips"`
 }
 
 func (s *ProjectsService) ServersCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
