@@ -10,8 +10,8 @@ type PlansService service
 
 type PlanParams struct {
 	Disk int `json:"disk"`
-	Ram  int `json:"ram"`
-	VCpu int `json:"vcpu"`
+	RAM  int `json:"ram"`
+	VCPU int `json:"vcpu"`
 }
 
 type PlanLimit struct {
