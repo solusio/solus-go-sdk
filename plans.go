@@ -9,9 +9,9 @@ import (
 type PlansService service
 
 type PlanParams struct {
-	Hdd int `json:"hdd"`
-	Ram int `json:"ram"`
-	Cpu int `json:"cpu"`
+	Disk int `json:"disk"`
+	Ram  int `json:"ram"`
+	VCpu int `json:"vcpu"`
 }
 
 type PlanLimit struct {
@@ -27,7 +27,6 @@ type PlanLimits struct {
 type Plan struct {
 	Id                  int        `json:"id"`
 	Name                string     `json:"name"`
-	Type                string     `json:"type"`
 	Params              PlanParams `json:"params"`
 	StorageType         string     `json:"storage_type"`
 	IsDefault           bool       `json:"is_default"`
