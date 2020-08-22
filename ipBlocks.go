@@ -38,7 +38,7 @@ type IpBlock struct {
 	Ns2              string             `json:"ns_2"`
 	From             string             `json:"from"`
 	To               string             `json:"to"`
-	Subnet           string             `json:"subnet"`
+	Subnet           int                `json:"subnet"`
 	ComputeResources []ComputeResource  `json:"compute_resources[]"`
 	Ips              []IpBlockIpAddress `json:"ips[]"`
 }
