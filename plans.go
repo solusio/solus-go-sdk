@@ -35,6 +35,7 @@ type Plan struct {
 	Limits              PlanLimits `json:"limits"`
 	TokenPerHour        float64    `json:"token_per_hour"`
 	TokenPerMonth       float64    `json:"token_per_month"`
+	Position            float64    `json:"position"`
 }
 
 type PlanCreateRequest struct {
@@ -48,6 +49,7 @@ type PlanCreateRequest struct {
 	Limits             PlanLimits `json:"limits"`
 	TokenPerHour       float64    `json:"token_per_hour"`
 	TokenPerMonth      float64    `json:"token_per_month"`
+	Position           float64    `json:"position"`
 }
 
 type PlansResponse struct {
