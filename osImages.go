@@ -17,11 +17,11 @@ type OsImage struct {
 }
 
 type OsImageVersion struct {
-	Id               int    `json:"id"`
-	Position         int    `json:"position"`
-	Version          string `json:"version"`
-	Url              string `json:"url"`
-	CloudInitVersion string `json:"cloud_init_version"`
+	Id               int     `json:"id"`
+	Position         float64 `json:"position"`
+	Version          string  `json:"version"`
+	Url              string  `json:"url"`
+	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
 type OsImageRequest struct {
@@ -31,10 +31,10 @@ type OsImageRequest struct {
 }
 
 type OsImageVersionRequest struct {
-	Position         int    `json:"position"`
-	Version          string `json:"version"`
-	Url              string `json:"url"`
-	CloudInitVersion string `json:"cloud_init_version"`
+	Position         float64 `json:"position"`
+	Version          string  `json:"version"`
+	Url              string  `json:"url"`
+	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
 type OsImageResponse struct {
