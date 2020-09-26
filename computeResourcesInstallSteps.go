@@ -6,6 +6,10 @@ import (
 	"fmt"
 )
 
+const (
+	ComputeResourceInstallStepStatusError = "error"
+)
+
 type ComputerResourceInstallStepsResponse struct {
 	Data []ComputerResourceInstallSteps `json:"data"`
 }
