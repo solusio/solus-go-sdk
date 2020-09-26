@@ -25,6 +25,7 @@ type Client struct {
 
 	ComputeResources *ComputeResourcesService
 	IpBlocks         *IpBlocksService
+	License          *LicenseService
 	Locations        *LocationsService
 	OsImages         *OsImagesService
 	Plans            *PlansService
@@ -129,6 +130,7 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 	client.s.client = client
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
 	client.IpBlocks = (*IpBlocksService)(&client.s)
+	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
 	client.Plans = (*PlansService)(&client.s)
