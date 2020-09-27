@@ -99,6 +99,13 @@ func AllowInsecure() ClientOption {
 	}
 }
 
+// AllowInsecure allow to skip certificate verify.
+func WithLogger(logger *log.Logger) ClientOption {
+	return func(c *Client) {
+		c.Logger = logger
+	}
+}
+
 // NewClient create and initialize Client instance.
 func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client, error) {
 	client := &Client{
