@@ -22,6 +22,7 @@ type User struct {
 	// CreatedAt for date in RFC3339Nano format
 	CreatedAt string `json:"created_at"`
 	Status    string `json:"status"`
+	Roles     []Role `json:"roles"`
 }
 
 type UsersResponse struct {
@@ -36,6 +37,13 @@ type UsersResponse struct {
 type UserCreateRequest struct {
 	Password   string `json:"password,omitempty"`
 	Email      string `json:"email,omitempty"`
+	Status     string `json:"status,omitempty"`
+	LanguageId int    `json:"language_id,omitempty"`
+	Roles      []int  `json:"roles,omitempty"`
+}
+
+type UserUpdateRequest struct {
+	Password   string `json:"password,omitempty"`
 	Status     string `json:"status,omitempty"`
 	LanguageId int    `json:"language_id,omitempty"`
 	Roles      []int  `json:"roles,omitempty"`
@@ -155,7 +163,7 @@ func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User
 	return resp.Data, nil
 }
 
-func (s *UsersService) Update(ctx context.Context, userId int, data User) (User, error) {
+func (s *UsersService) Update(ctx context.Context, userId int, data UserUpdateRequest) (User, error) {
 	opts := newRequestOpts()
 	opts.body = data
 	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("users/%d", userId), withBody(opts))
