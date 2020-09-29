@@ -42,3 +42,18 @@ func (s *RolesService) List(ctx context.Context) (RolesResponse, error) {
 
 	return resp, nil
 }
+
+func (s *RolesService) GetByName(ctx context.Context, name string) (Role, error) {
+	roles, err := s.List(ctx)
+	if err != nil {
+		return Role{}, err
+	}
+
+	for _, role := range roles.Data {
+		if role.Name == name {
+			return role, nil
+		}
+	}
+
+	return Role{}, fmt.Errorf("failed to get role by name %q: role not found", name)
+}
