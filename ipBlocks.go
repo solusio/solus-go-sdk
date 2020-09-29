@@ -16,16 +16,21 @@ const (
 )
 
 type IpBlockCreateRequest struct {
+	ComputeResources []int     `json:"compute_resources,omitempty"`
 	Name             string    `json:"name"`
 	Type             IPVersion `json:"type"`
 	Gateway          string    `json:"gateway"`
-	Netmask          string    `json:"netmask"`
 	Ns1              string    `json:"ns_1"`
 	Ns2              string    `json:"ns_2"`
-	ComputeResources []int     `json:"compute_resources"`
-	From             string    `json:"from"`
-	To               string    `json:"to"`
-	Subnet           int       `json:"subnet"`
+
+	// IPv4 related fields
+	Netmask string `json:"netmask"`
+	From    string `json:"from"`
+	To      string `json:"to"`
+
+	// IPv6 related fields
+	Range  string `json:"range"`
+	Subnet int    `json:"subnet"`
 }
 
 type IpBlock struct {
@@ -55,6 +60,30 @@ type IpBlockIpAddress struct {
 
 type IpBlockIpAddressCreateResponse struct {
 	Data IpBlockIpAddress `json:"data"`
+}
+
+type IpBlocksPaginatedResponse struct {
+	Data  []IpBlock     `json:"data"`
+	Links ResponseLinks `json:"links"`
+	Meta  ResponseMeta  `json:"meta"`
+}
+
+func (s *IpBlocksService) List(ctx context.Context) (IpBlocksPaginatedResponse, error) {
+	body, code, err := s.client.request(ctx, "GET", "ip_blocks")
+	if err != nil {
+		return IpBlocksPaginatedResponse{}, err
+	}
+
+	if code != 200 {
+		return IpBlocksPaginatedResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
+	}
+
+	var resp IpBlocksPaginatedResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return IpBlocksPaginatedResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	}
+
+	return resp, nil
 }
 
 func (s *IpBlocksService) Create(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {

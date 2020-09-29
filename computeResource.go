@@ -53,6 +53,8 @@ type ComputerResourceCreateRequest struct {
 	// SSH private key
 	Key       string `json:"key"`
 	AgentPort int    `json:"agent_port"`
+	IpBlocks  []int  `json:"ip_blocks,omitempty"`
+	Locations []int  `json:"locations,omitempty"`
 }
 
 type ComputerResourceResponse struct {

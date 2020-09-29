@@ -6,17 +6,23 @@ import (
 	"fmt"
 )
 
+type ComputeResourceInstallStepStatus string
+
+const (
+	ComputeResourceInstallStepStatusError ComputeResourceInstallStepStatus = "error"
+)
+
 type ComputerResourceInstallStepsResponse struct {
 	Data []ComputerResourceInstallSteps `json:"data"`
 }
 
 type ComputerResourceInstallSteps struct {
-	Id                int    `json:"id"`
-	ComputeResourceId int    `json:"compute_resource_id"`
-	Title             string `json:"title"`
-	Status            string `json:"status"`
-	StatusText        string `json:"status_text"`
-	Progress          int    `json:"progress"`
+	Id                int                              `json:"id"`
+	ComputeResourceId int                              `json:"compute_resource_id"`
+	Title             string                           `json:"title"`
+	Status            ComputeResourceInstallStepStatus `json:"status"`
+	StatusText        string                           `json:"status_text"`
+	Progress          int                              `json:"progress"`
 }
 
 func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputerResourceInstallSteps, error) {

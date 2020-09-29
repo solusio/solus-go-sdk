@@ -25,10 +25,12 @@ type Client struct {
 
 	ComputeResources *ComputeResourcesService
 	IpBlocks         *IpBlocksService
+	License          *LicenseService
 	Locations        *LocationsService
 	OsImages         *OsImagesService
 	Plans            *PlansService
 	Projects         *ProjectsService
+	Roles            *RolesService
 	Servers          *ServersService
 	Tasks            *TasksService
 	Users            *UsersService
@@ -98,6 +100,13 @@ func AllowInsecure() ClientOption {
 	}
 }
 
+// AllowInsecure allow to skip certificate verify.
+func WithLogger(logger *log.Logger) ClientOption {
+	return func(c *Client) {
+		c.Logger = logger
+	}
+}
+
 // NewClient create and initialize Client instance.
 func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client, error) {
 	client := &Client{
@@ -129,10 +138,12 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 	client.s.client = client
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
 	client.IpBlocks = (*IpBlocksService)(&client.s)
+	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
 	client.Plans = (*PlansService)(&client.s)
 	client.Projects = (*ProjectsService)(&client.s)
+	client.Roles = (*RolesService)(&client.s)
 	client.Servers = (*ServersService)(&client.s)
 	client.Tasks = (*TasksService)(&client.s)
 	client.Users = (*UsersService)(&client.s)

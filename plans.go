@@ -29,9 +29,10 @@ type Plan struct {
 	Name                string     `json:"name"`
 	Params              PlanParams `json:"params"`
 	StorageType         string     `json:"storage_type"`
+	ImageFormat         string     `json:"image_format"`
 	IsDefault           bool       `json:"is_default"`
 	IsSnapshotAvailable bool       `json:"is_snapshot_available"`
-	IsSnapshotEnabled   bool       `json:"is_snapshot_enabled"`
+	IsSnapshotsEnabled  bool       `json:"is_snapshots_enabled"`
 	Limits              PlanLimits `json:"limits"`
 	TokenPerHour        float64    `json:"token_per_hour"`
 	TokenPerMonth       float64    `json:"token_per_month"`
