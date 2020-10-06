@@ -28,6 +28,7 @@ type Client struct {
 	License          *LicenseService
 	Locations        *LocationsService
 	OsImages         *OsImagesService
+	Applications     *ApplicationsService
 	Plans            *PlansService
 	Projects         *ProjectsService
 	Roles            *RolesService
@@ -141,6 +142,7 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
+	client.Applications = (*ApplicationsService)(&client.s)
 	client.Plans = (*PlansService)(&client.s)
 	client.Projects = (*ProjectsService)(&client.s)
 	client.Roles = (*RolesService)(&client.s)
