@@ -39,8 +39,9 @@ type Application struct {
 type ApplicationRequest struct {
 	Name             string    `json:"name"`
 	Url              string    `json:"url"`
-	IconId           string    `json:"icon_id"`
+	IconId           int       `json:"icon_id"`
 	CloudInitVersion string    `json:"cloud_init_version"`
+	UserDataTemplate string    `json:"user_data_template"`
 	JsonSchema       string    `json:"json_schema"`
 	IsVisible        bool      `json:"is_visible"`
 	LoginLink        LoginLink `json:"login_link"`
