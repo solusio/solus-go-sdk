@@ -7,15 +7,14 @@ import (
 	"gopkg.in/guregu/null.v4"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"testing"
 )
 
 func TestLocationsService_List(t *testing.T) {
-	expected := LocationsPaginatedResponse{}
+	expected := LocationsResponse{}
 
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/locations", r.URL.Path)
 		require.Equal(t, http.MethodGet, r.Method)
 		require.Equal(t, url.QueryEscape("filter[search]")+"=test", r.URL.Query().Encode())
@@ -25,23 +24,21 @@ func TestLocationsService_List(t *testing.T) {
 
 		w.WriteHeader(200)
 		_, _ = w.Write(b)
-	}))
+	})
+	defer s.Close()
 
-	u, err := url.Parse(s.URL)
-	require.NoError(t, err)
-
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
+	c := createTestClient(t, s.URL)
 
 	p, err := c.Locations.List(context.Background(), NewFilterLocations().FilterByName("test"))
 	require.NoError(t, err)
+	p.service = nil
 	require.Equal(t, expected, p)
 }
 
 func TestLocationsService_Get(t *testing.T) {
 	expected := Location{}
 
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/locations/1", r.URL.Path)
 		require.Equal(t, http.MethodGet, r.Method)
 
@@ -50,7 +47,8 @@ func TestLocationsService_Get(t *testing.T) {
 
 		w.WriteHeader(200)
 		_, _ = w.Write(b)
-	}))
+	})
+	defer s.Close()
 
 	u, err := url.Parse(s.URL)
 	require.NoError(t, err)
@@ -73,7 +71,7 @@ func TestLocationsService_Create(t *testing.T) {
 		IsVisible:   true,
 	}
 
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
@@ -90,7 +88,8 @@ func TestLocationsService_Create(t *testing.T) {
 
 		w.WriteHeader(201)
 		_, _ = w.Write(b)
-	}))
+	})
+	defer s.Close()
 
 	u, err := url.Parse(s.URL)
 	require.NoError(t, err)
@@ -113,7 +112,7 @@ func TestLocationsService_Update(t *testing.T) {
 		IsVisible:   true,
 	}
 
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		b, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
 
@@ -130,7 +129,8 @@ func TestLocationsService_Update(t *testing.T) {
 
 		w.WriteHeader(200)
 		_, _ = w.Write(b)
-	}))
+	})
+	defer s.Close()
 
 	u, err := url.Parse(s.URL)
 	require.NoError(t, err)
@@ -144,12 +144,13 @@ func TestLocationsService_Update(t *testing.T) {
 }
 
 func TestLocationsService_Delete(t *testing.T) {
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/locations/1", r.URL.Path)
 		require.Equal(t, http.MethodDelete, r.Method)
 
 		w.WriteHeader(204)
-	}))
+	})
+	defer s.Close()
 
 	u, err := url.Parse(s.URL)
 	require.NoError(t, err)

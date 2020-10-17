@@ -45,28 +45,33 @@ type OsImageVersionResponse struct {
 	Data OsImageVersion `json:"data"`
 }
 
-type GetOsImageResponse struct {
-	Data  []OsImage     `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+type OsImagesResponse struct {
+	paginatedResponse
+
+	Data []OsImage `json:"data"`
 }
 
-func (s *OsImagesService) List(ctx context.Context) ([]OsImage, error) {
+func (s *OsImagesService) List(ctx context.Context) (OsImagesResponse, error) {
+	resp := OsImagesResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	body, code, err := s.client.request(ctx, "GET", "os_images")
 	if err != nil {
-		return []OsImage{}, err
+		return OsImagesResponse{}, err
 	}
 
 	if code != 200 {
-		return []OsImage{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return OsImagesResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp GetOsImageResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return []OsImage{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return OsImagesResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }
 
 func (s *OsImagesService) Create(ctx context.Context, data OsImageRequest) (OsImage, error) {

@@ -54,31 +54,36 @@ type PlanCreateRequest struct {
 }
 
 type PlansResponse struct {
-	Data  []Plan        `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+	paginatedResponse
+
+	Data []Plan `json:"data"`
 }
 
 type PlanCreateResponse struct {
 	Data Plan `json:"data"`
 }
 
-func (s *PlansService) List(ctx context.Context) ([]Plan, error) {
+func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
+	resp := PlansResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	body, code, err := s.client.request(ctx, "GET", "plans")
 	if err != nil {
-		return []Plan{}, err
+		return PlansResponse{}, err
 	}
 
 	if code != 200 {
-		return []Plan{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return PlansResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp PlansResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return []Plan{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return PlansResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }
 
 func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {

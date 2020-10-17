@@ -42,6 +42,8 @@ type Task struct {
 }
 
 type TasksResponse struct {
+	paginatedResponse
+
 	Data []Task `json:"data"`
 }
 type Date struct {
@@ -51,22 +53,27 @@ type Date struct {
 }
 
 // Tasks return list of Task, filter can be nil
-func (s *TasksService) List(ctx context.Context, filter *FilterTasks) ([]Task, error) {
+func (s *TasksService) List(ctx context.Context, filter *FilterTasks) (TasksResponse, error) {
+	resp := TasksResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
 	body, code, err := s.client.request(ctx, "GET", "tasks", withParams(opts))
 	if err != nil {
-		return []Task{}, err
+		return TasksResponse{}, err
 	}
 
 	if code != 200 {
-		return []Task{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return TasksResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp TasksResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return []Task{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return TasksResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }

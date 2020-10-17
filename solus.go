@@ -1,3 +1,5 @@
+//go:generate go run paginatorgen.go
+
 package solus
 
 import (

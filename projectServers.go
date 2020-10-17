@@ -20,9 +20,9 @@ type ProjectServersCreateResponse struct {
 }
 
 type ProjectServersResponse struct {
-	Data  []Server      `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+	paginatedResponse
+
+	Data []Server `json:"data"`
 }
 
 type Server struct {
@@ -60,34 +60,20 @@ func (s *ProjectsService) ServersListAll(ctx context.Context, projectId int) ([]
 		return nil, err
 	}
 
-	servers := resp.Data
-	nextPageUrl := resp.Links.Next
-	for nextPageUrl != "" {
-		body, code, err := s.client.request(ctx, "GET", nextPageUrl)
-		if err != nil {
-			return servers, err
-		}
-
-		if code != 200 {
-			return servers, fmt.Errorf("HTTP %d: %s", code, body)
-		}
-
-		var resp ProjectServersResponse
-		if err := json.Unmarshal(body, &resp); err != nil {
-			return servers, fmt.Errorf("failed to decode '%s': %s", body, err)
-		}
-
+	servers := make([]Server, len(resp.Data))
+	copy(servers, resp.Data)
+	for resp.Next(ctx) {
 		servers = append(servers, resp.Data...)
-		if nextPageUrl == resp.Links.Next {
-			break
-		}
-		nextPageUrl = resp.Links.Next
 	}
-
-	return servers, nil
+	return servers, resp.Err()
 }
 
 func (s *ProjectsService) Servers(ctx context.Context, projectId int) (ProjectServersResponse, error) {
+	resp := ProjectServersResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
 	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId))
 	if err != nil {
 		return ProjectServersResponse{}, err
@@ -97,7 +83,6 @@ func (s *ProjectsService) Servers(ctx context.Context, projectId int) (ProjectSe
 		return ProjectServersResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ProjectServersResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return ProjectServersResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}

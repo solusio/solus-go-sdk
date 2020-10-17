@@ -62,25 +62,30 @@ type IpBlockIpAddressCreateResponse struct {
 	Data IpBlockIpAddress `json:"data"`
 }
 
-type IpBlocksPaginatedResponse struct {
-	Data  []IpBlock     `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+type IpBlocksResponse struct {
+	paginatedResponse
+
+	Data []IpBlock `json:"data"`
 }
 
-func (s *IpBlocksService) List(ctx context.Context) (IpBlocksPaginatedResponse, error) {
+func (s *IpBlocksService) List(ctx context.Context) (IpBlocksResponse, error) {
+	resp := IpBlocksResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	body, code, err := s.client.request(ctx, "GET", "ip_blocks")
 	if err != nil {
-		return IpBlocksPaginatedResponse{}, err
+		return IpBlocksResponse{}, err
 	}
 
 	if code != 200 {
-		return IpBlocksPaginatedResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return IpBlocksResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp IpBlocksPaginatedResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return IpBlocksPaginatedResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return IpBlocksResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
 	return resp, nil

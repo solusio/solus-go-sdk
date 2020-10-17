@@ -51,28 +51,33 @@ type ApplicationResponse struct {
 	Data Application `json:"data"`
 }
 
-type ApplicationsPaginatedResponse struct {
-	Data  []Application `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+type ApplicationsResponse struct {
+	paginatedResponse
+
+	Data []Application `json:"data"`
 }
 
-func (s *ApplicationsService) List(ctx context.Context) ([]Application, error) {
+func (s *ApplicationsService) List(ctx context.Context) (ApplicationsResponse, error) {
+	resp := ApplicationsResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	body, code, err := s.client.request(ctx, "GET", "applications")
 	if err != nil {
-		return []Application{}, err
+		return ApplicationsResponse{}, err
 	}
 
 	if code != 200 {
-		return []Application{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return ApplicationsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ApplicationsPaginatedResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return []Application{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return ApplicationsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }
 
 func (s *ApplicationsService) Create(ctx context.Context, data ApplicationRequest) (Application, error) {
