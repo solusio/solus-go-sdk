@@ -32,6 +32,12 @@ type LocationResponse struct {
 	Data Location `json:"data"`
 }
 
+type LocationsResponse struct {
+	paginatedResponse
+
+	Data []Location `json:"data"`
+}
+
 func (s *LocationsService) Create(ctx context.Context, data LocationCreateRequest) (Location, error) {
 	opts := newRequestOpts()
 	opts.body = data
@@ -52,28 +58,27 @@ func (s *LocationsService) Create(ctx context.Context, data LocationCreateReques
 	return resp.Data, nil
 }
 
-type LocationsPaginatedResponse struct {
-	Data  []Location    `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
-}
+func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (LocationsResponse, error) {
+	resp := LocationsResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
 
-func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (LocationsPaginatedResponse, error) {
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.get())
 
 	body, code, err := s.client.request(ctx, "GET", "locations", withParams(opts))
 	if err != nil {
-		return LocationsPaginatedResponse{}, err
+		return LocationsResponse{}, err
 	}
 
 	if code != 200 {
-		return LocationsPaginatedResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return LocationsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp LocationsPaginatedResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return LocationsPaginatedResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return LocationsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
 	return resp, nil

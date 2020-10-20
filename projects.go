@@ -9,9 +9,9 @@ import (
 type ProjectsService service
 
 type ProjectsResponse struct {
-	Data  []Project     `json:"data"`
-	Links ResponseLinks `json:"links"`
-	Meta  ResponseMeta  `json:"meta"`
+	paginatedResponse
+
+	Data []Project `json:"data"`
 }
 
 type Project struct {
@@ -26,6 +26,12 @@ type Project struct {
 }
 
 func (s *ProjectsService) List(ctx context.Context) (ProjectsResponse, error) {
+	resp := ProjectsResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	body, code, err := s.client.request(ctx, "GET", "projects")
 	if err != nil {
 		return ProjectsResponse{}, err
@@ -35,7 +41,6 @@ func (s *ProjectsService) List(ctx context.Context) (ProjectsResponse, error) {
 		return ProjectsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ProjectsResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return ProjectsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}

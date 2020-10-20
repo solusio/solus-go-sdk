@@ -15,6 +15,8 @@ const (
 )
 
 type ServersResponse struct {
+	paginatedResponse
+
 	Data []Server `json:"data"`
 }
 
@@ -31,24 +33,29 @@ type ServerDeleteResponse struct {
 }
 
 // Servers return list of server, filter can be nil
-func (s *ServersService) List(ctx context.Context, filter *FilterServers) ([]Server, error) {
+func (s *ServersService) List(ctx context.Context, filter *FilterServers) (ServersResponse, error) {
+	resp := ServersResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
 	body, code, err := s.client.request(ctx, "GET", "servers", withParams(opts))
 	if err != nil {
-		return []Server{}, err
+		return ServersResponse{}, err
 	}
 
 	if code != 200 {
-		return []Server{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return ServersResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ServersResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
-		return []Server{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+		return ServersResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }
 
 func (s *ServersService) Get(ctx context.Context, serverId int) (Server, error) {

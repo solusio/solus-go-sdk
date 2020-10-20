@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 )
 
 const (
@@ -26,12 +25,9 @@ type User struct {
 }
 
 type UsersResponse struct {
-	Data    []User        `json:"data"`
-	Links   ResponseLinks `json:"links"`
-	Meta    ResponseMeta  `json:"meta"`
-	err     error
-	service *UsersService
-	opts    requestOpts
+	paginatedResponse
+
+	Data []User `json:"data"`
 }
 
 type UserCreateRequest struct {
@@ -54,13 +50,14 @@ type UserCreateResponse struct {
 }
 
 func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResponse, error) {
-	resp := UsersResponse{}
+	resp := UsersResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
 
 	opts := newRequestOpts()
 	opts.params = filterToParams(filter.Get())
-
-	resp.opts = opts
-	resp.service = s
 
 	body, code, err := s.client.request(ctx, "GET", "users", withParams(opts))
 	if err != nil {
@@ -76,71 +73,6 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 	}
 
 	return resp, nil
-}
-
-// Next using for retrieving all data entities
-//
-// Examples:
-//
-//  ctx, cancelFunc := context.WithTimeout(context.Background(), 30 * time.Second)
-//	defer cancelFunc()
-//	usersResponse, err := io.Users.List(ctx, solus.NewFilterUsers())
-//	if err != err {
-//		return err
-//	}
-//
-//	for usersResponse.Next(ctx) {
-//		if err := usersResponse.Err(); err != nil {
-//			return err
-//		}
-//	}
-//
-//  // all your data now in usersResponse.Data
-//	for _, u := range usersResponse.Data {
-//
-//  }
-//
-func (ur *UsersResponse) Next(ctx context.Context) bool {
-	if ur.Links.Next == "" {
-		return false
-	}
-
-	nextUrl, err := url.Parse(ur.Links.Next)
-	if err != nil {
-		ur.err = err
-		return false
-	}
-
-	for k, v := range nextUrl.Query() {
-		ur.opts.params[k] = v
-	}
-
-	body, code, err := ur.service.client.request(ctx, "GET", "users", withParams(ur.opts))
-	if err != nil {
-		ur.err = err
-		return false
-	}
-
-	if code != 200 {
-		ur.err = fmt.Errorf("HTTP %d: %s", code, body)
-		return false
-	}
-
-	var resp UsersResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		ur.err = fmt.Errorf("failed to decode '%s': %s", body, err)
-		return false
-	}
-
-	ur.Data = append(ur.Data, resp.Data...)
-	ur.Meta = resp.Meta
-	ur.Links = resp.Links
-
-	return true
-}
-
-func (ur *UsersResponse) Err() error {
-	return ur.err
 }
 
 func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User, error) {

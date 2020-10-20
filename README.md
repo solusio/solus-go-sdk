@@ -25,3 +25,8 @@ Or
 ```go
 client, err := solus.NewClient(baseURL, solus.ApiTokenAuthenticator{Token: "api token"})
 ```
+
+Development
+-----------
+
+For (re)generating code just run `go generate`

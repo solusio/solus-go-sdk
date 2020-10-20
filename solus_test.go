@@ -10,10 +10,6 @@ import (
 	"testing"
 )
 
-type authenticator struct{}
-
-func (authenticator) Authenticate(*Client) (Credentials, error) { return Credentials{}, nil }
-
 func TestAllowInsecure(t *testing.T) {
 	c := &Client{
 		HttpClient: &http.Client{

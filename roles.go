@@ -16,16 +16,17 @@ type Role struct {
 }
 
 type RolesResponse struct {
-	Data    []Role        `json:"data"`
-	Links   ResponseLinks `json:"links"`
-	Meta    ResponseMeta  `json:"meta"`
-	err     error
-	service *RolesService
-	opts    requestOpts
+	paginatedResponse
+
+	Data []Role `json:"data"`
 }
 
 func (s *RolesService) List(ctx context.Context) (RolesResponse, error) {
-	resp := RolesResponse{}
+	resp := RolesResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
 
 	body, code, err := s.client.request(ctx, "GET", "roles")
 	if err != nil {
