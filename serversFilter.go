@@ -1,47 +1,24 @@
 package solus
 
-import "strconv"
-
-func NewFilterServers() *FilterServers {
-	return &FilterServers{
-		filter: map[string]string{},
-	}
-}
-
+// FilterServers represent available filters for fetching list of Servers.
 type FilterServers struct {
-	filter map[string]string
+	filter
 }
 
-func (f *FilterServers) Get() map[string]string {
-	return f.filter
-}
-
-func (f *FilterServers) FilterByUserID(id int) *FilterServers {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[user_id]"] = strconv.Itoa(id)
-
+// ByUserID filter Servers by specified User ID.
+func (f *FilterServers) ByUserID(id int) *FilterServers {
+	f.addInt("filter[user_id]", id)
 	return f
 }
 
-func (f *FilterServers) FilterByComputeResourceID(id int) *FilterServers {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[compute_resource_id]"] = strconv.Itoa(id)
-
+// ByComputeResourceID filter Servers by specified Compute Resource ID.
+func (f *FilterServers) ByComputeResourceID(id int) *FilterServers {
+	f.addInt("filter[compute_resource_id]", id)
 	return f
 }
 
-func (f *FilterServers) FilterByStatus(status string) *FilterServers {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[status]"] = status
-
+// ByStatus filter Servers by specified status.
+func (f *FilterServers) ByStatus(status string) *FilterServers {
+	f.add("filter[status]", status)
 	return f
 }

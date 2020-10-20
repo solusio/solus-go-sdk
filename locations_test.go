@@ -29,7 +29,7 @@ func TestLocationsService_List(t *testing.T) {
 
 	c := createTestClient(t, s.URL)
 
-	p, err := c.Locations.List(context.Background(), NewFilterLocations().FilterByName("test"))
+	p, err := c.Locations.List(context.Background(), (&FilterLocations{}).ByName("test"))
 	require.NoError(t, err)
 	p.service = nil
 	require.Equal(t, expected, p)
