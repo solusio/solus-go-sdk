@@ -90,7 +90,7 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 
 	req.Header.Set("User-Agent", c.UserAgent)
 
-	c.Logger.Println(method, fullUrl.String(), string(bodyByte))
+	c.Logger.Debugf("[%s] %s with body %q", method, fullUrl.String(), string(bodyByte))
 	var resp *http.Response
 	err = Retry(func(attempt int) (bool, error) {
 		var err error
@@ -110,7 +110,7 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			c.Logger.Println("failed to close body", method, path)
+			c.Logger.Errorf("failed to close response body for %s %s: %s", method, path, err)
 		}
 	}()
 

@@ -7,10 +7,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -20,7 +18,7 @@ type Client struct {
 	Credentials Credentials
 	Headers     http.Header
 	HttpClient  *http.Client
-	Logger      *log.Logger
+	Logger      Logger
 	Retries     int
 
 	s service
@@ -104,7 +102,7 @@ func AllowInsecure() ClientOption {
 }
 
 // AllowInsecure allow to skip certificate verify.
-func WithLogger(logger *log.Logger) ClientOption {
+func WithLogger(logger Logger) ClientOption {
 	return func(c *Client) {
 		c.Logger = logger
 	}
@@ -122,7 +120,7 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 		HttpClient: &http.Client{
 			Timeout: time.Second * 35,
 		},
-		Logger:  log.New(os.Stderr, "", 0),
+		Logger:  NullLogger{},
 		Retries: 5,
 	}
 

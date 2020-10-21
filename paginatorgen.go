@@ -61,7 +61,6 @@ func run() error {
 		name := info.Name()
 		if info.IsDir() {
 			if shouldIgnoreDir(name) {
-				// Ignore vendor folder if it exists
 				return filepath.SkipDir
 			}
 			return nil
