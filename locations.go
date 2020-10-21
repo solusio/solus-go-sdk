@@ -66,7 +66,7 @@ func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (L
 	}
 
 	opts := newRequestOpts()
-	opts.params = filterToParams(filter.get())
+	opts.params = filterToParams(filter.data)
 
 	body, code, err := s.client.request(ctx, "GET", "locations", withParams(opts))
 	if err != nil {

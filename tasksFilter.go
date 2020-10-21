@@ -1,57 +1,29 @@
 package solus
 
-import "strconv"
-
-func NewFilterTasks() *FilterTasks {
-	return &FilterTasks{
-		filter: map[string]string{},
-	}
-}
-
 type FilterTasks struct {
-	filter map[string]string
+	filter
 }
 
-func (f *FilterTasks) Get() map[string]string {
-	return f.filter
-}
-
-func (f *FilterTasks) FilterByAction(action string) *FilterTasks {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[action]"] = action
-
+// ByAction filter Tasks by specified action.
+func (f *FilterTasks) ByAction(action string) *FilterTasks {
+	f.add("filter[action]", action)
 	return f
 }
 
-func (f *FilterTasks) FilterByStatus(status string) *FilterTasks {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[status]"] = status
-
+// ByStatus filter Tasks by specified status.
+func (f *FilterTasks) ByStatus(status string) *FilterTasks {
+	f.add("filter[status]", status)
 	return f
 }
 
-func (f *FilterTasks) FilterByComputeResourceID(id int) *FilterTasks {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[compute_resource_id]"] = strconv.Itoa(id)
-
+// ByComputeResourceID filter Tasks by specified Compute Resource ID.
+func (f *FilterTasks) ByComputeResourceID(id int) *FilterTasks {
+	f.addInt("filter[compute_resource_id]", id)
 	return f
 }
 
-func (f *FilterTasks) FilterByComputeResourceVmID(id int) *FilterTasks {
-	if f.filter == nil {
-		f.filter = map[string]string{}
-	}
-
-	f.filter["filter[compute_resource_vm_id]"] = strconv.Itoa(id)
-
+// ByComputeResourceVmID filter Tasks by specified Compute Resource VM ID.
+func (f *FilterTasks) ByComputeResourceVmID(id int) *FilterTasks {
+	f.addInt("filter[compute_resource_vm_id]", id)
 	return f
 }

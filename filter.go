@@ -1,11 +1,9 @@
 package solus
 
+import "strconv"
+
 type filter struct {
 	data map[string]string
-}
-
-func (f *filter) get() map[string]string {
-	return f.data
 }
 
 func (f *filter) add(k, v string) {
@@ -14,4 +12,8 @@ func (f *filter) add(k, v string) {
 	}
 
 	f.data[k] = v
+}
+
+func (f *filter) addInt(k string, v int) {
+	f.add(k, strconv.Itoa(v))
 }

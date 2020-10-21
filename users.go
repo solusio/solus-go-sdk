@@ -57,7 +57,7 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 	}
 
 	opts := newRequestOpts()
-	opts.params = filterToParams(filter.Get())
+	opts.params = filterToParams(filter.data)
 
 	body, code, err := s.client.request(ctx, "GET", "users", withParams(opts))
 	if err != nil {

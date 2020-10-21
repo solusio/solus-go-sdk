@@ -1,13 +1,12 @@
 package solus
 
-func NewFilterLocations() *FilterLocations {
-	return &filter{}
+// FilterLocations represent available filters for fetching list of Locations.
+type FilterLocations struct {
+	filter
 }
 
-type FilterLocations = filter
-
-func (f *FilterLocations) FilterByName(name string) *FilterLocations {
+// ByName filter Locations by specified name.
+func (f *FilterLocations) ByName(name string) *FilterLocations {
 	f.add("filter[search]", name)
-
 	return f
 }
