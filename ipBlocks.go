@@ -92,9 +92,7 @@ func (s *IpBlocksService) List(ctx context.Context) (IpBlocksResponse, error) {
 }
 
 func (s *IpBlocksService) Create(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "ip_blocks", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "ip_blocks", withBody(data))
 	if err != nil {
 		return IpBlock{}, err
 	}

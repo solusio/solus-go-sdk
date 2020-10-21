@@ -24,7 +24,7 @@ type OsImageVersion struct {
 	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
-type OsImageRequest struct {
+type OsImageCreateRequest struct {
 	Name      string `json:"name"`
 	Icon      string `json:"icon"`
 	IsVisible bool   `json:"is_visible"`
@@ -74,10 +74,8 @@ func (s *OsImagesService) List(ctx context.Context) (OsImagesResponse, error) {
 	return resp, nil
 }
 
-func (s *OsImagesService) Create(ctx context.Context, data OsImageRequest) (OsImage, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "os_images", withBody(opts))
+func (s *OsImagesService) Create(ctx context.Context, data OsImageCreateRequest) (OsImage, error) {
+	body, code, err := s.client.request(ctx, "POST", "os_images", withBody(data))
 	if err != nil {
 		return OsImage{}, err
 	}
@@ -95,9 +93,7 @@ func (s *OsImagesService) Create(ctx context.Context, data OsImageRequest) (OsIm
 }
 
 func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(data))
 	if err != nil {
 		return OsImageVersion{}, err
 	}

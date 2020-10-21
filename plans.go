@@ -87,9 +87,7 @@ func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
 }
 
 func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "plans", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "plans", withBody(data))
 	if err != nil {
 		return Plan{}, err
 	}

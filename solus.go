@@ -156,9 +156,7 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 }
 
 func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := c.request(ctx, "POST", "auth/login", withBody(opts))
+	body, code, err := c.request(ctx, "POST", "auth/login", withBody(data))
 	if err != nil {
 		return AuthLoginResponse{}, err
 	}

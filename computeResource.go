@@ -66,9 +66,7 @@ type ComputerResourceNetworksResponse struct {
 }
 
 func (s *ComputeResourcesService) Create(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "compute_resources", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "compute_resources", withBody(data))
 	if err != nil {
 		return ComputeResource{}, err
 	}
@@ -127,9 +125,7 @@ func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, netw
 	}{
 		Id: networkId,
 	}
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(data))
 	if err != nil {
 		return err
 	}

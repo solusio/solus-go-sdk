@@ -24,30 +24,33 @@ type requestOpts struct {
 	body   interface{}
 }
 
-func newRequestOpts() requestOpts {
-	return requestOpts{}
-}
+type requestOption func(*requestOpts)
 
-type requestWithOpt func(requestOpts) requestOpts
+func withFilter(f map[string]string) requestOption {
+	return func(o *requestOpts) {
+		if f == nil {
+			return
+		}
 
-func withParams(params requestOpts) func(requestOpts) requestOpts {
-	return func(o requestOpts) requestOpts {
-		o.params = params.params
-		return o
+		if o.params == nil {
+			o.params = map[string][]string{}
+		}
+		for field, value := range f {
+			o.params[field] = append(o.params[field], value)
+		}
 	}
 }
 
-func withBody(body requestOpts) func(requestOpts) requestOpts {
-	return func(o requestOpts) requestOpts {
-		o.body = body.body
-		return o
+func withBody(b interface{}) requestOption {
+	return func(o *requestOpts) {
+		o.body = b
 	}
 }
 
-func (c *Client) request(ctx context.Context, method, path string, opts ...requestWithOpt) ([]byte, int, error) {
-	reqOpts := newRequestOpts()
+func (c *Client) request(ctx context.Context, method, path string, opts ...requestOption) ([]byte, int, error) {
+	reqOpts := requestOpts{}
 	for _, o := range opts {
-		reqOpts = o(reqOpts)
+		o(&reqOpts)
 	}
 
 	var bodyByte []byte
@@ -92,7 +95,7 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 
 	c.Logger.Println(method, fullUrl.String(), string(bodyByte))
 	var resp *http.Response
-	err = Retry(func(attempt int) (bool, error) {
+	err = retry(func(attempt int) (bool, error) {
 		var err error
 		resp, err = c.HttpClient.Do(req)
 		if err != nil {
@@ -128,13 +131,15 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 	return respBody, code, nil
 }
 
-func Retry(fn retryFunc) error {
-	var err error
-	var cont bool
+func retry(fn retryFunc) error {
+	var (
+		err   error
+		retry bool
+	)
 	attempt := 1
 	for {
-		cont, err = fn(attempt)
-		if !cont || err == nil {
+		retry, err = fn(attempt)
+		if !retry || err == nil {
 			break
 		}
 		attempt++
@@ -143,15 +148,4 @@ func Retry(fn retryFunc) error {
 		}
 	}
 	return err
-}
-
-func filterToParams(filter map[string]string) map[string][]string {
-	var params map[string][]string
-	if filter != nil {
-		params = map[string][]string{}
-		for field, value := range filter {
-			params[field] = append(params[field], value)
-		}
-	}
-	return params
 }

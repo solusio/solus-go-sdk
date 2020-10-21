@@ -60,9 +60,7 @@ func (s *TasksService) List(ctx context.Context, filter *FilterTasks) (TasksResp
 		},
 	}
 
-	opts := newRequestOpts()
-	opts.params = filterToParams(filter.data)
-	body, code, err := s.client.request(ctx, "GET", "tasks", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "tasks", withFilter(filter.data))
 	if err != nil {
 		return TasksResponse{}, err
 	}

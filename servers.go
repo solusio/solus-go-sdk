@@ -40,9 +40,7 @@ func (s *ServersService) List(ctx context.Context, filter *FilterServers) (Serve
 		},
 	}
 
-	opts := newRequestOpts()
-	opts.params = filterToParams(filter.data)
-	body, code, err := s.client.request(ctx, "GET", "servers", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "servers", withFilter(filter.data))
 	if err != nil {
 		return ServersResponse{}, err
 	}

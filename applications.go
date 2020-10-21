@@ -36,7 +36,7 @@ type Application struct {
 	IsBuiltin        bool      `json:"is_buildin"`
 }
 
-type ApplicationRequest struct {
+type ApplicationCreateRequest struct {
 	Name             string    `json:"name"`
 	Url              string    `json:"url"`
 	IconId           int       `json:"icon_id"`
@@ -80,10 +80,8 @@ func (s *ApplicationsService) List(ctx context.Context) (ApplicationsResponse, e
 	return resp, nil
 }
 
-func (s *ApplicationsService) Create(ctx context.Context, data ApplicationRequest) (Application, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "applications", withBody(opts))
+func (s *ApplicationsService) Create(ctx context.Context, data ApplicationCreateRequest) (Application, error) {
+	body, code, err := s.client.request(ctx, "POST", "applications", withBody(data))
 	if err != nil {
 		return Application{}, err
 	}

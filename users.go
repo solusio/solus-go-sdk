@@ -56,10 +56,7 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 		},
 	}
 
-	opts := newRequestOpts()
-	opts.params = filterToParams(filter.data)
-
-	body, code, err := s.client.request(ctx, "GET", "users", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "users", withFilter(filter.data))
 	if err != nil {
 		return resp, err
 	}
@@ -76,9 +73,7 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 }
 
 func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "users", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "users", withBody(data))
 	if err != nil {
 		return User{}, err
 	}
@@ -96,9 +91,7 @@ func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User
 }
 
 func (s *UsersService) Update(ctx context.Context, userId int, data UserUpdateRequest) (User, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("users/%d", userId), withBody(opts))
+	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("users/%d", userId), withBody(data))
 	if err != nil {
 		return User{}, err
 	}
