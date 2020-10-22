@@ -28,9 +28,7 @@ type LicenseActivateResponse struct {
 }
 
 func (s *LicenseService) Activate(ctx context.Context, data LicenseActivateRequest) (License, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "license/activate", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "license/activate", withBody(data))
 	if err != nil {
 		return License{}, err
 	}

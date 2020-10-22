@@ -35,9 +35,7 @@ type Server struct {
 }
 
 func (s *ProjectsService) ServersCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(data))
 	if err != nil {
 		return Server{}, err
 	}

@@ -17,7 +17,12 @@ func TestLocationsService_List(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/locations", r.URL.Path)
 		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t, url.QueryEscape("filter[search]")+"=test", r.URL.Query().Encode())
+		require.Equal(t,
+			url.Values{
+				"filter[search]": []string{"name"},
+			}.Encode(),
+			r.URL.Query().Encode(),
+		)
 
 		b, err := json.Marshal(expected)
 		require.NoError(t, err)
@@ -29,7 +34,9 @@ func TestLocationsService_List(t *testing.T) {
 
 	c := createTestClient(t, s.URL)
 
-	p, err := c.Locations.List(context.Background(), (&FilterLocations{}).ByName("test"))
+	f := (&FilterLocations{}).ByName("name")
+
+	p, err := c.Locations.List(context.Background(), f)
 	require.NoError(t, err)
 	p.service = nil
 	require.Equal(t, expected, p)

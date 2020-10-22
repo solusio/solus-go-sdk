@@ -39,9 +39,7 @@ type LocationsResponse struct {
 }
 
 func (s *LocationsService) Create(ctx context.Context, data LocationCreateRequest) (Location, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "POST", "locations", withBody(opts))
+	body, code, err := s.client.request(ctx, "POST", "locations", withBody(data))
 	if err != nil {
 		return Location{}, err
 	}
@@ -65,10 +63,7 @@ func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (L
 		},
 	}
 
-	opts := newRequestOpts()
-	opts.params = filterToParams(filter.data)
-
-	body, code, err := s.client.request(ctx, "GET", "locations", withParams(opts))
+	body, code, err := s.client.request(ctx, "GET", "locations", withFilter(filter.data))
 	if err != nil {
 		return LocationsResponse{}, err
 	}
@@ -103,9 +98,7 @@ func (s *LocationsService) Get(ctx context.Context, id int) (Location, error) {
 }
 
 func (s *LocationsService) Update(ctx context.Context, id int, data LocationCreateRequest) (Location, error) {
-	opts := newRequestOpts()
-	opts.body = data
-	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("locations/%d", id), withBody(opts))
+	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("locations/%d", id), withBody(data))
 	if err != nil {
 		return Location{}, err
 	}
