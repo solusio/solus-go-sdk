@@ -18,45 +18,11 @@ jobs:
             {
               username: 'solus-github-bot',
               icon_emoji: ':octocat:',
-              blocks: [
-                {
-                  type: 'header',
-                  text: {
-                    type: 'plain_text',
-                    text: 'New pull request in ${{ github.repository }}'
-                  }
-                },
-                {
-                  type: 'divider'
-                },
-                {
-                  type: 'section',
-                  fields: [
-                    {
-                      type: 'mrkdwn',
-                      text: '*Author*\n${process.env.AS_AUTHOR}'
-                    },
-                    {
-                      type: 'mrkdwn',
-                      text: '*Title*\n${{ github.event.pull_request.title }}'
-                    }
-                  ]
-                },
-                {
-                  type: 'actions',
-                  elements: [
-                    {
-                      type: 'button',
-                      text: {
-                        type: 'plain_text',
-                        text: 'Review'
-                      },
-                      url: '${{ github.event.pull_request.html_url }}',
-                      style: 'primary'
-                    }
-                  ]
-                }
-              ]
+              attachments: [{
+                color: 'good',
+                title: 'New pull request at ${{ github.repository }}',
+                text: `Title: ${{ github.event.pull_request.title }}\nAuthor: ${process.env.AS_AUTHOR}\nPlease <${{ github.event.pull_request.html_url }}|review this PR>`,
+              }]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -69,45 +35,11 @@ jobs:
             {
               username: 'solus-github-bot',
               icon_emoji: ':octocat:',
-              blocks: [
-                {
-                  type: 'header',
-                  text: {
-                    type: 'plain_text',
-                    text: 'Pull request was updated in ${{ github.repository }}'
-                  }
-                },
-                {
-                  type: 'divider'
-                },
-                {
-                  type: 'section',
-                  fields: [
-                    {
-                      type: 'mrkdwn',
-                      text: '*Author*\n${process.env.AS_AUTHOR}'
-                    },
-                    {
-                      type: 'mrkdwn',
-                      text: '*Title*\n${{ github.event.pull_request.title }}'
-                    }
-                  ]
-                },
-                {
-                  type: 'actions',
-                  elements: [
-                    {
-                      type: 'button',
-                      text: {
-                        type: 'plain_text',
-                        text: 'Review'
-                      },
-                      url: '${{ github.event.pull_request.html_url }}',
-                      style: 'primary'
-                    }
-                  ]
-                }
-              ]
+              attachments: [{
+                color: 'good',
+                title: 'Pull request was updated at ${{ github.repository }}',
+                text: `Title: ${{ github.event.pull_request.title }}\nAuthor: ${process.env.AS_AUTHOR}\nPlease <${{ github.event.pull_request.html_url }}|review this PR>`,
+              }]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -120,31 +52,11 @@ jobs:
             {
               username: 'solus-github-bot',
               icon_emoji: ':octocat:',
-              blocks: [
-                {
-                  type: 'header',
-                  text: {
-                    type: 'plain_text',
-                    text: 'Pull request was merged in ${{ github.repository }}'
-                  }
-                },
-                {
-                  type: 'divider'
-                },
-                {
-                  type: 'section',
-                  fields: [
-                    {
-                      type: 'mrkdwn',
-                      text: '*Author*\n${process.env.AS_AUTHOR}'
-                    },
-                    {
-                      type: 'mrkdwn',
-                      text: '*Title*\n${{ github.event.pull_request.title }}'
-                    }
-                  ]
-                }
-              ]
+              attachments: [{
+                color: 'good',
+                title: 'Pull request was merged at ${{ github.repository }}',
+                text: `Title: ${{ github.event.pull_request.title }}\nAuthor: ${process.env.AS_AUTHOR}`,
+              }]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
