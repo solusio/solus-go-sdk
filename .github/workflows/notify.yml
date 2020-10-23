@@ -1,0 +1,150 @@
+name: notify
+
+on:
+  pull_request:
+    branches: master
+    types: [ opened, synchronize, closed ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 8398a7/action-slack@v3
+        if: github.event.action == 'opened'
+        with:
+          status: custom
+          fields: author
+          custom_payload: |
+            {
+              username: 'solus-github-bot',
+              icon_emoji: ':octocat:',
+              blocks: [
+                {
+                  type: 'header',
+                  text: {
+                    type: 'plain_text',
+                    text: 'New pull request in ${{ github.repository }}'
+                  }
+                },
+                {
+                  type: 'divider'
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    {
+                      type: 'mrkdwn',
+                      text: '*Author*\n${process.env.AS_AUTHOR}'
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: '*Title*\n${{ github.event.pull_request.title }}'
+                    }
+                  ]
+                },
+                {
+                  type: 'actions',
+                  elements: [
+                    {
+                      type: 'button',
+                      text: {
+                        type: 'plain_text',
+                        text: 'Review'
+                      },
+                      url: '${{ github.event.pull_request.html_url }}',
+                      style: 'primary'
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - uses: 8398a7/action-slack@v3
+        if: github.event.action == 'synchronize'
+        with:
+          status: custom
+          fields: author
+          custom_payload: |
+            {
+              username: 'solus-github-bot',
+              icon_emoji: ':octocat:',
+              blocks: [
+                {
+                  type: 'header',
+                  text: {
+                    type: 'plain_text',
+                    text: 'Pull request was updated in ${{ github.repository }}'
+                  }
+                },
+                {
+                  type: 'divider'
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    {
+                      type: 'mrkdwn',
+                      text: '*Author*\n${process.env.AS_AUTHOR}'
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: '*Title*\n${{ github.event.pull_request.title }}'
+                    }
+                  ]
+                },
+                {
+                  type: 'actions',
+                  elements: [
+                    {
+                      type: 'button',
+                      text: {
+                        type: 'plain_text',
+                        text: 'Review'
+                      },
+                      url: '${{ github.event.pull_request.html_url }}',
+                      style: 'primary'
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - uses: 8398a7/action-slack@v3
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
+        with:
+          status: custom
+          fields: author
+          custom_payload: |
+            {
+              username: 'solus-github-bot',
+              icon_emoji: ':octocat:',
+              blocks: [
+                {
+                  type: 'header',
+                  text: {
+                    type: 'plain_text',
+                    text: 'Pull request was merged in ${{ github.repository }}'
+                  }
+                },
+                {
+                  type: 'divider'
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    {
+                      type: 'mrkdwn',
+                      text: '*Author*\n${process.env.AS_AUTHOR}'
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: '*Title*\n${{ github.event.pull_request.title }}'
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
