@@ -12,11 +12,11 @@ const (
 	ComputeResourceInstallStepStatusError ComputeResourceInstallStepStatus = "error"
 )
 
-type ComputerResourceInstallStepsResponse struct {
-	Data []ComputerResourceInstallSteps `json:"data"`
+type ComputeResourceInstallStepsResponse struct {
+	Data []ComputeResourceInstallStep `json:"data"`
 }
 
-type ComputerResourceInstallSteps struct {
+type ComputeResourceInstallStep struct {
 	Id                int                              `json:"id"`
 	ComputeResourceId int                              `json:"compute_resource_id"`
 	Title             string                           `json:"title"`
@@ -25,7 +25,7 @@ type ComputerResourceInstallSteps struct {
 	Progress          int                              `json:"progress"`
 }
 
-func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputerResourceInstallSteps, error) {
+func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputeResourceInstallStep, error) {
 	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id))
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]C
 		return nil, fmt.Errorf("HTTP %d: %s", code, body)
 	}
 
-	var resp ComputerResourceInstallStepsResponse
+	var resp ComputeResourceInstallStepsResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, fmt.Errorf("failed to decode '%s': %s", body, err)
 	}

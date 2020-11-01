@@ -2,47 +2,28 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"testing"
 )
 
 func TestLicenseService_Activate(t *testing.T) {
-	expected := License{}
+	expected := fakeLicense
 	data := LicenseActivateRequest{
 		ActivationCode: "activation code",
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.Equal(t, "/license/activate", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
 
-		d := LicenseActivateRequest{}
-		err = json.Unmarshal(b, &d)
-		require.NoError(t, err)
-
-		require.Equal(t, "/license/activate", r.URL.Path)
-		require.Equal(t, http.MethodPost, r.Method)
-		require.Equal(t, data, d)
-
-		b, err = json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(200)
-		_, _ = w.Write(b)
+		writeJSON(t, w, http.StatusOK, LicenseActivateResponse{expected})
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
+	actual, err := createTestClient(t, s.URL).License.Activate(context.Background(), data)
 	require.NoError(t, err)
-
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
-
-	l, err := c.License.Activate(context.Background(), data)
-	require.NoError(t, err)
-	require.Equal(t, expected, l)
+	require.Equal(t, expected, actual)
 }

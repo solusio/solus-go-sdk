@@ -2,9 +2,8 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -14,35 +13,25 @@ func TestUsersService_List(t *testing.T) {
 	expected := UsersResponse{}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, "/users", r.URL.Path)
-		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t,
-			url.Values{
-				"filter[status]": []string{"status"},
-			}.Encode(),
-			r.URL.Query().Encode(),
-		)
+		assert.Equal(t, "/users", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		assertRequestQuery(t, r, url.Values{
+			"filter[status]": []string{"status"},
+		})
 
-		b, err := json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(200)
-		_, _ = w.Write(b)
+		writeJSON(t, w, http.StatusOK, expected)
 	})
 	defer s.Close()
 
-	c := createTestClient(t, s.URL)
-
 	f := (&FilterUsers{}).ByStatus("status")
 
-	p, err := c.Users.List(context.Background(), f)
+	actual, err := createTestClient(t, s.URL).Users.List(context.Background(), f)
 	require.NoError(t, err)
-	p.service = nil
-	require.Equal(t, expected, p)
+	actual.service = nil
+	require.Equal(t, expected, actual)
 }
 
 func TestUsersService_Create(t *testing.T) {
-	expected := User{}
 	data := UserCreateRequest{
 		Password:   "password",
 		Email:      "email",
@@ -52,32 +41,50 @@ func TestUsersService_Create(t *testing.T) {
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.Equal(t, "/users", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
 
-		d := UserCreateRequest{}
-		err = json.Unmarshal(b, &d)
-		require.NoError(t, err)
-
-		require.Equal(t, "/users", r.URL.Path)
-		require.Equal(t, http.MethodPost, r.Method)
-		require.Equal(t, data, d)
-
-		b, err = json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(201)
-		_, _ = w.Write(b)
+		writeResponse(t, w, http.StatusCreated, fakeUser)
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
+	actual, err := createTestClient(t, s.URL).Users.Create(context.Background(), data)
 	require.NoError(t, err)
+	require.Equal(t, fakeUser, actual)
+}
 
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
+func TestUsersService_Update(t *testing.T) {
+	data := UserUpdateRequest{
+		Password:   "password",
+		Status:     "status",
+		LanguageId: 1,
+		Roles:      []int{2, 3},
+	}
 
-	l, err := c.Users.Create(context.Background(), data)
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/users/10", r.URL.Path)
+		assert.Equal(t, http.MethodPut, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusOK, fakeUser)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Users.Update(context.Background(), 10, data)
 	require.NoError(t, err)
-	require.Equal(t, expected, l)
+	require.Equal(t, fakeUser, actual)
+}
+
+func TestUsersService_Delete(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/users/10", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Users.Delete(context.Background(), 10)
+	require.NoError(t, err)
 }

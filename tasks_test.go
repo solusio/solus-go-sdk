@@ -2,7 +2,7 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/url"
@@ -10,30 +10,25 @@ import (
 )
 
 func TestTasksService_List(t *testing.T) {
-	expected := TasksResponse{}
+	expected := TasksResponse{
+		Data: []Task{
+			fakeTask,
+		},
+	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, "/tasks", r.URL.Path)
-		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t,
-			url.Values{
-				"filter[action]":                 []string{"action"},
-				"filter[status]":                 []string{"status"},
-				"filter[compute_resource_id]":    []string{"1"},
-				"filter[compute_resource_vm_id]": []string{"2"},
-			}.Encode(),
-			r.URL.Query().Encode(),
-		)
+		assert.Equal(t, "/tasks", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		assertRequestQuery(t, r, url.Values{
+			"filter[action]":                 []string{"action"},
+			"filter[status]":                 []string{"status"},
+			"filter[compute_resource_id]":    []string{"1"},
+			"filter[compute_resource_vm_id]": []string{"2"},
+		})
 
-		b, err := json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(200)
-		_, _ = w.Write(b)
+		writeJSON(t, w, http.StatusOK, expected)
 	})
 	defer s.Close()
-
-	c := createTestClient(t, s.URL)
 
 	f := (&FilterTasks{}).
 		ByAction("action").
@@ -41,8 +36,8 @@ func TestTasksService_List(t *testing.T) {
 		ByComputeResourceID(1).
 		ByComputeResourceVmID(2)
 
-	p, err := c.Tasks.List(context.Background(), f)
+	actual, err := createTestClient(t, s.URL).Tasks.List(context.Background(), f)
 	require.NoError(t, err)
-	p.service = nil
-	require.Equal(t, expected, p)
+	actual.service = nil
+	require.Equal(t, expected, actual)
 }
