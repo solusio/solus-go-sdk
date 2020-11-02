@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -35,21 +34,8 @@ type Server struct {
 }
 
 func (s *ProjectsService) ServersCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("projects/%d/servers", projectId), withBody(data))
-	if err != nil {
-		return Server{}, err
-	}
-
-	if code != 201 {
-		return Server{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ProjectServersCreateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Server{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("projects/%d/servers", projectId), data, &resp)
 }
 
 func (s *ProjectsService) ServersListAll(ctx context.Context, projectId int) ([]Server, error) {
@@ -72,18 +58,5 @@ func (s *ProjectsService) Servers(ctx context.Context, projectId int) (ProjectSe
 			service: (*service)(s),
 		},
 	}
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("projects/%d/servers", projectId))
-	if err != nil {
-		return ProjectServersResponse{}, err
-	}
-
-	if code != 200 {
-		return ProjectServersResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ProjectServersResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, fmt.Sprintf("projects/%d/servers", projectId), &resp)
 }

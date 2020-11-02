@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -55,68 +54,19 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "users", withFilter(filter.data))
-	if err != nil {
-		return resp, err
-	}
-
-	if code != 200 {
-		return resp, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return resp, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "users", &resp, withFilter(filter.data))
 }
 
 func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User, error) {
-	body, code, err := s.client.request(ctx, "POST", "users", withBody(data))
-	if err != nil {
-		return User{}, err
-	}
-
-	if code != 201 {
-		return User{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp UserCreateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return User{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, "users", data, &resp)
 }
 
 func (s *UsersService) Update(ctx context.Context, userId int, data UserUpdateRequest) (User, error) {
-	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("users/%d", userId), withBody(data))
-	if err != nil {
-		return User{}, err
-	}
-
-	if code != 200 {
-		return User{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp UserCreateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return User{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("users/%d", userId), data, &resp)
 }
 
 func (s *UsersService) Delete(ctx context.Context, userId int) error {
-	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("users/%d", userId))
-	if err != nil {
-		return err
-	}
-
-	if code != 204 {
-		return wrapError(code, body)
-	}
-
-	return nil
+	return s.client.delete(ctx, fmt.Sprintf("users/%d", userId))
 }

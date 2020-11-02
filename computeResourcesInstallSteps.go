@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -26,19 +25,6 @@ type ComputeResourceInstallStep struct {
 }
 
 func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputeResourceInstallStep, error) {
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/install_steps", id))
-	if err != nil {
-		return nil, err
-	}
-
-	if code != 200 {
-		return nil, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ComputeResourceInstallStepsResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return nil, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/install_steps", id), &resp)
 }

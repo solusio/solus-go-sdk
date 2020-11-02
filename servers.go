@@ -2,8 +2,9 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 type ServersService service
@@ -39,76 +40,45 @@ func (s *ServersService) List(ctx context.Context, filter *FilterServers) (Serve
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "servers", withFilter(filter.data))
-	if err != nil {
-		return ServersResponse{}, err
-	}
-
-	if code != 200 {
-		return ServersResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ServersResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "servers", &resp, withFilter(filter.data))
 }
 
 func (s *ServersService) Get(ctx context.Context, serverId int) (Server, error) {
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("servers/%d", serverId))
-	if err != nil {
-		return Server{}, err
-	}
-
-	if code != 200 {
-		return Server{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ServerResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Server{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d", serverId), &resp)
 }
 
 func (s *ServersService) Restart(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("servers/%d/restart", serverId))
+	body, code, err := s.client.request(ctx, http.MethodPost, fmt.Sprintf("servers/%d/restart", serverId))
 	if err != nil {
 		return Task{}, err
 	}
 
-	if code != 200 {
-		return Task{}, fmt.Errorf("HTTP %d: %s", code, body)
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(code, body)
 	}
 
 	var resp ServerRestartResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Task{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, unmarshal(body, &resp)
 }
 
 func (s *ServersService) Delete(ctx context.Context, serverId int) (Task, error) {
-	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("servers/%d", serverId))
+	body, code, err := s.client.request(ctx, http.MethodDelete, fmt.Sprintf("servers/%d", serverId))
 	if err != nil {
 		return Task{}, err
 	}
 
-	if code != 200 {
-		return Task{}, fmt.Errorf("HTTP %d: %s", code, body)
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(code, body)
 	}
 
 	var resp ServerDeleteResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Task{}, fmt.Errorf("failed to decode '%s': %s", body, err)
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
 	}
 
 	if resp.Data.Id == 0 {
-		return Task{}, fmt.Errorf("failed to decode '%s': to task", body)
+		return Task{}, errors.New("task doesn't have an id")
 	}
 
 	return resp.Data, nil

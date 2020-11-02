@@ -2,8 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 )
 
 type TasksService service
@@ -59,19 +57,5 @@ func (s *TasksService) List(ctx context.Context, filter *FilterTasks) (TasksResp
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "tasks", withFilter(filter.data))
-	if err != nil {
-		return TasksResponse{}, err
-	}
-
-	if code != 200 {
-		return TasksResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return TasksResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "tasks", &resp, withFilter(filter.data))
 }

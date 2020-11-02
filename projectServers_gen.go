@@ -35,13 +35,13 @@ func (r *ProjectServersResponse) Next(ctx context.Context) bool {
 		return false
 	}
 
-	if code != 200 {
-		r.err = wrapError(code, body)
+	if code != http.StatusOK {
+		r.err = newHTTPError(code, body)
 		return false
 	}
 
 	if err := json.Unmarshal(body, &r); err != nil {
-		r.err = fmt.Errorf("failed to decode '%s': %s", body, err)
+		r.err = fmt.Errorf("failed to decode %q: %s", body, err)
 		return false
 	}
 	return true

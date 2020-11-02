@@ -47,6 +47,70 @@ func withBody(b interface{}) requestOption {
 	}
 }
 
+func (c *Client) create(ctx context.Context, path string, data, resp interface{}) error {
+	body, code, err := c.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusCreated {
+		return newHTTPError(code, body)
+	}
+
+	return unmarshal(body, &resp)
+}
+
+func (c *Client) list(ctx context.Context, path string, resp interface{}, opts ...requestOption) error {
+	body, code, err := c.request(ctx, http.MethodGet, path, opts...)
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusOK {
+		return newHTTPError(code, body)
+	}
+
+	return unmarshal(body, resp)
+}
+
+func (c *Client) get(ctx context.Context, path string, resp interface{}, opts ...requestOption) error {
+	body, code, err := c.request(ctx, http.MethodGet, path, opts...)
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusOK {
+		return newHTTPError(code, body)
+	}
+
+	return unmarshal(body, resp)
+}
+
+func (c *Client) update(ctx context.Context, path string, data, resp interface{}) error {
+	body, code, err := c.request(ctx, http.MethodPut, path, withBody(data))
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusOK {
+		return newHTTPError(code, body)
+	}
+
+	return unmarshal(body, resp)
+}
+
+func (c *Client) delete(ctx context.Context, path string) error {
+	body, code, err := c.request(ctx, http.MethodDelete, path)
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusNoContent {
+		return newHTTPError(code, body)
+	}
+	return nil
+}
+
 func (c *Client) request(ctx context.Context, method, path string, opts ...requestOption) ([]byte, int, error) {
 	reqOpts := requestOpts{}
 	for _, o := range opts {
@@ -148,4 +212,11 @@ func retry(fn retryFunc) error {
 		}
 	}
 	return err
+}
+
+func unmarshal(data []byte, v interface{}) error {
+	if err := json.Unmarshal(data, v); err != nil {
+		return fmt.Errorf("failed to decode %q: %w", data, err)
+	}
+	return nil
 }
