@@ -2,8 +2,7 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	"net/http"
 )
 
 type LicenseService service
@@ -28,19 +27,15 @@ type LicenseActivateResponse struct {
 }
 
 func (s *LicenseService) Activate(ctx context.Context, data LicenseActivateRequest) (License, error) {
-	body, code, err := s.client.request(ctx, "POST", "license/activate", withBody(data))
+	body, code, err := s.client.request(ctx, http.MethodPost, "license/activate", withBody(data))
 	if err != nil {
 		return License{}, err
 	}
 
-	if code != 200 {
-		return License{}, fmt.Errorf("HTTP %d: %s", code, body)
+	if code != http.StatusOK {
+		return License{}, newHTTPError(code, body)
 	}
 
 	var resp LicenseActivateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return License{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, unmarshal(body, &resp)
 }

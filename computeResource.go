@@ -2,8 +2,8 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type ComputeResourcesService service
@@ -66,57 +66,18 @@ type ComputerResourceNetworksResponse struct {
 }
 
 func (s *ComputeResourcesService) Create(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
-	body, code, err := s.client.request(ctx, "POST", "compute_resources", withBody(data))
-	if err != nil {
-		return ComputeResource{}, err
-	}
-
-	if code != 201 {
-		return ComputeResource{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ComputerResourceResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ComputeResource{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, "compute_resources", data, &resp)
 }
 
 func (s *ComputeResourcesService) Get(ctx context.Context, id int) (ComputeResource, error) {
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d", id))
-	if err != nil {
-		return ComputeResource{}, err
-	}
-
-	if code != 200 {
-		return ComputeResource{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ComputerResourceResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ComputeResource{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d", id), &resp)
 }
 
 func (s *ComputeResourcesService) Networks(ctx context.Context, id int) ([]ComputeResourceNetwork, error) {
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("compute_resources/%d/networks", id))
-	if err != nil {
-		return nil, err
-	}
-
-	if code != 200 {
-		return nil, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp ComputerResourceNetworksResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return nil, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/networks", id), &resp)
 }
 
 func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, networkId string) error {
@@ -125,14 +86,13 @@ func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, netw
 	}{
 		Id: networkId,
 	}
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(data))
+	body, code, err := s.client.request(ctx, http.MethodPost, fmt.Sprintf("compute_resources/%d/setup_network", id), withBody(data))
 	if err != nil {
 		return err
 	}
 
-	if code != 200 {
-		return fmt.Errorf("HTTP %d: %s", code, body)
+	if code != http.StatusOK {
+		return newHTTPError(code, body)
 	}
-
 	return nil
 }

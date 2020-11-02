@@ -2,8 +2,8 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type IpBlocksService service
@@ -74,68 +74,28 @@ func (s *IpBlocksService) List(ctx context.Context) (IpBlocksResponse, error) {
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "ip_blocks")
-	if err != nil {
-		return IpBlocksResponse{}, err
-	}
-
-	if code != 200 {
-		return IpBlocksResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return IpBlocksResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "ip_blocks", &resp)
 }
 
 func (s *IpBlocksService) Create(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
-	body, code, err := s.client.request(ctx, "POST", "ip_blocks", withBody(data))
-	if err != nil {
-		return IpBlock{}, err
-	}
-
-	if code != 201 {
-		return IpBlock{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp IpBlockCreateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return IpBlock{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, "ip_blocks", data, &resp)
 }
 
 func (s *IpBlocksService) IpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
+	body, code, err := s.client.request(ctx, http.MethodPost, fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
 	if err != nil {
 		return IpBlockIpAddress{}, err
 	}
 
-	if code != 201 {
-		return IpBlockIpAddress{}, fmt.Errorf("HTTP %d: %s", code, body)
+	if code != http.StatusCreated {
+		return IpBlockIpAddress{}, newHTTPError(code, body)
 	}
 
 	var resp IpBlockIpAddressCreateResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return IpBlockIpAddress{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, unmarshal(body, &resp)
 }
 
 func (s *IpBlocksService) IpAddressDelete(ctx context.Context, ipId int) error {
-	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("ips/%d", ipId))
-	if err != nil {
-		return err
-	}
-
-	if code != 204 {
-		return fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	return nil
+	return s.client.delete(ctx, fmt.Sprintf("ips/%d", ipId))
 }

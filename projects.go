@@ -2,8 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 )
 
 type ProjectsService service
@@ -31,19 +29,5 @@ func (s *ProjectsService) List(ctx context.Context) (ProjectsResponse, error) {
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "projects")
-	if err != nil {
-		return ProjectsResponse{}, err
-	}
-
-	if code != 200 {
-		return ProjectsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ProjectsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "projects", &resp)
 }

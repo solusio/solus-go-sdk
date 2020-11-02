@@ -5,8 +5,6 @@ package solus
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -154,19 +152,15 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 }
 
 func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
-	body, code, err := c.request(ctx, "POST", "auth/login", withBody(data))
+	body, code, err := c.request(ctx, http.MethodPost, "auth/login", withBody(data))
 	if err != nil {
 		return AuthLoginResponse{}, err
 	}
 
 	if code != 200 {
-		return AuthLoginResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
+		return AuthLoginResponse{}, newHTTPError(code, body)
 	}
 
 	var resp AuthLoginResponseData
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return AuthLoginResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, unmarshal(body, &resp)
 }

@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -57,55 +56,15 @@ func (s *OsImagesService) List(ctx context.Context) (OsImagesResponse, error) {
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "os_images")
-	if err != nil {
-		return OsImagesResponse{}, err
-	}
-
-	if code != 200 {
-		return OsImagesResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return OsImagesResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "os_images", &resp)
 }
 
 func (s *OsImagesService) Create(ctx context.Context, data OsImageCreateRequest) (OsImage, error) {
-	body, code, err := s.client.request(ctx, "POST", "os_images", withBody(data))
-	if err != nil {
-		return OsImage{}, err
-	}
-
-	if code != 201 {
-		return OsImage{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp OsImageResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return OsImage{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, "os_images", data, &resp)
 }
 
 func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
-	body, code, err := s.client.request(ctx, "POST", fmt.Sprintf("os_images/%d/versions", osImageId), withBody(data))
-	if err != nil {
-		return OsImageVersion{}, err
-	}
-
-	if code != 201 {
-		return OsImageVersion{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp OsImageVersionResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return OsImageVersion{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("os_images/%d/versions", osImageId), data, &resp)
 }

@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -27,21 +26,7 @@ func (s *RolesService) List(ctx context.Context) (RolesResponse, error) {
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "roles")
-	if err != nil {
-		return resp, err
-	}
-
-	if code != 200 {
-		return resp, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return resp, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "roles", &resp)
 }
 
 func (s *RolesService) GetByName(ctx context.Context, name string) (Role, error) {

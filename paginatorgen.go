@@ -257,13 +257,13 @@ func ({{ .Receiver }} *{{ .Name }}) Next(ctx context.Context) bool {
 		return false
 	}
 
-	if code != 200 {
-		{{ .Receiver }}.err = wrapError(code, body)
+	if code != http.StatusOK {
+		{{ .Receiver }}.err = newHTTPError(code, body)
 		return false
 	}
 
 	if err := json.Unmarshal(body, &{{ .Receiver }}); err != nil {
-		{{ .Receiver }}.err = fmt.Errorf("failed to decode '%s': %s", body, err)
+		{{ .Receiver }}.err = fmt.Errorf("failed to decode %q: %s", body, err)
 		return false
 	}
 	return true

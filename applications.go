@@ -2,8 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 )
 
 type ApplicationsService service
@@ -57,43 +55,16 @@ type ApplicationsResponse struct {
 	Data []Application `json:"data"`
 }
 
+func (s *ApplicationsService) Create(ctx context.Context, data ApplicationCreateRequest) (Application, error) {
+	var resp ApplicationResponse
+	return resp.Data, s.client.create(ctx, "applications", data, &resp)
+}
+
 func (s *ApplicationsService) List(ctx context.Context) (ApplicationsResponse, error) {
 	resp := ApplicationsResponse{
 		paginatedResponse: paginatedResponse{
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "applications")
-	if err != nil {
-		return ApplicationsResponse{}, err
-	}
-
-	if code != 200 {
-		return ApplicationsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return ApplicationsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
-}
-
-func (s *ApplicationsService) Create(ctx context.Context, data ApplicationCreateRequest) (Application, error) {
-	body, code, err := s.client.request(ctx, "POST", "applications", withBody(data))
-	if err != nil {
-		return Application{}, err
-	}
-
-	if code != 201 {
-		return Application{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	var resp ApplicationResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Application{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp, s.client.list(ctx, "applications", &resp)
 }

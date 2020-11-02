@@ -5,17 +5,17 @@ import (
 	"fmt"
 )
 
-type Error struct {
+type HTTPError struct {
 	HttpCode int    `json:"http_code"`
 	Message  string `json:"message"`
 }
 
-func (e Error) Error() string {
+func (e HTTPError) Error() string {
 	return fmt.Sprintf("HTTP %d: %s", e.HttpCode, e.Message)
 }
 
-func wrapError(httpCode int, body []byte) error {
-	e := Error{
+func newHTTPError(httpCode int, body []byte) error {
+	e := HTTPError{
 		HttpCode: httpCode,
 	}
 

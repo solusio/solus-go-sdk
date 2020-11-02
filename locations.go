@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"gopkg.in/guregu/null.v4"
 )
@@ -39,21 +38,8 @@ type LocationsResponse struct {
 }
 
 func (s *LocationsService) Create(ctx context.Context, data LocationCreateRequest) (Location, error) {
-	body, code, err := s.client.request(ctx, "POST", "locations", withBody(data))
-	if err != nil {
-		return Location{}, err
-	}
-
-	if code != 201 {
-		return Location{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp LocationResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Location{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.create(ctx, "locations", data, &resp)
 }
 
 func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (LocationsResponse, error) {
@@ -62,67 +48,19 @@ func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (L
 			service: (*service)(s),
 		},
 	}
-
-	body, code, err := s.client.request(ctx, "GET", "locations", withFilter(filter.data))
-	if err != nil {
-		return LocationsResponse{}, err
-	}
-
-	if code != 200 {
-		return LocationsResponse{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return LocationsResponse{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp, nil
+	return resp, s.client.list(ctx, "locations", &resp, withFilter(filter.data))
 }
 
 func (s *LocationsService) Get(ctx context.Context, id int) (Location, error) {
-	body, code, err := s.client.request(ctx, "GET", fmt.Sprintf("locations/%d", id))
-	if err != nil {
-		return Location{}, err
-	}
-
-	if code != 200 {
-		return Location{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp LocationResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Location{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("locations/%d", id), &resp)
 }
 
 func (s *LocationsService) Update(ctx context.Context, id int, data LocationCreateRequest) (Location, error) {
-	body, code, err := s.client.request(ctx, "PUT", fmt.Sprintf("locations/%d", id), withBody(data))
-	if err != nil {
-		return Location{}, err
-	}
-
-	if code != 200 {
-		return Location{}, fmt.Errorf("HTTP %d: %s", code, body)
-	}
-
 	var resp LocationResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return Location{}, fmt.Errorf("failed to decode '%s': %s", body, err)
-	}
-
-	return resp.Data, nil
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("locations/%d", id), data, &resp)
 }
 
 func (s *LocationsService) Delete(ctx context.Context, id int) error {
-	body, code, err := s.client.request(ctx, "DELETE", fmt.Sprintf("locations/%d", id))
-	if err != nil {
-		return err
-	}
-
-	if code != 204 {
-		return fmt.Errorf("HTTP %d: %s", code, body)
-	}
-	return nil
+	return s.client.delete(ctx, fmt.Sprintf("locations/%d", id))
 }
