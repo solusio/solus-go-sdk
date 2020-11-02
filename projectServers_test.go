@@ -2,18 +2,15 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strconv"
 	"sync/atomic"
 	"testing"
 )
 
 func TestProjectsService_ServersCreate(t *testing.T) {
-	expected := Server{}
 	data := ProjectServersCreateRequest{
 		Name:             "name",
 		PlanId:           1,
@@ -24,34 +21,17 @@ func TestProjectsService_ServersCreate(t *testing.T) {
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.Equal(t, "/projects/42/servers", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
 
-		d := ProjectServersCreateRequest{}
-		err = json.Unmarshal(b, &d)
-		require.NoError(t, err)
-
-		require.Equal(t, "/projects/42/servers", r.URL.Path)
-		require.Equal(t, http.MethodPost, r.Method)
-		require.Equal(t, data, d)
-
-		b, err = json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(201)
-		_, _ = w.Write(b)
+		writeResponse(t, w, http.StatusCreated, fakeServer)
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
+	actual, err := createTestClient(t, s.URL).Projects.ServersCreate(context.Background(), 42, data)
 	require.NoError(t, err)
-
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
-
-	l, err := c.Projects.ServersCreate(context.Background(), 42, data)
-	require.NoError(t, err)
-	require.Equal(t, expected, l)
+	require.Equal(t, fakeServer, actual)
 }
 
 func TestProjectsService_ServersListAll(t *testing.T) {
@@ -60,8 +40,8 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		p := atomic.LoadInt32(&page)
 
-		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t, "/projects/1/servers", r.URL.Path)
+		assert.Equal(t, "/projects/1/servers", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
 		if page == 0 {
 			require.Equal(t, "", r.URL.Query().Get("page"))
 		} else {
@@ -91,12 +71,33 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 
 	c := createTestClient(t, s.URL)
 
-	servers, err := c.Projects.ServersListAll(context.Background(), 1)
+	actual, err := c.Projects.ServersListAll(context.Background(), 1)
 	require.NoError(t, err)
 
 	require.Equal(t, []Server{
 		{Id: 0},
 		{Id: 1},
 		{Id: 2},
-	}, servers)
+	}, actual)
+}
+
+func TestProjectsService_Servers(t *testing.T) {
+	expected := ProjectServersResponse{
+		Data: []Server{
+			fakeServer,
+		},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/projects/42/servers", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		writeJSON(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Projects.Servers(context.Background(), 42)
+	require.NoError(t, err)
+	actual.service = nil
+	require.Equal(t, expected, actual)
 }

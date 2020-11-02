@@ -2,16 +2,34 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"testing"
 )
 
+func TestPlansService_List(t *testing.T) {
+	expected := PlansResponse{
+		Data: []Plan{
+			fakePlan,
+		},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/plans", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		writeJSON(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Plans.List(context.Background())
+	require.NoError(t, err)
+	actual.service = nil
+	require.Equal(t, expected, actual)
+}
+
 func TestPlansService_Create(t *testing.T) {
-	expected := Plan{}
 	data := PlanCreateRequest{
 		Name: "name",
 		Type: "type",
@@ -40,32 +58,15 @@ func TestPlansService_Create(t *testing.T) {
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.Equal(t, "/plans", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
 
-		d := PlanCreateRequest{}
-		err = json.Unmarshal(b, &d)
-		require.NoError(t, err)
-
-		require.Equal(t, "/plans", r.URL.Path)
-		require.Equal(t, http.MethodPost, r.Method)
-		require.Equal(t, data, d)
-
-		b, err = json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(201)
-		_, _ = w.Write(b)
+		writeResponse(t, w, http.StatusCreated, fakePlan)
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
+	actual, err := createTestClient(t, s.URL).Plans.Create(context.Background(), data)
 	require.NoError(t, err)
-
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
-
-	l, err := c.Plans.Create(context.Background(), data)
-	require.NoError(t, err)
-	require.Equal(t, expected, l)
+	require.Equal(t, fakePlan, actual)
 }

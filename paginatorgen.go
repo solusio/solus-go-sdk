@@ -281,11 +281,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"sync/atomic"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 {{ range . }}
@@ -295,9 +295,9 @@ func Test{{ .Name }}_Next(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		p := atomic.LoadInt32(&page)
 
-		require.Equal(t, http.MethodGet, r.Method)
-		require.Equal(t, "/{{ .Entrypoint }}", r.URL.Path)
-		require.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
+		assert.Equal(t, "/{{ .Entrypoint }}", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
 			writeJSON(t, w, http.StatusOK, {{ .Name }}{Data: []{{ .DataType }}{{"{{"}}Id: int(p){{"}}}"}})
@@ -320,18 +320,12 @@ func Test{{ .Name }}_Next(t *testing.T) {
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
-	require.NoError(t, err)
-
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
-
 	resp := {{ .Name }}{
 		paginatedResponse: paginatedResponse{
 			Links: ResponseLinks{
 				Next: fmt.Sprintf("%s/{{ .Entrypoint }}?page=1", s.URL),
 			},
-			service: &service{c},
+			service: &service{createTestClient(t, s.URL)},
 		},
 	}
 

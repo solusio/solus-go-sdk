@@ -2,16 +2,34 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"testing"
 )
 
+func TestOsImagesService_List(t *testing.T) {
+	expected := OsImagesResponse{
+		Data: []OsImage{
+			fakeOsImage,
+		},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/os_images", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		writeJSON(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).OsImages.List(context.Background())
+	require.NoError(t, err)
+	actual.service = nil
+	require.Equal(t, expected, actual)
+}
+
 func TestOsImagesService_Create(t *testing.T) {
-	expected := OsImage{}
 	data := OsImageCreateRequest{
 		Name:      "name",
 		Icon:      "icon",
@@ -19,32 +37,37 @@ func TestOsImagesService_Create(t *testing.T) {
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.Equal(t, "/os_images", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
 
-		d := OsImageCreateRequest{}
-		err = json.Unmarshal(b, &d)
-		require.NoError(t, err)
-
-		require.Equal(t, "/os_images", r.URL.Path)
-		require.Equal(t, http.MethodPost, r.Method)
-		require.Equal(t, data, d)
-
-		b, err = json.Marshal(expected)
-		require.NoError(t, err)
-
-		w.WriteHeader(201)
-		_, _ = w.Write(b)
+		writeResponse(t, w, http.StatusCreated, fakeOsImage)
 	})
 	defer s.Close()
 
-	u, err := url.Parse(s.URL)
+	actual, err := createTestClient(t, s.URL).OsImages.Create(context.Background(), data)
 	require.NoError(t, err)
+	require.Equal(t, fakeOsImage, actual)
+}
 
-	c, err := NewClient(u, authenticator{})
-	require.NoError(t, err)
+func TestOsImagesService_OsImageVersionCreate(t *testing.T) {
+	data := OsImageVersionRequest{
+		Position:         1,
+		Version:          "version",
+		Url:              "http://example.com",
+		CloudInitVersion: "v2",
+	}
 
-	l, err := c.OsImages.Create(context.Background(), data)
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/os_images/10/versions", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusCreated, fakeOsImageVersion)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).OsImages.OsImageVersionCreate(context.Background(), 10, data)
 	require.NoError(t, err)
-	require.Equal(t, expected, l)
+	require.Equal(t, fakeOsImageVersion, actual)
 }
