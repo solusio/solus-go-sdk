@@ -92,9 +92,6 @@ type ClientOption func(c *Client)
 // AllowInsecure allow to skip certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
-		if c.HttpClient.Transport == nil {
-			c.HttpClient.Transport = http.DefaultTransport
-		}
 		c.HttpClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 }
@@ -116,7 +113,8 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 			"Content-Type": {"application/json"},
 		},
 		HttpClient: &http.Client{
-			Timeout: time.Second * 35,
+			Timeout:   time.Second * 35,
+			Transport: http.DefaultTransport.(*http.Transport).Clone(),
 		},
 		Logger:  NullLogger{},
 		Retries: 5,
