@@ -32,7 +32,6 @@ func TestPlansService_List(t *testing.T) {
 func TestPlansService_Create(t *testing.T) {
 	data := PlanCreateRequest{
 		Name: "name",
-		Type: "type",
 		Params: PlanParams{
 			Disk: 1,
 			RAM:  2,
@@ -52,9 +51,9 @@ func TestPlansService_Create(t *testing.T) {
 				Limit:     5,
 			},
 		},
-		TokenPerHour:  6,
-		TokenPerMonth: 7,
-		Position:      8,
+		TokensPerHour:  6,
+		TokensPerMonth: 7,
+		Position:       8,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -69,4 +68,17 @@ func TestPlansService_Create(t *testing.T) {
 	actual, err := createTestClient(t, s.URL).Plans.Create(context.Background(), data)
 	require.NoError(t, err)
 	require.Equal(t, fakePlan, actual)
+}
+
+func TestPlansService_Delete(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/plans/10", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
+
+		w.WriteHeader(204)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Plans.Delete(context.Background(), 10)
+	require.NoError(t, err)
 }

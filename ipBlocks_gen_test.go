@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIpBlocksResponse_Next(t *testing.T) {
+func TestIPBlocksResponse_Next(t *testing.T) {
 	page := int32(1)
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,7 @@ func TestIpBlocksResponse_Next(t *testing.T) {
 		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
-			writeJSON(t, w, http.StatusOK, IpBlocksResponse{Data: []IpBlock{{Id: int(p)}}})
+			writeJSON(t, w, http.StatusOK, IPBlocksResponse{Data: []IPBlock{{ID: int(p)}}})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -34,18 +34,18 @@ func TestIpBlocksResponse_Next(t *testing.T) {
 		q.Set("page", strconv.Itoa(int(p)+1))
 		r.URL.RawQuery = q.Encode()
 
-		writeJSON(t, w, http.StatusOK, IpBlocksResponse{
+		writeJSON(t, w, http.StatusOK, IPBlocksResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
 					Next: r.URL.String(),
 				},
 			},
-			Data: []IpBlock{{Id: int(p)}},
+			Data: []IPBlock{{ID: int(p)}},
 		})
 	})
 	defer s.Close()
 
-	resp := IpBlocksResponse{
+	resp := IPBlocksResponse{
 		paginatedResponse: paginatedResponse{
 			Links: ResponseLinks{
 				Next: fmt.Sprintf("%s/ipblocks?page=1", s.URL),
@@ -56,7 +56,7 @@ func TestIpBlocksResponse_Next(t *testing.T) {
 
 	i := 1
 	for resp.Next(context.Background()) {
-		require.Equal(t, []IpBlock{{Id: i}}, resp.Data)
+		require.Equal(t, []IPBlock{{ID: i}}, resp.Data)
 		i++
 	}
 	require.NoError(t, resp.err)

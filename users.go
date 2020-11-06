@@ -14,7 +14,7 @@ const (
 type UsersService service
 
 type User struct {
-	Id       int    `json:"id"`
+	ID       int    `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	// CreatedAt for date in RFC3339Nano format
@@ -33,14 +33,14 @@ type UserCreateRequest struct {
 	Password   string `json:"password,omitempty"`
 	Email      string `json:"email,omitempty"`
 	Status     string `json:"status,omitempty"`
-	LanguageId int    `json:"language_id,omitempty"`
+	LanguageID int    `json:"language_id,omitempty"`
 	Roles      []int  `json:"roles,omitempty"`
 }
 
 type UserUpdateRequest struct {
 	Password   string `json:"password,omitempty"`
 	Status     string `json:"status,omitempty"`
-	LanguageId int    `json:"language_id,omitempty"`
+	LanguageID int    `json:"language_id,omitempty"`
 	Roles      []int  `json:"roles,omitempty"`
 }
 
@@ -62,11 +62,11 @@ func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User
 	return resp.Data, s.client.create(ctx, "users", data, &resp)
 }
 
-func (s *UsersService) Update(ctx context.Context, userId int, data UserUpdateRequest) (User, error) {
+func (s *UsersService) Update(ctx context.Context, id int, data UserUpdateRequest) (User, error) {
 	var resp UserCreateResponse
-	return resp.Data, s.client.update(ctx, fmt.Sprintf("users/%d", userId), data, &resp)
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("users/%d", id), data, &resp)
 }
 
-func (s *UsersService) Delete(ctx context.Context, userId int) error {
-	return s.client.delete(ctx, fmt.Sprintf("users/%d", userId))
+func (s *UsersService) Delete(ctx context.Context, id int) error {
+	return s.client.delete(ctx, fmt.Sprintf("users/%d", id))
 }

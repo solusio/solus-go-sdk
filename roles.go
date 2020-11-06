@@ -8,7 +8,7 @@ import (
 type RolesService service
 
 type Role struct {
-	Id         int    `json:"id"`
+	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	IsDefault  bool   `json:"is_default"`
 	UsersCount int    `json:"users_count"`

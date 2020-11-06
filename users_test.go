@@ -36,7 +36,7 @@ func TestUsersService_Create(t *testing.T) {
 		Password:   "password",
 		Email:      "email",
 		Status:     "status",
-		LanguageId: 1,
+		LanguageID: 1,
 		Roles:      []int{2, 3},
 	}
 
@@ -58,7 +58,7 @@ func TestUsersService_Update(t *testing.T) {
 	data := UserUpdateRequest{
 		Password:   "password",
 		Status:     "status",
-		LanguageId: 1,
+		LanguageID: 1,
 		Roles:      []int{2, 3},
 	}
 

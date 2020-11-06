@@ -8,7 +8,7 @@ import (
 type OsImagesService service
 
 type OsImage struct {
-	Id        int              `json:"id"`
+	ID        int              `json:"id"`
 	Name      string           `json:"name"`
 	Icon      Icon             `json:"icon"`
 	Versions  []OsImageVersion `json:"versions,omitempty"`
@@ -16,7 +16,7 @@ type OsImage struct {
 }
 
 type OsImageVersion struct {
-	Id               int     `json:"id"`
+	ID               int     `json:"id"`
 	Position         float64 `json:"position"`
 	Version          string  `json:"version"`
 	Url              string  `json:"url"`
@@ -64,7 +64,11 @@ func (s *OsImagesService) Create(ctx context.Context, data OsImageCreateRequest)
 	return resp.Data, s.client.create(ctx, "os_images", data, &resp)
 }
 
-func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageId int, data OsImageVersionRequest) (OsImageVersion, error) {
+func (s *OsImagesService) Delete(ctx context.Context, id int) error {
+	return s.client.delete(ctx, fmt.Sprintf("os_images/%d", id))
+}
+
+func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageID int, data OsImageVersionRequest) (OsImageVersion, error) {
 	var resp OsImageVersionResponse
-	return resp.Data, s.client.create(ctx, fmt.Sprintf("os_images/%d/versions", osImageId), data, &resp)
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("os_images/%d/versions", osImageID), data, &resp)
 }

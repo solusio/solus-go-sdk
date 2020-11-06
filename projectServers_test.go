@@ -13,9 +13,9 @@ import (
 func TestProjectsService_ServersCreate(t *testing.T) {
 	data := ProjectServersCreateRequest{
 		Name:             "name",
-		PlanId:           1,
-		LocationId:       2,
-		OsImageVersionId: 3,
+		PlanID:           1,
+		LocationID:       2,
+		OsImageVersionID: 3,
 		SshKeys:          []int{4, 5},
 		UserData:         "user data",
 	}
@@ -43,13 +43,13 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 		assert.Equal(t, "/projects/1/servers", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
 		if page == 0 {
-			require.Equal(t, "", r.URL.Query().Get("page"))
+			assert.Equal(t, "", r.URL.Query().Get("page"))
 		} else {
-			require.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
+			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 		}
 
 		if p == 2 {
-			writeJSON(t, w, http.StatusOK, ProjectServersResponse{Data: []Server{{Id: int(p)}}})
+			writeJSON(t, w, http.StatusOK, ProjectServersResponse{Data: []Server{{ID: int(p)}}})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -64,7 +64,7 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 					Next: r.URL.String(),
 				},
 			},
-			Data: []Server{{Id: int(p)}},
+			Data: []Server{{ID: int(p)}},
 		})
 	})
 	defer s.Close()
@@ -75,9 +75,9 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, []Server{
-		{Id: 0},
-		{Id: 1},
-		{Id: 2},
+		{ID: 0},
+		{ID: 1},
+		{ID: 2},
 	}, actual)
 }
 

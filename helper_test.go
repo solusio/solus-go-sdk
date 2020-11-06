@@ -15,10 +15,10 @@ import (
 )
 
 var fakeApplication = Application{
-	Id:   1,
+	ID:   1,
 	Name: "fake application",
 	Icon: Icon{
-		Id:   2,
+		ID:   2,
 		Name: "Fake application icon",
 		URL:  "http://example.com/image.png",
 		Type: IconTypeApplication,
@@ -36,12 +36,12 @@ var fakeApplication = Application{
 }
 
 var fakeComputeResource = ComputeResource{
-	Id:        1,
+	ID:        1,
 	Name:      "fake compute resource",
 	Host:      "192.0.2.1",
 	AgentPort: 1337,
 	Status: ComputerResourceStatus{
-		Id:   2,
+		ID:   2,
 		Name: "fake status",
 	},
 	Locations: []Location{
@@ -50,16 +50,16 @@ var fakeComputeResource = ComputeResource{
 }
 
 var fakeComputeResourceInstallStep = ComputeResourceInstallStep{
-	Id:                1,
-	ComputeResourceId: 2,
+	ID:                1,
+	ComputeResourceID: 2,
 	Title:             "fake CR install step",
 	Status:            ComputeResourceInstallStepStatusError,
 	StatusText:        "fake status text",
 	Progress:          57,
 }
 
-var fakeIpBlock = IpBlock{
-	Id:      1,
+var fakeIPBlock = IPBlock{
+	ID:      1,
 	Name:    "fake ip block",
 	Type:    IPv4,
 	Gateway: "192.0.2.254",
@@ -72,18 +72,18 @@ var fakeIpBlock = IpBlock{
 	ComputeResources: []ComputeResource{
 		fakeComputeResource,
 	},
-	Ips: []IpBlockIpAddress{
+	IPs: []IPBlockIPAddress{
 		{
-			Id: 3,
-			Ip: "192.0.2.1",
+			ID: 3,
+			IP: "192.0.2.1",
 		},
 	},
 }
 
-var fakeIpBlockIpAddress = IpBlockIpAddress{
-	Id:      1,
-	Ip:      "192.0.2.2",
-	IpBlock: fakeIpBlock,
+var fakeIPBlockIPAddress = IPBlockIPAddress{
+	ID:      1,
+	IP:      "192.0.2.2",
+	IPBlock: fakeIPBlock,
 }
 
 var fakeLicense = License{
@@ -98,10 +98,10 @@ var fakeLicense = License{
 }
 
 var fakeLocation = Location{
-	Id:   1,
+	ID:   1,
 	Name: "fake location",
 	Icon: Icon{
-		Id:   2,
+		ID:   2,
 		Name: "Fake location icon",
 		URL:  "http://example.com/image.png",
 		Type: IconTypeFlags,
@@ -110,15 +110,15 @@ var fakeLocation = Location{
 	IsDefault:   true,
 	IsVisible:   true,
 	ComputeResources: []ComputeResource{
-		{Id: 1},
+		{ID: 1},
 	},
 }
 
 var fakeOsImage = OsImage{
-	Id:   1,
+	ID:   1,
 	Name: "fake os image",
 	Icon: Icon{
-		Id:   2,
+		ID:   2,
 		Name: "fake os image icon",
 		URL:  "http://example.com/image.png",
 		Type: IconTypeOS,
@@ -130,7 +130,7 @@ var fakeOsImage = OsImage{
 }
 
 var fakeOsImageVersion = OsImageVersion{
-	Id:               1,
+	ID:               1,
 	Position:         100,
 	Version:          "1337",
 	Url:              "http://example.com/os.qcow2",
@@ -138,7 +138,7 @@ var fakeOsImageVersion = OsImageVersion{
 }
 
 var fakePlan = Plan{
-	Id:   1,
+	ID:   1,
 	Name: "fake plan",
 	Params: PlanParams{
 		Disk: 42,
@@ -150,6 +150,9 @@ var fakePlan = Plan{
 	IsDefault:           true,
 	IsSnapshotAvailable: true,
 	IsSnapshotsEnabled:  true,
+	IsBackupAvailable:   true,
+	BackupPrice:         11,
+	IsVisible:           true,
 	Limits: PlanLimits{
 		TotalBytes: PlanLimit{
 			IsEnabled: true,
@@ -160,26 +163,33 @@ var fakePlan = Plan{
 			Limit:     5,
 		},
 	},
-	TokenPerHour:  7,
-	TokenPerMonth: 8,
-	Position:      11,
+	TokensPerHour:  7,
+	TokensPerMonth: 8,
+	Position:       11,
+	Price: PlanPrice{
+		PerHour:        "fake per hour",
+		PerMonth:       "fake per month",
+		CurrencyCode:   "fake currency code",
+		TaxesInclusive: true,
+		Taxes:          []interface{}{"foo"},
+		TotalPrice:     "fake total price",
+		BackupPrice:    "fake backup price",
+	},
 }
 
 var fakeProject = Project{
-	Id:          1,
+	ID:          1,
 	Name:        "fake project",
 	Description: "fake descriptions",
 	Members:     42,
 	IsOwner:     true,
 	IsDefault:   true,
 	Owner:       fakeUser,
-	Servers: []Server{
-		fakeServer,
-	},
+	Servers:     1,
 }
 
 var fakeUser = User{
-	Id:        1,
+	ID:        1,
 	Email:     "fake@example.com",
 	Password:  "fake password",
 	CreatedAt: time.Now().String(),
@@ -190,32 +200,95 @@ var fakeUser = User{
 }
 
 var fakeRole = Role{
-	Id:         1,
+	ID:         1,
 	Name:       "fake role",
 	IsDefault:  true,
 	UsersCount: 42,
 }
 
 var fakeServer = Server{
-	Id:          1,
+	ID:          1,
 	Name:        "fake server",
 	Description: "fake description",
 	UUID:        "123e4567-e89b-12d3-a456-426655440000",
 	Status:      "running",
-	Ips: []IpBlockIpAddress{
-		fakeIpBlockIpAddress,
+	IPs: []IPBlockIPAddress{
+		fakeIPBlockIPAddress,
 	},
 }
 
 var fakeTask = Task{
-	Id:                1,
-	ComputeResourceId: 2,
+	ID:                1,
+	ComputeResourceID: 2,
 	Queue:             "fake queue",
 	Action:            ServerActionCreate,
 	Status:            TaskStatusDone,
 	Output:            "fake output",
 	Progress:          42,
 	Duration:          23,
+}
+
+var fakeSSHKey = SSHKey{
+	ID:   1,
+	Name: "fake ssh key",
+	Body: "fake ssh key body",
+}
+
+var fakeStorage = Storage{
+	ID:   1,
+	Name: "fake storage",
+	Type: StorageType{
+		ID:      1,
+		Name:    "fake storage",
+		Formats: []ImageFormat{ImageFormatRaw},
+	},
+	Path:                    "fake path",
+	Mount:                   "fake mount",
+	ThinPool:                "fake thinpool",
+	IsAvailableForBalancing: true,
+	ServersCount:            2,
+	ComputeResourcesCount:   3,
+	FreeSpace:               4,
+	Credentials: map[string]interface{}{
+		"foo": "bar",
+	},
+}
+
+var fakeServersMigration = ServersMigration{
+	ID:                         1,
+	DestinationComputeResource: fakeComputeResource,
+	Task:                       fakeTask,
+	Children: []Task{
+		fakeTask,
+		fakeTask,
+	},
+}
+
+var fakeBackupNode = BackupNode{
+	ID:   1,
+	Name: "fake backup node",
+	Type: BackupNodeTypeSSHRsync,
+	Credentials: map[string]interface{}{
+		"foo": "bar",
+	},
+	ComputeResourcesCount: 1,
+	BackupsCount:          2,
+	TotalBackupsSize:      3,
+	ComputeResources:      []ComputeResource{fakeComputeResource},
+}
+
+var fakeBackup = Backup{
+	ID:                1,
+	Type:              BackupTypeAuto,
+	Status:            BackupStatusCreated,
+	Size:              1337,
+	ComputeResourceVm: fakeServer,
+	BackupNode:        fakeBackupNode,
+	Creator:           fakeUser,
+	CreatedAt:         "1970-01-01T00:00:00.000000Z",
+	BackupProgress:    90,
+	BackupFailReason:  "for some reason",
+	Disk:              42,
 }
 
 func startTestServer(t *testing.T, h http.HandlerFunc) *httptest.Server {

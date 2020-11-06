@@ -1,9 +1,8 @@
 package solus
 
 import (
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,23 +34,16 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 		}
 
 		s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			b, err := ioutil.ReadAll(r.Body)
-			require.NoError(t, err)
-			_ = r.Body.Close()
-			require.Equal(t, http.MethodPost, r.Method)
-			require.Equal(t, "/auth/login", r.URL.Path)
-			require.Equal(t, string(b), `{"email":"test@example.com","password":"Pass80rd"}`)
-
-			b, err = json.Marshal(AuthLoginResponseData{
-				Data: AuthLoginResponse{
-					Credentials: credentials,
-				},
+			assert.Equal(t, http.MethodPost, r.Method)
+			assert.Equal(t, "/auth/login", r.URL.Path)
+			assertRequestBody(t, r, AuthLoginRequest{
+				Email:    "test@example.com",
+				Password: "Pass80rd",
 			})
-			require.NoError(t, err)
 
-			w.WriteHeader(200)
-			_, err = w.Write(b)
-			require.NoError(t, err)
+			writeResponse(t, w, http.StatusOK, AuthLoginResponse{
+				Credentials: credentials,
+			})
 		}))
 		defer s.Close()
 
@@ -74,6 +66,6 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = NewClient(u, authenticator)
-		require.EqualError(t, err, "HTTP 400: fake error")
+		require.EqualError(t, err, "HTTP POST auth/login returns 400 status code: fake error")
 	})
 }

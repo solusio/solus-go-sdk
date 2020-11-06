@@ -11,14 +11,14 @@ type LocationsService service
 type LocationCreateRequest struct {
 	Name             string   `json:"name"`
 	Description      string   `json:"description"`
-	IconId           null.Int `json:"icon_id"`
+	IconID           null.Int `json:"icon_id"`
 	IsDefault        bool     `json:"is_default"`
 	IsVisible        bool     `json:"is_visible"`
 	ComputeResources []int    `json:"compute_resources"`
 }
 
 type Location struct {
-	Id               int               `json:"id"`
+	ID               int               `json:"id"`
 	Name             string            `json:"name"`
 	Icon             Icon              `json:"icon"`
 	Description      string            `json:"description"`

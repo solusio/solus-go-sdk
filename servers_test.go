@@ -54,6 +54,34 @@ func TestServersService_Get(t *testing.T) {
 	require.Equal(t, fakeServer, actual)
 }
 
+func TestServersService_Start(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/start", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		writeResponse(t, w, http.StatusOK, fakeTask)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.Start(context.Background(), 10)
+	require.NoError(t, err)
+	require.Equal(t, fakeTask, actual)
+}
+
+func TestServersService_Stop(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/stop", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		writeResponse(t, w, http.StatusOK, fakeTask)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.Stop(context.Background(), 10)
+	require.NoError(t, err)
+	require.Equal(t, fakeTask, actual)
+}
+
 func TestServersService_Restart(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/restart", r.URL.Path)
@@ -66,6 +94,20 @@ func TestServersService_Restart(t *testing.T) {
 	actual, err := createTestClient(t, s.URL).Servers.Restart(context.Background(), 10)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
+}
+
+func TestServersService_Backup(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/backups", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		writeResponse(t, w, http.StatusCreated, fakeBackup)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
+	require.NoError(t, err)
+	require.Equal(t, fakeBackup, actual)
 }
 
 func TestServersService_Delete(t *testing.T) {

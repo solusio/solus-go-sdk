@@ -21,7 +21,7 @@ type LoginLink struct {
 }
 
 type Application struct {
-	Id               int       `json:"id"`
+	ID               int       `json:"id"`
 	Name             string    `json:"name"`
 	Icon             Icon      `json:"icon"`
 	Url              string    `json:"url"`
@@ -37,7 +37,7 @@ type Application struct {
 type ApplicationCreateRequest struct {
 	Name             string    `json:"name"`
 	Url              string    `json:"url"`
-	IconId           int       `json:"icon_id"`
+	IconID           int       `json:"icon_id"`
 	CloudInitVersion string    `json:"cloud_init_version"`
 	UserDataTemplate string    `json:"user_data_template"`
 	JsonSchema       string    `json:"json_schema"`

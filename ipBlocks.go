@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type IpBlocksService service
+type IPBlocksService service
 
 type IPVersion string
 
@@ -15,7 +15,7 @@ const (
 	IPv6 IPVersion = "IPv6"
 )
 
-type IpBlockCreateRequest struct {
+type IPBlockCreateRequest struct {
 	ComputeResources []int     `json:"compute_resources,omitempty"`
 	Name             string    `json:"name"`
 	Type             IPVersion `json:"type"`
@@ -33,8 +33,8 @@ type IpBlockCreateRequest struct {
 	Subnet int    `json:"subnet"`
 }
 
-type IpBlock struct {
-	Id               int                `json:"id"`
+type IPBlock struct {
+	ID               int                `json:"id"`
 	Name             string             `json:"name"`
 	Type             IPVersion          `json:"type"`
 	Gateway          string             `json:"gateway"`
@@ -45,31 +45,31 @@ type IpBlock struct {
 	To               string             `json:"to"`
 	Subnet           int                `json:"subnet"`
 	ComputeResources []ComputeResource  `json:"compute_resources[]"`
-	Ips              []IpBlockIpAddress `json:"ips[]"`
+	IPs              []IPBlockIPAddress `json:"ips[]"`
 }
 
-type IpBlockCreateResponse struct {
-	Data IpBlock `json:"data"`
+type IPBlockCreateResponse struct {
+	Data IPBlock `json:"data"`
 }
 
-type IpBlockIpAddress struct {
-	Id      int     `json:"id"`
-	Ip      string  `json:"ip"`
-	IpBlock IpBlock `json:"ip_block"`
+type IPBlockIPAddress struct {
+	ID      int     `json:"id"`
+	IP      string  `json:"ip"`
+	IPBlock IPBlock `json:"ip_block"`
 }
 
-type IpBlockIpAddressCreateResponse struct {
-	Data IpBlockIpAddress `json:"data"`
+type IPBlockIPAddressCreateResponse struct {
+	Data IPBlockIPAddress `json:"data"`
 }
 
-type IpBlocksResponse struct {
+type IPBlocksResponse struct {
 	paginatedResponse
 
-	Data []IpBlock `json:"data"`
+	Data []IPBlock `json:"data"`
 }
 
-func (s *IpBlocksService) List(ctx context.Context) (IpBlocksResponse, error) {
-	resp := IpBlocksResponse{
+func (s *IPBlocksService) List(ctx context.Context) (IPBlocksResponse, error) {
+	resp := IPBlocksResponse{
 		paginatedResponse: paginatedResponse{
 			service: (*service)(s),
 		},
@@ -77,25 +77,30 @@ func (s *IpBlocksService) List(ctx context.Context) (IpBlocksResponse, error) {
 	return resp, s.client.list(ctx, "ip_blocks", &resp)
 }
 
-func (s *IpBlocksService) Create(ctx context.Context, data IpBlockCreateRequest) (IpBlock, error) {
-	var resp IpBlockCreateResponse
+func (s *IPBlocksService) Create(ctx context.Context, data IPBlockCreateRequest) (IPBlock, error) {
+	var resp IPBlockCreateResponse
 	return resp.Data, s.client.create(ctx, "ip_blocks", data, &resp)
 }
 
-func (s *IpBlocksService) IpAddressCreate(ctx context.Context, ipBlockId int) (IpBlockIpAddress, error) {
-	body, code, err := s.client.request(ctx, http.MethodPost, fmt.Sprintf("ip_blocks/%d/ips", ipBlockId))
+func (s *IPBlocksService) Delete(ctx context.Context, id int) error {
+	return s.client.delete(ctx, fmt.Sprintf("ip_blocks/%d", id))
+}
+
+func (s *IPBlocksService) IPAddressCreate(ctx context.Context, ipBlockID int) (IPBlockIPAddress, error) {
+	path := fmt.Sprintf("ip_blocks/%d/ips", ipBlockID)
+	body, code, err := s.client.request(ctx, http.MethodPost, path)
 	if err != nil {
-		return IpBlockIpAddress{}, err
+		return IPBlockIPAddress{}, err
 	}
 
 	if code != http.StatusCreated {
-		return IpBlockIpAddress{}, newHTTPError(code, body)
+		return IPBlockIPAddress{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
-	var resp IpBlockIpAddressCreateResponse
+	var resp IPBlockIPAddressCreateResponse
 	return resp.Data, unmarshal(body, &resp)
 }
 
-func (s *IpBlocksService) IpAddressDelete(ctx context.Context, ipId int) error {
-	return s.client.delete(ctx, fmt.Sprintf("ips/%d", ipId))
+func (s *IPBlocksService) IPAddressDelete(ctx context.Context, id int) error {
+	return s.client.delete(ctx, fmt.Sprintf("ips/%d", id))
 }

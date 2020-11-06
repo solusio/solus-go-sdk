@@ -2,41 +2,59 @@ package solus
 
 import (
 	"context"
+	"fmt"
 )
 
 type TasksService service
 
+type TaskStatus string
+
 const (
 	// status
-	TaskStatusPending  = "pending"
-	TaskStatusQueued   = "queued"
-	TaskStatusRunning  = "running"
-	TaskStatusDone     = "done"
-	TaskStatusFailed   = "failed"
-	TaskStatusCanceled = "canceled"
+	TaskStatusPending        TaskStatus = "pending"
+	TaskStatusQueued         TaskStatus = "queued"
+	TaskStatusRunning        TaskStatus = "running"
+	TaskStatusDone           TaskStatus = "done"
+	TaskStatusDoneWithErrors TaskStatus = "done_with_errors"
+	TaskStatusFailed         TaskStatus = "failed"
+	TaskStatusCanceled       TaskStatus = "canceled"
+)
 
+type TaskAction string
+
+const (
 	// actions
-	ServerActionCreate         = "vm-create"
-	ServerActionReinstall      = "vm-reinstall"
-	ServerActionDelete         = "vm-delete"
-	ServerActionUpdate         = "vm-update"
-	ServerActionPasswordChange = "vm-password-change"
-	ServerActionStart          = "vm-start"
-	ServerActionStop           = "vm-stop"
-	ServerActionRestart        = "vm-restart"
-	ServerActionSuspend        = "vm-suspend"
-	ServerActionResume         = "vm-resume"
+	ServerActionCreate         TaskAction = "vm-create"
+	ServerActionReinstall      TaskAction = "vm-reinstall"
+	ServerActionDelete         TaskAction = "vm-delete"
+	ServerActionUpdate         TaskAction = "vm-update"
+	ServerActionPasswordChange TaskAction = "vm-password-change"
+	ServerActionStart          TaskAction = "vm-start"
+	ServerActionStop           TaskAction = "vm-stop"
+	ServerActionRestart        TaskAction = "vm-restart"
+	ServerActionSuspend        TaskAction = "vm-suspend"
+	ServerActionResume         TaskAction = "vm-resume"
 )
 
 type Task struct {
-	Id                int    `json:"id"`
-	ComputeResourceId int    `json:"compute_resource_id"`
-	Queue             string `json:"queue"`
-	Action            string `json:"action"`
-	Status            string `json:"status"`
-	Output            string `json:"output"`
-	Progress          int    `json:"progress"`
-	Duration          int    `json:"duration"`
+	ID                int        `json:"id"`
+	ComputeResourceID int        `json:"compute_resource_id"`
+	Queue             string     `json:"queue"`
+	Action            TaskAction `json:"action"`
+	Status            TaskStatus `json:"status"`
+	Output            string     `json:"output"`
+	Progress          int        `json:"progress"`
+	Duration          int        `json:"duration"`
+}
+
+func (t Task) IsFinished() bool {
+	return t.Status != TaskStatusPending &&
+		t.Status != TaskStatusQueued &&
+		t.Status != TaskStatusRunning
+}
+
+type taskResponse struct {
+	Data Task `json:"data"`
 }
 
 type TasksResponse struct {
@@ -58,4 +76,9 @@ func (s *TasksService) List(ctx context.Context, filter *FilterTasks) (TasksResp
 		},
 	}
 	return resp, s.client.list(ctx, "tasks", &resp, withFilter(filter.data))
+}
+
+func (s *TasksService) Get(ctx context.Context, id int) (Task, error) {
+	var resp taskResponse
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("tasks/%d", id), &resp)
 }
