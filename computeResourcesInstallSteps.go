@@ -16,12 +16,12 @@ type ComputeResourceInstallStepsResponse struct {
 }
 
 type ComputeResourceInstallStep struct {
-	Id                int                              `json:"id"`
-	ComputeResourceId int                              `json:"compute_resource_id"`
+	ID                int                              `json:"id"`
+	ComputeResourceID int                              `json:"compute_resource_id"`
 	Title             string                           `json:"title"`
 	Status            ComputeResourceInstallStepStatus `json:"status"`
 	StatusText        string                           `json:"status_text"`
-	Progress          int                              `json:"progress"`
+	Progress          float32                          `json:"progress"`
 }
 
 func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]ComputeResourceInstallStep, error) {

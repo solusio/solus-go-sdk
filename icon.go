@@ -11,7 +11,7 @@ const (
 )
 
 type Icon struct {
-	Id   int      `json:"id"`
+	ID   int      `json:"id"`
 	Name string   `json:"name"`
 	URL  string   `json:"url"`
 	Type IconType `json:"type"`

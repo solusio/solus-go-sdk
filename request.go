@@ -54,7 +54,7 @@ func (c *Client) create(ctx context.Context, path string, data, resp interface{}
 	}
 
 	if code != http.StatusCreated {
-		return newHTTPError(code, body)
+		return newHTTPError(http.MethodPost, path, code, body)
 	}
 
 	return unmarshal(body, &resp)
@@ -67,7 +67,7 @@ func (c *Client) list(ctx context.Context, path string, resp interface{}, opts .
 	}
 
 	if code != http.StatusOK {
-		return newHTTPError(code, body)
+		return newHTTPError(http.MethodGet, path, code, body)
 	}
 
 	return unmarshal(body, resp)
@@ -80,7 +80,7 @@ func (c *Client) get(ctx context.Context, path string, resp interface{}, opts ..
 	}
 
 	if code != http.StatusOK {
-		return newHTTPError(code, body)
+		return newHTTPError(http.MethodGet, path, code, body)
 	}
 
 	return unmarshal(body, resp)
@@ -93,7 +93,20 @@ func (c *Client) update(ctx context.Context, path string, data, resp interface{}
 	}
 
 	if code != http.StatusOK {
-		return newHTTPError(code, body)
+		return newHTTPError(http.MethodPut, path, code, body)
+	}
+
+	return unmarshal(body, resp)
+}
+
+func (c *Client) patch(ctx context.Context, path string, data, resp interface{}) error {
+	body, code, err := c.request(ctx, http.MethodPatch, path, withBody(data))
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusOK {
+		return newHTTPError(http.MethodPatch, path, code, body)
 	}
 
 	return unmarshal(body, resp)
@@ -106,7 +119,7 @@ func (c *Client) delete(ctx context.Context, path string) error {
 	}
 
 	if code != http.StatusNoContent {
-		return newHTTPError(code, body)
+		return newHTTPError(http.MethodDelete, path, code, body)
 	}
 	return nil
 }

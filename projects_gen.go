@@ -36,7 +36,7 @@ func (r *ProjectsResponse) Next(ctx context.Context) bool {
 	}
 
 	if code != http.StatusOK {
-		r.err = newHTTPError(code, body)
+		r.err = newHTTPError(http.MethodGet, r.Links.Next, code, body)
 		return false
 	}
 

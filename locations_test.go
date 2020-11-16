@@ -11,11 +11,10 @@ import (
 )
 
 func TestLocationsService_Create(t *testing.T) {
-	expected := fakeLocation
 	data := LocationCreateRequest{
 		Name:        "name",
 		Description: "description",
-		IconId:      null.IntFrom(1),
+		IconID:      null.IntFrom(1),
 		IsDefault:   false,
 		IsVisible:   true,
 	}
@@ -25,13 +24,13 @@ func TestLocationsService_Create(t *testing.T) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusCreated, expected)
+		writeResponse(t, w, http.StatusCreated, fakeLocation)
 	})
 	defer s.Close()
 
 	actual, err := createTestClient(t, s.URL).Locations.Create(context.Background(), data)
 	require.NoError(t, err)
-	require.Equal(t, expected, actual)
+	require.Equal(t, fakeLocation, actual)
 }
 
 func TestLocationsService_List(t *testing.T) {
@@ -78,7 +77,7 @@ func TestLocationsService_Update(t *testing.T) {
 	data := LocationCreateRequest{
 		Name:        "name",
 		Description: "description",
-		IconId:      null.IntFrom(1),
+		IconID:      null.IntFrom(1),
 		IsDefault:   false,
 		IsVisible:   true,
 	}
@@ -99,8 +98,8 @@ func TestLocationsService_Update(t *testing.T) {
 
 func TestLocationsService_Delete(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, "/locations/10", r.URL.Path)
-		require.Equal(t, http.MethodDelete, r.Method)
+		assert.Equal(t, "/locations/10", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
 
 		w.WriteHeader(204)
 	})

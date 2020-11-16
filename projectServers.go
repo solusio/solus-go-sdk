@@ -6,12 +6,16 @@ import (
 )
 
 type ProjectServersCreateRequest struct {
-	Name             string `json:"name"`
-	PlanId           int    `json:"plan_id"`
-	LocationId       int    `json:"location_id"`
-	OsImageVersionId int    `json:"os_image_version_id"`
-	SshKeys          []int  `json:"ssh_keys,omitempty"`
-	UserData         string `json:"user_data,omitempty"`
+	Name             string                `json:"name"`
+	PlanID           int                   `json:"plan_id"`
+	LocationID       int                   `json:"location_id"`
+	OsImageVersionID int                   `json:"os_image_version_id,omitempty"`
+	ApplicationID    int                   `json:"application_id,omitempty"`
+	ApplicationData  string                `json:"application_data,omitempty"`
+	SshKeys          []int                 `json:"ssh_keys,omitempty"`
+	UserData         string                `json:"user_data,omitempty"`
+	FQDNs            []string              `json:"fqdns,omitempty"`
+	BackupSettings   *ServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
 type ProjectServersCreateResponse struct {
@@ -24,22 +28,13 @@ type ProjectServersResponse struct {
 	Data []Server `json:"data"`
 }
 
-type Server struct {
-	Id          int                `json:"id"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	UUID        string             `json:"uuid"`
-	Status      string             `json:"status"`
-	Ips         []IpBlockIpAddress `json:"ips"`
-}
-
-func (s *ProjectsService) ServersCreate(ctx context.Context, projectId int, data ProjectServersCreateRequest) (Server, error) {
+func (s *ProjectsService) ServersCreate(ctx context.Context, projectID int, data ProjectServersCreateRequest) (Server, error) {
 	var resp ProjectServersCreateResponse
-	return resp.Data, s.client.create(ctx, fmt.Sprintf("projects/%d/servers", projectId), data, &resp)
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("projects/%d/servers", projectID), data, &resp)
 }
 
-func (s *ProjectsService) ServersListAll(ctx context.Context, projectId int) ([]Server, error) {
-	resp, err := s.Servers(ctx, projectId)
+func (s *ProjectsService) ServersListAll(ctx context.Context, id int) ([]Server, error) {
+	resp, err := s.Servers(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +47,11 @@ func (s *ProjectsService) ServersListAll(ctx context.Context, projectId int) ([]
 	return servers, resp.Err()
 }
 
-func (s *ProjectsService) Servers(ctx context.Context, projectId int) (ProjectServersResponse, error) {
+func (s *ProjectsService) Servers(ctx context.Context, id int) (ProjectServersResponse, error) {
 	resp := ProjectServersResponse{
 		paginatedResponse: paginatedResponse{
 			service: (*service)(s),
 		},
 	}
-	return resp, s.client.list(ctx, fmt.Sprintf("projects/%d/servers", projectId), &resp)
+	return resp, s.client.list(ctx, fmt.Sprintf("projects/%d/servers", id), &resp)
 }

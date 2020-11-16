@@ -33,7 +33,7 @@ func TestApplicationsService_Create(t *testing.T) {
 	data := ApplicationCreateRequest{
 		Name:             "name",
 		Url:              "url",
-		IconId:           1,
+		IconID:           1,
 		CloudInitVersion: "cloud init version",
 		UserDataTemplate: "user data template",
 		JsonSchema:       "json schema",

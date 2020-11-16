@@ -21,18 +21,25 @@ type Client struct {
 
 	s service
 
-	ComputeResources *ComputeResourcesService
-	IpBlocks         *IpBlocksService
-	License          *LicenseService
-	Locations        *LocationsService
-	OsImages         *OsImagesService
-	Applications     *ApplicationsService
-	Plans            *PlansService
-	Projects         *ProjectsService
-	Roles            *RolesService
-	Servers          *ServersService
-	Tasks            *TasksService
-	Users            *UsersService
+	Account           *AccountService
+	BackupNodes       *BackupNodesService
+	Backups           *BackupsService
+	ComputeResources  *ComputeResourcesService
+	IPBlocks          *IPBlocksService
+	License           *LicenseService
+	Locations         *LocationsService
+	OsImages          *OsImagesService
+	Applications      *ApplicationsService
+	Plans             *PlansService
+	Projects          *ProjectsService
+	Roles             *RolesService
+	Storage           *StorageService
+	Servers           *ServersService
+	ServersMigrations *ServersMigrationsService
+	StorageTypes      *StorageTypesService
+	SSHKeys           *SSHKeysService
+	Tasks             *TasksService
+	Users             *UsersService
 }
 
 type service struct {
@@ -92,9 +99,6 @@ type ClientOption func(c *Client)
 // AllowInsecure allow to skip certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
-		if c.HttpClient.Transport == nil {
-			c.HttpClient.Transport = http.DefaultTransport
-		}
 		c.HttpClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 }
@@ -116,7 +120,8 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 			"Content-Type": {"application/json"},
 		},
 		HttpClient: &http.Client{
-			Timeout: time.Second * 35,
+			Timeout:   time.Second * 35,
+			Transport: http.DefaultTransport.(*http.Transport).Clone(),
 		},
 		Logger:  NullLogger{},
 		Retries: 5,
@@ -135,8 +140,11 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
 
 	client.s.client = client
+	client.Account = (*AccountService)(&client.s)
+	client.BackupNodes = (*BackupNodesService)(&client.s)
+	client.Backups = (*BackupsService)(&client.s)
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
-	client.IpBlocks = (*IpBlocksService)(&client.s)
+	client.IPBlocks = (*IPBlocksService)(&client.s)
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
@@ -144,7 +152,11 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 	client.Plans = (*PlansService)(&client.s)
 	client.Projects = (*ProjectsService)(&client.s)
 	client.Roles = (*RolesService)(&client.s)
+	client.Storage = (*StorageService)(&client.s)
 	client.Servers = (*ServersService)(&client.s)
+	client.ServersMigrations = (*ServersMigrationsService)(&client.s)
+	client.StorageTypes = (*StorageTypesService)(&client.s)
+	client.SSHKeys = (*SSHKeysService)(&client.s)
 	client.Tasks = (*TasksService)(&client.s)
 	client.Users = (*UsersService)(&client.s)
 
@@ -152,13 +164,14 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 }
 
 func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLoginResponse, error) {
-	body, code, err := c.request(ctx, http.MethodPost, "auth/login", withBody(data))
+	const path = "auth/login"
+	body, code, err := c.request(ctx, http.MethodPost, path, withBody(data))
 	if err != nil {
 		return AuthLoginResponse{}, err
 	}
 
-	if code != 200 {
-		return AuthLoginResponse{}, newHTTPError(code, body)
+	if code != http.StatusOK {
+		return AuthLoginResponse{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
 	var resp AuthLoginResponseData

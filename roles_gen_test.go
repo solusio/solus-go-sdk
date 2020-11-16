@@ -25,7 +25,7 @@ func TestRolesResponse_Next(t *testing.T) {
 		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
-			writeJSON(t, w, http.StatusOK, RolesResponse{Data: []Role{{Id: int(p)}}})
+			writeJSON(t, w, http.StatusOK, RolesResponse{Data: []Role{{ID: int(p)}}})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -40,7 +40,7 @@ func TestRolesResponse_Next(t *testing.T) {
 					Next: r.URL.String(),
 				},
 			},
-			Data: []Role{{Id: int(p)}},
+			Data: []Role{{ID: int(p)}},
 		})
 	})
 	defer s.Close()
@@ -56,7 +56,7 @@ func TestRolesResponse_Next(t *testing.T) {
 
 	i := 1
 	for resp.Next(context.Background()) {
-		require.Equal(t, []Role{{Id: i}}, resp.Data)
+		require.Equal(t, []Role{{ID: i}}, resp.Data)
 		i++
 	}
 	require.NoError(t, resp.err)

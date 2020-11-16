@@ -25,7 +25,7 @@ func TestServersResponse_Next(t *testing.T) {
 		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
-			writeJSON(t, w, http.StatusOK, ServersResponse{Data: []Server{{Id: int(p)}}})
+			writeJSON(t, w, http.StatusOK, ServersResponse{Data: []Server{{ID: int(p)}}})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -40,7 +40,7 @@ func TestServersResponse_Next(t *testing.T) {
 					Next: r.URL.String(),
 				},
 			},
-			Data: []Server{{Id: int(p)}},
+			Data: []Server{{ID: int(p)}},
 		})
 	})
 	defer s.Close()
@@ -56,7 +56,7 @@ func TestServersResponse_Next(t *testing.T) {
 
 	i := 1
 	for resp.Next(context.Background()) {
-		require.Equal(t, []Server{{Id: i}}, resp.Data)
+		require.Equal(t, []Server{{ID: i}}, resp.Data)
 		i++
 	}
 	require.NoError(t, resp.err)

@@ -27,13 +27,14 @@ type LicenseActivateResponse struct {
 }
 
 func (s *LicenseService) Activate(ctx context.Context, data LicenseActivateRequest) (License, error) {
-	body, code, err := s.client.request(ctx, http.MethodPost, "license/activate", withBody(data))
+	const path = "license/activate"
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
 	if err != nil {
 		return License{}, err
 	}
 
 	if code != http.StatusOK {
-		return License{}, newHTTPError(code, body)
+		return License{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
 	var resp LicenseActivateResponse

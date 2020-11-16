@@ -50,6 +50,19 @@ func TestOsImagesService_Create(t *testing.T) {
 	require.Equal(t, fakeOsImage, actual)
 }
 
+func TestOsImagesService_Delete(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/os_images/10", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
+
+		w.WriteHeader(204)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).OsImages.Delete(context.Background(), 10)
+	require.NoError(t, err)
+}
+
 func TestOsImagesService_OsImageVersionCreate(t *testing.T) {
 	data := OsImageVersionRequest{
 		Position:         1,

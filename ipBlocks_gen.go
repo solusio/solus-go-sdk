@@ -24,7 +24,7 @@ import (
 //  if resp.Err() != nil {
 //		handleAnError(resp.Err())
 //	}
-func (r *IpBlocksResponse) Next(ctx context.Context) bool {
+func (r *IPBlocksResponse) Next(ctx context.Context) bool {
 	if (r.Links.Next == "") || (r.err != nil) {
 		return false
 	}
@@ -36,7 +36,7 @@ func (r *IpBlocksResponse) Next(ctx context.Context) bool {
 	}
 
 	if code != http.StatusOK {
-		r.err = newHTTPError(code, body)
+		r.err = newHTTPError(http.MethodGet, r.Links.Next, code, body)
 		return false
 	}
 
