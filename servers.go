@@ -16,6 +16,7 @@ const (
 	ServerStatusProcessing  ServerStatus = "processing"
 	ServerStatusStarted     ServerStatus = "started"
 	ServerStatusStopped     ServerStatus = "stopped"
+	ServerStatusPaused      ServerStatus = "paused"
 	ServerStatusUnavailable ServerStatus = "unavailable"
 )
 
