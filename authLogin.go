@@ -5,10 +5,6 @@ type AuthLoginRequest struct {
 	Password string `json:"password"`
 }
 
-type AuthLoginResponseData struct {
-	Data AuthLoginResponse `json:"data"`
-}
-
 type AuthLoginResponse struct {
 	Credentials Credentials `json:"credentials"`
 }

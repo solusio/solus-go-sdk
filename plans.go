@@ -74,10 +74,6 @@ type PlansResponse struct {
 	Data []Plan `json:"data"`
 }
 
-type PlanCreateResponse struct {
-	Data Plan `json:"data"`
-}
-
 func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
 	resp := PlansResponse{
 		paginatedResponse: paginatedResponse{
@@ -88,7 +84,9 @@ func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
 }
 
 func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {
-	var resp PlanCreateResponse
+	var resp struct {
+		Data Plan `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, "plans", data, &resp)
 }
 

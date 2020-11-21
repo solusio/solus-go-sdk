@@ -44,7 +44,7 @@ type UserUpdateRequest struct {
 	Roles      []int  `json:"roles,omitempty"`
 }
 
-type UserCreateResponse struct {
+type userResponse struct {
 	Data User `json:"data"`
 }
 
@@ -58,12 +58,12 @@ func (s *UsersService) List(ctx context.Context, filter *FilterUsers) (UsersResp
 }
 
 func (s *UsersService) Create(ctx context.Context, data UserCreateRequest) (User, error) {
-	var resp UserCreateResponse
+	var resp userResponse
 	return resp.Data, s.client.create(ctx, "users", data, &resp)
 }
 
 func (s *UsersService) Update(ctx context.Context, id int, data UserUpdateRequest) (User, error) {
-	var resp UserCreateResponse
+	var resp userResponse
 	return resp.Data, s.client.update(ctx, fmt.Sprintf("users/%d", id), data, &resp)
 }
 

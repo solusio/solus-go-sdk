@@ -22,10 +22,6 @@ type LicenseActivateRequest struct {
 	ActivationCode string `json:"activation_code"`
 }
 
-type LicenseActivateResponse struct {
-	Data License `json:"data"`
-}
-
 func (s *LicenseService) Activate(ctx context.Context, data LicenseActivateRequest) (License, error) {
 	const path = "license/activate"
 	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
@@ -37,6 +33,8 @@ func (s *LicenseService) Activate(ctx context.Context, data LicenseActivateReque
 		return License{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
-	var resp LicenseActivateResponse
+	var resp struct {
+		Data License `json:"data"`
+	}
 	return resp.Data, unmarshal(body, &resp)
 }

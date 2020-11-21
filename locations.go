@@ -27,18 +27,18 @@ type Location struct {
 	ComputeResources []ComputeResource `json:"compute_resources"`
 }
 
-type LocationResponse struct {
-	Data Location `json:"data"`
-}
-
 type LocationsResponse struct {
 	paginatedResponse
 
 	Data []Location `json:"data"`
 }
 
+type locationResponse struct {
+	Data Location `json:"data"`
+}
+
 func (s *LocationsService) Create(ctx context.Context, data LocationCreateRequest) (Location, error) {
-	var resp LocationResponse
+	var resp locationResponse
 	return resp.Data, s.client.create(ctx, "locations", data, &resp)
 }
 
@@ -52,12 +52,12 @@ func (s *LocationsService) List(ctx context.Context, filter *FilterLocations) (L
 }
 
 func (s *LocationsService) Get(ctx context.Context, id int) (Location, error) {
-	var resp LocationResponse
+	var resp locationResponse
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("locations/%d", id), &resp)
 }
 
 func (s *LocationsService) Update(ctx context.Context, id int, data LocationCreateRequest) (Location, error) {
-	var resp LocationResponse
+	var resp locationResponse
 	return resp.Data, s.client.update(ctx, fmt.Sprintf("locations/%d", id), data, &resp)
 }
 

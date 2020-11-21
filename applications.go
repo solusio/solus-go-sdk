@@ -45,10 +45,6 @@ type ApplicationCreateRequest struct {
 	LoginLink        LoginLink `json:"login_link"`
 }
 
-type ApplicationResponse struct {
-	Data Application `json:"data"`
-}
-
 type ApplicationsResponse struct {
 	paginatedResponse
 
@@ -56,7 +52,9 @@ type ApplicationsResponse struct {
 }
 
 func (s *ApplicationsService) Create(ctx context.Context, data ApplicationCreateRequest) (Application, error) {
-	var resp ApplicationResponse
+	var resp struct {
+		Data Application `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, "applications", data, &resp)
 }
 
