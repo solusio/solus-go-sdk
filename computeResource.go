@@ -152,12 +152,19 @@ type computerResourceResponse struct {
 	Data ComputeResource `json:"data"`
 }
 
-func (s *ComputeResourcesService) Create(ctx context.Context, data ComputerResourceCreateRequest) (ComputeResource, error) {
+func (s *ComputeResourcesService) Create(
+	ctx context.Context,
+	data ComputerResourceCreateRequest,
+) (ComputeResource, error) {
 	var resp computerResourceResponse
 	return resp.Data, s.client.create(ctx, "compute_resources", data, &resp)
 }
 
-func (s *ComputeResourcesService) Patch(ctx context.Context, id int, data ComputerResourceCreateRequest) (ComputeResource, error) {
+func (s *ComputeResourcesService) Patch(
+	ctx context.Context,
+	id int,
+	data ComputerResourceCreateRequest,
+) (ComputeResource, error) {
 	var resp computerResourceResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
 }
@@ -212,7 +219,10 @@ func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, netw
 	return nil
 }
 
-func (s *ComputeResourcesService) PhysicalVolumes(ctx context.Context, id int) ([]ComputeResourcePhysicalVolume, error) {
+func (s *ComputeResourcesService) PhysicalVolumes(
+	ctx context.Context,
+	id int,
+) ([]ComputeResourcePhysicalVolume, error) {
 	var resp struct {
 		Data []ComputeResourcePhysicalVolume `json:"data"`
 	}

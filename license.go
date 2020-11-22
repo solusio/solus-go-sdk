@@ -8,8 +8,8 @@ import (
 type LicenseService service
 
 type License struct {
-	CpuCores       int    `json:"cpu_cores"`
-	CpuCoresInUse  int    `json:"cpu_cores_in_use"`
+	CPUCores       int    `json:"cpu_cores"`
+	CPUCoresInUse  int    `json:"cpu_cores_in_use"`
 	IsActive       bool   `json:"is_active"`
 	Key            string `json:"key"`
 	KeyType        string `json:"key_type"`

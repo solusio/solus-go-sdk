@@ -3,6 +3,7 @@ package solus
 import (
 	"context"
 	"fmt"
+
 	"gopkg.in/guregu/null.v4"
 )
 

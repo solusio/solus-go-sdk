@@ -2,11 +2,12 @@ package solus
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTask_IsFinished(t *testing.T) {
@@ -21,6 +22,8 @@ func TestTask_IsFinished(t *testing.T) {
 	}
 
 	for status, expected := range testCases {
+		status := status
+		expected := expected
 		t.Run(string(status), func(t *testing.T) {
 			require.Equal(t, expected, Task{Status: status}.IsFinished())
 		})
@@ -52,7 +55,7 @@ func TestTasksService_List(t *testing.T) {
 		ByAction("action").
 		ByStatus("status").
 		ByComputeResourceID(1).
-		ByComputeResourceVmID(2)
+		ByComputeResourceVMID(2)
 
 	actual, err := createTestClient(t, s.URL).Tasks.List(context.Background(), f)
 	require.NoError(t, err)

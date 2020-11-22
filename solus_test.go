@@ -1,23 +1,24 @@
 package solus
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAllowInsecure(t *testing.T) {
 	c := &Client{
-		HttpClient: &http.Client{
+		HTTPClient: &http.Client{
 			Transport: &http.Transport{},
 		},
 	}
 	AllowInsecure()(c)
 
-	require.True(t, c.HttpClient.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify)
+	require.True(t, c.HTTPClient.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify)
 }
 
 func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {

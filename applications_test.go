@@ -2,10 +2,11 @@ package solus
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestApplicationsService_List(t *testing.T) {
@@ -32,11 +33,11 @@ func TestApplicationsService_List(t *testing.T) {
 func TestApplicationsService_Create(t *testing.T) {
 	data := ApplicationCreateRequest{
 		Name:             "name",
-		Url:              "url",
+		URL:              "url",
 		IconID:           1,
 		CloudInitVersion: "cloud init version",
 		UserDataTemplate: "user data template",
-		JsonSchema:       "json schema",
+		JSONSchema:       "json schema",
 		IsVisible:        true,
 		LoginLink: LoginLink{
 			Type:    LoginLinkTypeURL,

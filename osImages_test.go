@@ -2,10 +2,11 @@ package solus
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestOsImagesService_List(t *testing.T) {
@@ -67,7 +68,7 @@ func TestOsImagesService_OsImageVersionCreate(t *testing.T) {
 	data := OsImageVersionRequest{
 		Position:         1,
 		Version:          "version",
-		Url:              "http://example.com",
+		URL:              "http://example.com",
 		CloudInitVersion: "v2",
 	}
 

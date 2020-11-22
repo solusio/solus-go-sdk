@@ -15,7 +15,7 @@ type Client struct {
 	UserAgent   string
 	Credentials Credentials
 	Headers     http.Header
-	HttpClient  *http.Client
+	HTTPClient  *http.Client
 	Logger      Logger
 	Retries     int
 
@@ -65,12 +65,7 @@ type EmailAndPasswordAuthenticator struct {
 var _ Authenticator = EmailAndPasswordAuthenticator{}
 
 func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, error) {
-	authRequest := AuthLoginRequest{
-		Email:    a.Email,
-		Password: a.Password,
-	}
-
-	resp, err := c.authLogin(context.Background(), authRequest)
+	resp, err := c.authLogin(context.Background(), AuthLoginRequest(a))
 	if err != nil {
 		return Credentials{}, err
 	}
@@ -78,14 +73,14 @@ func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, err
 	return resp.Credentials, nil
 }
 
-// ApiTokenAuthenticator authenticate at SOLUS IO by provided API token.
-type ApiTokenAuthenticator struct {
+// APITokenAuthenticator authenticate at SOLUS IO by provided API token.
+type APITokenAuthenticator struct {
 	Token string
 }
 
-var _ Authenticator = ApiTokenAuthenticator{}
+var _ Authenticator = APITokenAuthenticator{}
 
-func (a ApiTokenAuthenticator) Authenticate(*Client) (Credentials, error) {
+func (a APITokenAuthenticator) Authenticate(*Client) (Credentials, error) {
 	return Credentials{
 		AccessToken: a.Token,
 		TokenType:   "Bearer",
@@ -99,7 +94,7 @@ type ClientOption func(c *Client)
 // AllowInsecure allow to skip certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
-		c.HttpClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		c.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
 	}
 }
 
@@ -119,7 +114,7 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 			"Accept":       {"application/json"},
 			"Content-Type": {"application/json"},
 		},
-		HttpClient: &http.Client{
+		HTTPClient: &http.Client{
 			Timeout:   time.Second * 35,
 			Transport: http.DefaultTransport.(*http.Transport).Clone(),
 		},

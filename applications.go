@@ -24,11 +24,11 @@ type Application struct {
 	ID               int       `json:"id"`
 	Name             string    `json:"name"`
 	Icon             Icon      `json:"icon"`
-	Url              string    `json:"url"`
+	URL              string    `json:"url"`
 	CloudInitVersion string    `json:"cloud_init_version"`
 	UserData         string    `json:"user_data_template"`
 	LoginLink        LoginLink `json:"login_link"`
-	JsonSchema       string    `json:"json_schema"`
+	JSONSchema       string    `json:"json_schema"`
 	IsDefault        bool      `json:"is_default"`
 	IsVisible        bool      `json:"is_visible"`
 	IsBuiltin        bool      `json:"is_buildin"`
@@ -36,11 +36,11 @@ type Application struct {
 
 type ApplicationCreateRequest struct {
 	Name             string    `json:"name"`
-	Url              string    `json:"url"`
+	URL              string    `json:"url"`
 	IconID           int       `json:"icon_id"`
 	CloudInitVersion string    `json:"cloud_init_version"`
 	UserDataTemplate string    `json:"user_data_template"`
-	JsonSchema       string    `json:"json_schema"`
+	JSONSchema       string    `json:"json_schema"`
 	IsVisible        bool      `json:"is_visible"`
 	LoginLink        LoginLink `json:"login_link"`
 }

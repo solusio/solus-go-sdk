@@ -73,8 +73,8 @@ func (c *Client) list(ctx context.Context, path string, resp interface{}, opts .
 	return unmarshal(body, resp)
 }
 
-func (c *Client) get(ctx context.Context, path string, resp interface{}, opts ...requestOption) error {
-	body, code, err := c.request(ctx, http.MethodGet, path, opts...)
+func (c *Client) get(ctx context.Context, path string, resp interface{}) error {
+	body, code, err := c.request(ctx, http.MethodGet, path)
 	if err != nil {
 		return err
 	}
@@ -125,56 +125,15 @@ func (c *Client) delete(ctx context.Context, path string) error {
 }
 
 func (c *Client) request(ctx context.Context, method, path string, opts ...requestOption) ([]byte, int, error) {
-	reqOpts := requestOpts{}
-	for _, o := range opts {
-		o(&reqOpts)
-	}
-
-	var bodyByte []byte
-	var reqBody io.ReadWriter
-	if reqOpts.body != nil {
-		var err error
-		bodyByte, err = json.Marshal(reqOpts.body)
-		if err != nil {
-			return nil, 0, err
-		}
-		reqBody = bytes.NewBuffer(bodyByte)
-	}
-
-	fullUrl, err := c.BaseURL.Parse(path)
+	req, err := c.buildRequest(ctx, method, path, opts...)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	if reqOpts.params != nil {
-		query := fullUrl.Query()
-		for param, values := range reqOpts.params {
-			for _, value := range values {
-				query.Add(param, value)
-			}
-		}
-
-		fullUrl.RawQuery = query.Encode()
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, fullUrl.String(), reqBody)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	for k, values := range c.Headers {
-		for _, v := range values {
-			req.Header.Add(k, v)
-		}
-	}
-
-	req.Header.Set("User-Agent", c.UserAgent)
-
-	c.Logger.Debugf("[%s] %s with body %q", method, fullUrl.String(), string(bodyByte))
 	var resp *http.Response
 	err = retry(func(attempt int) (bool, error) {
-		var err error
-		resp, err = c.HttpClient.Do(req)
+		var err error //nolint:govet
+		resp, err = c.HTTPClient.Do(req)
 		if err != nil {
 			time.Sleep(1 * time.Second)     // wait before next try
 			return attempt < c.Retries, err // try N times
@@ -189,7 +148,7 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 		return nil, 0, err
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
+		if err := resp.Body.Close(); err != nil { //nolint:govet
 			c.Logger.Errorf("failed to close response body for %s %s: %s", method, path, err)
 		}
 	}()
@@ -206,6 +165,66 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 	}
 
 	return respBody, code, nil
+}
+
+func (c *Client) buildRequest(ctx context.Context, method, path string, opts ...requestOption) (*http.Request, error) {
+	reqOpts := requestOpts{}
+	for _, o := range opts {
+		o(&reqOpts)
+	}
+
+	var (
+		bodyByte []byte
+		reqBody  io.ReadWriter
+	)
+	if reqOpts.body != nil {
+		var err error
+		bodyByte, err = json.Marshal(reqOpts.body)
+		if err != nil {
+			return nil, err
+		}
+		reqBody = bytes.NewBuffer(bodyByte)
+	}
+
+	url, err := c.buildURL(path, reqOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	for k, values := range c.Headers {
+		for _, v := range values {
+			req.Header.Add(k, v)
+		}
+	}
+
+	req.Header.Set("User-Agent", c.UserAgent)
+
+	c.Logger.Debugf("[%s] %s with body %q", method, url, string(bodyByte))
+	return req, nil
+}
+
+func (c *Client) buildURL(path string, opts requestOpts) (string, error) {
+	fullURL, err := c.BaseURL.Parse(path)
+	if err != nil {
+		return "", err
+	}
+
+	if opts.params != nil {
+		query := fullURL.Query()
+		for param, values := range opts.params {
+			for _, value := range values {
+				query.Add(param, value)
+			}
+		}
+
+		fullURL.RawQuery = query.Encode()
+	}
+	return fullURL.String(), nil
 }
 
 func retry(fn retryFunc) error {

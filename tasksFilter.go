@@ -22,8 +22,8 @@ func (f *FilterTasks) ByComputeResourceID(id int) *FilterTasks {
 	return f
 }
 
-// ByComputeResourceVmID filter Tasks by specified Compute Resource VM ID.
-func (f *FilterTasks) ByComputeResourceVmID(id int) *FilterTasks {
+// ByComputeResourceVMID filter Tasks by specified Compute Resource VM ID.
+func (f *FilterTasks) ByComputeResourceVMID(id int) *FilterTasks {
 	f.addInt("filter[compute_resource_vm_id]", id)
 	return f
 }

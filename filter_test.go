@@ -1,8 +1,9 @@
 package solus
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestFilter_add(t *testing.T) {

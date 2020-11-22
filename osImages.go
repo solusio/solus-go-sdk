@@ -19,7 +19,7 @@ type OsImageVersion struct {
 	ID               int     `json:"id"`
 	Position         float64 `json:"position"`
 	Version          string  `json:"version"`
-	Url              string  `json:"url"`
+	URL              string  `json:"url"`
 	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
@@ -32,7 +32,7 @@ type OsImageCreateRequest struct {
 type OsImageVersionRequest struct {
 	Position         float64 `json:"position"`
 	Version          string  `json:"version"`
-	Url              string  `json:"url"`
+	URL              string  `json:"url"`
 	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
@@ -62,7 +62,11 @@ func (s *OsImagesService) Delete(ctx context.Context, id int) error {
 	return s.client.delete(ctx, fmt.Sprintf("os_images/%d", id))
 }
 
-func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageID int, data OsImageVersionRequest) (OsImageVersion, error) {
+func (s *OsImagesService) OsImageVersionCreate(
+	ctx context.Context,
+	osImageID int,
+	data OsImageVersionRequest,
+) (OsImageVersion, error) {
 	var resp struct {
 		Data OsImageVersion `json:"data"`
 	}
