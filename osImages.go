@@ -36,14 +36,6 @@ type OsImageVersionRequest struct {
 	CloudInitVersion string  `json:"cloud_init_version"`
 }
 
-type OsImageResponse struct {
-	Data OsImage `json:"data"`
-}
-
-type OsImageVersionResponse struct {
-	Data OsImageVersion `json:"data"`
-}
-
 type OsImagesResponse struct {
 	paginatedResponse
 
@@ -60,7 +52,9 @@ func (s *OsImagesService) List(ctx context.Context) (OsImagesResponse, error) {
 }
 
 func (s *OsImagesService) Create(ctx context.Context, data OsImageCreateRequest) (OsImage, error) {
-	var resp OsImageResponse
+	var resp struct {
+		Data OsImage `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, "os_images", data, &resp)
 }
 
@@ -69,6 +63,8 @@ func (s *OsImagesService) Delete(ctx context.Context, id int) error {
 }
 
 func (s *OsImagesService) OsImageVersionCreate(ctx context.Context, osImageID int, data OsImageVersionRequest) (OsImageVersion, error) {
-	var resp OsImageVersionResponse
+	var resp struct {
+		Data OsImageVersion `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("os_images/%d/versions", osImageID), data, &resp)
 }

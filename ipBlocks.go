@@ -48,18 +48,10 @@ type IPBlock struct {
 	IPs              []IPBlockIPAddress `json:"ips[]"`
 }
 
-type IPBlockCreateResponse struct {
-	Data IPBlock `json:"data"`
-}
-
 type IPBlockIPAddress struct {
 	ID      int     `json:"id"`
 	IP      string  `json:"ip"`
 	IPBlock IPBlock `json:"ip_block"`
-}
-
-type IPBlockIPAddressCreateResponse struct {
-	Data IPBlockIPAddress `json:"data"`
 }
 
 type IPBlocksResponse struct {
@@ -78,7 +70,9 @@ func (s *IPBlocksService) List(ctx context.Context) (IPBlocksResponse, error) {
 }
 
 func (s *IPBlocksService) Create(ctx context.Context, data IPBlockCreateRequest) (IPBlock, error) {
-	var resp IPBlockCreateResponse
+	var resp struct {
+		Data IPBlock `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, "ip_blocks", data, &resp)
 }
 
@@ -97,7 +91,9 @@ func (s *IPBlocksService) IPAddressCreate(ctx context.Context, ipBlockID int) (I
 		return IPBlockIPAddress{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
-	var resp IPBlockIPAddressCreateResponse
+	var resp struct {
+		Data IPBlockIPAddress `json:"data"`
+	}
 	return resp.Data, unmarshal(body, &resp)
 }
 

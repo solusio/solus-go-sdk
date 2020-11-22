@@ -53,19 +53,20 @@ func (t Task) IsFinished() bool {
 		t.Status != TaskStatusRunning
 }
 
-type taskResponse struct {
-	Data Task `json:"data"`
-}
-
 type TasksResponse struct {
 	paginatedResponse
 
 	Data []Task `json:"data"`
 }
+
 type Date struct {
 	Date         string `json:"date"`
 	TimezoneType int    `json:"timezone_type"`
 	Timezone     string `json:"timezone"`
+}
+
+type taskResponse struct {
+	Data Task `json:"data"`
 }
 
 // Tasks return list of Task, filter can be nil

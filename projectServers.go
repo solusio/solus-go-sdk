@@ -18,10 +18,6 @@ type ProjectServersCreateRequest struct {
 	BackupSettings   *ServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
-type ProjectServersCreateResponse struct {
-	Data Server `json:"data"`
-}
-
 type ProjectServersResponse struct {
 	paginatedResponse
 
@@ -29,7 +25,9 @@ type ProjectServersResponse struct {
 }
 
 func (s *ProjectsService) ServersCreate(ctx context.Context, projectID int, data ProjectServersCreateRequest) (Server, error) {
-	var resp ProjectServersCreateResponse
+	var resp struct {
+		Data Server `json:"data"`
+	}
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("projects/%d/servers", projectID), data, &resp)
 }
 

@@ -19,7 +19,7 @@ func TestLicenseService_Activate(t *testing.T) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeJSON(t, w, http.StatusOK, LicenseActivateResponse{expected})
+		writeResponse(t, w, http.StatusOK, expected)
 	})
 	defer s.Close()
 

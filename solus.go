@@ -174,6 +174,8 @@ func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLogi
 		return AuthLoginResponse{}, newHTTPError(http.MethodPost, path, code, body)
 	}
 
-	var resp AuthLoginResponseData
+	var resp struct {
+		Data AuthLoginResponse `json:"data"`
+	}
 	return resp.Data, unmarshal(body, &resp)
 }
