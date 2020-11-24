@@ -29,3 +29,7 @@ func (s *StorageService) Get(ctx context.Context, id int) (Storage, error) {
 	var resp storageResponse
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("storages/%d", id), &resp)
 }
+
+func (s *StorageService) Delete(ctx context.Context, id int) error {
+	return s.client.delete(ctx, fmt.Sprintf("storages/%d", id))
+}
