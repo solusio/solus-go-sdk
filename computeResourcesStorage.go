@@ -20,3 +20,10 @@ func (s *ComputeResourcesService) StorageCreate(
 	var resp storageResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("compute_resources/%d/storages", id), data, &resp)
 }
+
+func (s *ComputeResourcesService) StorageList(ctx context.Context, id int) ([]Storage, error) {
+	resp := struct {
+		Data []Storage `json:"data"`
+	}{}
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/storages", id), &resp)
+}

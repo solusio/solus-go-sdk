@@ -148,15 +148,30 @@ type ComputeResourceThinPool struct {
 	VGName          string `json:"vg_name"`
 }
 
-type computerResourceResponse struct {
+type computeResourceResponse struct {
 	Data ComputeResource `json:"data"`
+}
+
+type ComputeResourcesPaginatedResponse struct {
+	paginatedResponse
+
+	Data []ComputeResource `json:"data"`
+}
+
+func (s *ComputeResourcesService) List(ctx context.Context) (ComputeResourcesPaginatedResponse, error) {
+	resp := ComputeResourcesPaginatedResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
+	}
+	return resp, s.client.list(ctx, "compute_resources", &resp)
 }
 
 func (s *ComputeResourcesService) Create(
 	ctx context.Context,
 	data ComputerResourceCreateRequest,
 ) (ComputeResource, error) {
-	var resp computerResourceResponse
+	var resp computeResourceResponse
 	return resp.Data, s.client.create(ctx, "compute_resources", data, &resp)
 }
 
@@ -165,12 +180,12 @@ func (s *ComputeResourcesService) Patch(
 	id int,
 	data ComputerResourceCreateRequest,
 ) (ComputeResource, error) {
-	var resp computerResourceResponse
+	var resp computeResourceResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
 }
 
 func (s *ComputeResourcesService) Get(ctx context.Context, id int) (ComputeResource, error) {
-	var resp computerResourceResponse
+	var resp computeResourceResponse
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d", id), &resp)
 }
 
