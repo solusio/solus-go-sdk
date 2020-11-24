@@ -21,7 +21,11 @@ type ComputeResourceServerCreateRequest struct {
 	BackupSettings   *ServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
-func (s *ComputeResourcesService) ServersCreate(ctx context.Context, id int, data ComputeResourceServerCreateRequest) (Server, error) {
+func (s *ComputeResourcesService) ServersCreate(
+	ctx context.Context,
+	id int,
+	data ComputeResourceServerCreateRequest,
+) (Server, error) {
 	var resp serverResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("compute_resources/%d/servers", id), data, &resp)
 }

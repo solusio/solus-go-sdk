@@ -29,7 +29,7 @@ type Backup struct {
 	Type              BackupType   `json:"type"`
 	Status            BackupStatus `json:"status"`
 	Size              float32      `json:"size"`
-	ComputeResourceVm Server       `json:"compute_resource_vm"`
+	ComputeResourceVM Server       `json:"compute_resource_vm"`
 	BackupNode        BackupNode   `json:"backup_node"`
 	Creator           User         `json:"creator"`
 	CreatedAt         string       `json:"created_at"`

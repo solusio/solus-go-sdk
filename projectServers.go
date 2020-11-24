@@ -12,7 +12,7 @@ type ProjectServersCreateRequest struct {
 	OsImageVersionID int                   `json:"os_image_version_id,omitempty"`
 	ApplicationID    int                   `json:"application_id,omitempty"`
 	ApplicationData  string                `json:"application_data,omitempty"`
-	SshKeys          []int                 `json:"ssh_keys,omitempty"`
+	SSHKeys          []int                 `json:"ssh_keys,omitempty"`
 	UserData         string                `json:"user_data,omitempty"`
 	FQDNs            []string              `json:"fqdns,omitempty"`
 	BackupSettings   *ServerBackupSettings `json:"backup_settings,omitempty"`
@@ -24,7 +24,11 @@ type ProjectServersResponse struct {
 	Data []Server `json:"data"`
 }
 
-func (s *ProjectsService) ServersCreate(ctx context.Context, projectID int, data ProjectServersCreateRequest) (Server, error) {
+func (s *ProjectsService) ServersCreate(
+	ctx context.Context,
+	projectID int,
+	data ProjectServersCreateRequest,
+) (Server, error) {
 	var resp struct {
 		Data Server `json:"data"`
 	}

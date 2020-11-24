@@ -2,6 +2,7 @@ name: main
 
 on:
   push:
+    tags: [ v* ]
     branches: [ master ]
   pull_request:
     branches: [ master ]
@@ -24,5 +25,5 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: go test
-      - name: gofmt
-        run: gofmt -d `ls | grep .go`
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2

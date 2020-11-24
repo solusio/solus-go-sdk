@@ -12,7 +12,11 @@ type ComputeResourceStorageCreateRequest struct {
 	IsAvailableForBalancing bool   `json:"is_available_for_balancing"`
 }
 
-func (s *ComputeResourcesService) StorageCreate(ctx context.Context, id int, data ComputeResourceStorageCreateRequest) (Storage, error) {
+func (s *ComputeResourcesService) StorageCreate(
+	ctx context.Context,
+	id int,
+	data ComputeResourceStorageCreateRequest,
+) (Storage, error) {
 	var resp storageResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("compute_resources/%d/storages", id), data, &resp)
 }

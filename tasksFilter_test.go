@@ -1,8 +1,9 @@
 package solus
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestFilterTasks(t *testing.T) {
@@ -12,7 +13,7 @@ func TestFilterTasks(t *testing.T) {
 		ByAction("action").
 		ByStatus("status").
 		ByComputeResourceID(42).
-		ByComputeResourceVmID(1337)
+		ByComputeResourceVMID(1337)
 
 	require.Equal(t, map[string]string{
 		"filter[action]":                 "action",

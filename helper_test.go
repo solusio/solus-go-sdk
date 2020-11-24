@@ -2,8 +2,6 @@ package solus
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var fakeApplication = Application{
@@ -23,13 +24,13 @@ var fakeApplication = Application{
 		URL:  "http://example.com/image.png",
 		Type: IconTypeApplication,
 	},
-	Url:              "http://example.com/app",
+	URL:              "http://example.com/app",
 	CloudInitVersion: "v2",
 	UserData:         "fake user data",
 	LoginLink: LoginLink{
 		Type: LoginLinkTypeNone,
 	},
-	JsonSchema: "fake json schema",
+	JSONSchema: "fake json schema",
 	IsDefault:  true,
 	IsVisible:  true,
 	IsBuiltin:  true,
@@ -87,8 +88,8 @@ var fakeIPBlockIPAddress = IPBlockIPAddress{
 }
 
 var fakeLicense = License{
-	CpuCores:       1,
-	CpuCoresInUse:  2,
+	CPUCores:       1,
+	CPUCoresInUse:  2,
 	IsActive:       true,
 	Key:            "fake key",
 	KeyType:        "fake key type",
@@ -133,7 +134,7 @@ var fakeOsImageVersion = OsImageVersion{
 	ID:               1,
 	Position:         100,
 	Version:          "1337",
-	Url:              "http://example.com/os.qcow2",
+	URL:              "http://example.com/os.qcow2",
 	CloudInitVersion: "v2",
 }
 
@@ -282,7 +283,7 @@ var fakeBackup = Backup{
 	Type:              BackupTypeAuto,
 	Status:            BackupStatusCreated,
 	Size:              1337,
-	ComputeResourceVm: fakeServer,
+	ComputeResourceVM: fakeServer,
 	BackupNode:        fakeBackupNode,
 	Creator:           fakeUser,
 	CreatedAt:         "1970-01-01T00:00:00.000000Z",

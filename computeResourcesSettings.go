@@ -5,7 +5,11 @@ import (
 	"fmt"
 )
 
-func (s *ComputeResourcesService) SettingsUpdate(ctx context.Context, id int, data ComputeResourceSettings) (ComputeResourceSettings, error) {
+func (s *ComputeResourcesService) SettingsUpdate(
+	ctx context.Context,
+	id int,
+	data ComputeResourceSettings,
+) (ComputeResourceSettings, error) {
 	var resp struct {
 		Data ComputeResourceSettings `json:"data"`
 	}

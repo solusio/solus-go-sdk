@@ -2,12 +2,13 @@ package solus
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"strconv"
 	"sync/atomic"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestProjectsService_ServersCreate(t *testing.T) {
@@ -16,7 +17,7 @@ func TestProjectsService_ServersCreate(t *testing.T) {
 		PlanID:           1,
 		LocationID:       2,
 		OsImageVersionID: 3,
-		SshKeys:          []int{4, 5},
+		SSHKeys:          []int{4, 5},
 		UserData:         "user data",
 	}
 
