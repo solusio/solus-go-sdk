@@ -55,6 +55,29 @@ func TestServersService_Get(t *testing.T) {
 	require.Equal(t, fakeServer, actual)
 }
 
+func TestServersService_Patch(t *testing.T) {
+	data := ServerUpdateRequest{
+		Name:        "name",
+		BootMode:    BootModeRescue,
+		Description: "description",
+		UserData:    "data",
+		FQDNs:       []string{"foo.example.com"},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/42", r.URL.Path)
+		assert.Equal(t, http.MethodPatch, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusOK, fakeServer)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.Patch(context.Background(), 42, data)
+	require.NoError(t, err)
+	require.Equal(t, fakeServer, actual)
+}
+
 func TestServersService_Start(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/start", r.URL.Path)
