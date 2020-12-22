@@ -134,15 +134,19 @@ func (c *Client) request(ctx context.Context, method, path string, opts ...reque
 	err = retry(func(attempt int) (bool, error) {
 		var err error //nolint:govet
 		resp, err = c.HTTPClient.Do(req)
-		if err != nil {
-			time.Sleep(1 * time.Second)     // wait before next try
-			return attempt < c.Retries, err // try N times
-		}
-		if resp.StatusCode == http.StatusBadGateway {
-			return attempt < c.Retries, fmt.Errorf("HTTP %d", resp.StatusCode) // try N times
+
+		checkOk, checkErr := checkForRetry(resp, err)
+
+		if checkErr != nil {
+			err = checkErr
 		}
 
-		return false, nil
+		if checkOk {
+			time.Sleep(c.RetryAfter)        // wait before next try
+			return attempt < c.Retries, err // try N times
+		}
+
+		return false, err
 	})
 	if err != nil {
 		return nil, 0, err
@@ -227,6 +231,18 @@ func (c *Client) buildURL(path string, opts requestOpts) (string, error) {
 	return fullURL.String(), nil
 }
 
+func checkForRetry(resp *http.Response, err error) (bool, error) {
+	if err != nil {
+		return true, err
+	}
+
+	if resp.StatusCode == 0 || resp.StatusCode >= 500 {
+		return true, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+
+	return false, nil
+}
+
 func retry(fn retryFunc) error {
 	var (
 		err   error
@@ -235,7 +251,7 @@ func retry(fn retryFunc) error {
 	attempt := 1
 	for {
 		retry, err = fn(attempt)
-		if !retry || err == nil {
+		if !retry {
 			break
 		}
 		attempt++
