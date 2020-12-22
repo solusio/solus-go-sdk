@@ -18,6 +18,7 @@ type Client struct {
 	HTTPClient  *http.Client
 	Logger      Logger
 	Retries     int
+	RetryAfter  time.Duration
 
 	s service
 
@@ -91,10 +92,18 @@ func (a APITokenAuthenticator) Authenticate(*Client) (Credentials, error) {
 // ClientOption represent client initialization options.
 type ClientOption func(c *Client)
 
-// AllowInsecure allow to skip certificate verify.
+// AllowInsecure allows to skip certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
 		c.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
+	}
+}
+
+// SetRetryPolicy sets number of retries and timeout between them.
+func SetRetryPolicy(retries int, retryAfter time.Duration) ClientOption {
+	return func(c *Client) {
+		c.Retries = retries
+		c.RetryAfter = retryAfter
 	}
 }
 
@@ -106,7 +115,11 @@ func WithLogger(logger Logger) ClientOption {
 }
 
 // NewClient create and initialize Client instance.
-func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client, error) {
+func NewClient(
+	baseURL *url.URL,
+	a Authenticator,
+	opts ...ClientOption,
+) (*Client, error) {
 	client := &Client{
 		BaseURL:   baseURL,
 		UserAgent: "solus.io Go client",
@@ -118,8 +131,9 @@ func NewClient(baseURL *url.URL, a Authenticator, opts ...ClientOption) (*Client
 			Timeout:   time.Second * 35,
 			Transport: http.DefaultTransport.(*http.Transport).Clone(),
 		},
-		Logger:  NullLogger{},
-		Retries: 5,
+		Logger:     NullLogger{},
+		Retries:    5,
+		RetryAfter: 1 * time.Second,
 	}
 
 	for _, o := range opts {
