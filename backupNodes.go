@@ -10,7 +10,8 @@ type BackupNodesService service
 type BackupNodeType string
 
 const (
-	BackupNodeTypeSSHRsync BackupNodeType = "ssh_rsync"
+	BackupNodeTypeSSHRsync          BackupNodeType = "ssh_rsync"
+	BackupNodeTypeHetznerStorageBox BackupNodeType = "hetzner_storage_box"
 )
 
 type BackupNode struct {
