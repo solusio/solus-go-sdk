@@ -43,18 +43,42 @@ func TestPlansService_Create(t *testing.T) {
 		IsVisible:          true,
 		IsSnapshotsEnabled: true,
 		Limits: PlanLimits{
-			TotalBytes: PlanLimit{
+			DiskBandwidth: DiskBandwidthPlanLimit{
 				IsEnabled: true,
-				Limit:     4,
+				Limit:     11,
+				Unit:      DiskBandwidthPlanLimitUnitBps,
 			},
-			TotalIops: PlanLimit{
+			DiskIOPS: DiskIOPSPlanLimit{
 				IsEnabled: true,
-				Limit:     5,
+				Limit:     12,
+				Unit:      DiskIOPSPlanLimitUnitOPS,
 			},
+			NetworkIncomingBandwidth: BandwidthPlanLimit{
+				IsEnabled: true,
+				Limit:     13,
+				Unit:      BandwidthPlanLimitUnitKbps,
+			},
+			NetworkOutgoingBandwidth: BandwidthPlanLimit{
+				IsEnabled: true,
+				Limit:     14,
+				Unit:      BandwidthPlanLimitUnitMbps,
+			},
+			NetworkIncomingTraffic: TrafficPlanLimit{
+				IsEnabled: true,
+				Limit:     15,
+				Unit:      TrafficPlanLimitUnitTB,
+			},
+			NetworkOutgoingTraffic: TrafficPlanLimit{
+				IsEnabled: true,
+				Limit:     16,
+				Unit:      TrafficPlanLimitUnitMB,
+			},
+			NetworkReduceBandwidth: BandwidthPlanLimit{},
 		},
-		TokensPerHour:  6,
-		TokensPerMonth: 7,
-		Position:       8,
+		TokensPerHour:    4,
+		TokensPerMonth:   5,
+		Position:         6,
+		ResetLimitPolicy: PlanResetLimitPolicyVMCreatedDay,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {

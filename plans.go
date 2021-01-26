@@ -13,15 +13,76 @@ type PlanParams struct {
 	VCPU int `json:"vcpu"`
 }
 
-type PlanLimit struct {
-	IsEnabled bool `json:"is_enabled"`
-	Limit     int  `json:"limit"`
+type DiskBandwidthPlanLimit struct {
+	IsEnabled bool                       `json:"is_enabled"`
+	Limit     int                        `json:"limit"`
+	Unit      DiskBandwidthPlanLimitUnit `json:"unit"`
 }
 
-type PlanLimits struct {
-	TotalBytes PlanLimit `json:"total_bytes"`
-	TotalIops  PlanLimit `json:"total_iops"`
+type DiskBandwidthPlanLimitUnit string
+
+const (
+	DiskBandwidthPlanLimitUnitBps DiskBandwidthPlanLimitUnit = "Bps"
+)
+
+type BandwidthPlanLimit struct {
+	IsEnabled bool                   `json:"is_enabled"`
+	Limit     int                    `json:"limit"`
+	Unit      BandwidthPlanLimitUnit `json:"unit"`
 }
+
+type BandwidthPlanLimitUnit string
+
+const (
+	BandwidthPlanLimitUnitKbps BandwidthPlanLimitUnit = "Kbps"
+	BandwidthPlanLimitUnitMbps BandwidthPlanLimitUnit = "Mbps"
+	BandwidthPlanLimitUnitGbps BandwidthPlanLimitUnit = "Gbps"
+)
+
+type DiskIOPSPlanLimit struct {
+	IsEnabled bool                  `json:"is_enabled"`
+	Limit     int                   `json:"limit"`
+	Unit      DiskIOPSPlanLimitUnit `json:"unit"`
+}
+
+type DiskIOPSPlanLimitUnit string
+
+const (
+	DiskIOPSPlanLimitUnitOPS DiskIOPSPlanLimitUnit = "ops"
+)
+
+type TrafficPlanLimit struct {
+	IsEnabled bool                 `json:"is_enabled"`
+	Limit     int                  `json:"limit"`
+	Unit      TrafficPlanLimitUnit `json:"unit"`
+}
+
+type TrafficPlanLimitUnit string
+
+const (
+	TrafficPlanLimitUnitKB TrafficPlanLimitUnit = "KB"
+	TrafficPlanLimitUnitMB TrafficPlanLimitUnit = "MB"
+	TrafficPlanLimitUnitGB TrafficPlanLimitUnit = "GB"
+	TrafficPlanLimitUnitTB TrafficPlanLimitUnit = "TB"
+	TrafficPlanLimitUnitPB TrafficPlanLimitUnit = "PB"
+)
+
+type PlanLimits struct {
+	DiskBandwidth            DiskBandwidthPlanLimit `json:"disk_bandwidth"`
+	DiskIOPS                 DiskIOPSPlanLimit      `json:"disk_iops"`
+	NetworkIncomingBandwidth BandwidthPlanLimit     `json:"network_incoming_bandwidth"`
+	NetworkOutgoingBandwidth BandwidthPlanLimit     `json:"network_outgoing_bandwidth"`
+	NetworkIncomingTraffic   TrafficPlanLimit       `json:"network_incoming_traffic"`
+	NetworkOutgoingTraffic   TrafficPlanLimit       `json:"network_outgoing_traffic"`
+	NetworkReduceBandwidth   BandwidthPlanLimit     `json:"network_reduce_bandwidth"`
+}
+
+type PlanResetLimitPolicy string
+
+const (
+	PlanResetLimitPolicyFirstDayOfMonth PlanResetLimitPolicy = "first_day_of_month"
+	PlanResetLimitPolicyVMCreatedDay    PlanResetLimitPolicy = "vm_created_day"
+)
 
 type PlanPrice struct {
 	PerHour        string        `json:"per_hour"`
@@ -34,38 +95,40 @@ type PlanPrice struct {
 }
 
 type Plan struct {
-	ID                  int        `json:"id"`
-	Name                string     `json:"name"`
-	Params              PlanParams `json:"params"`
-	StorageType         string     `json:"storage_type"`
-	ImageFormat         string     `json:"image_format"`
-	IsDefault           bool       `json:"is_default"`
-	IsSnapshotAvailable bool       `json:"is_snapshot_available"`
-	IsSnapshotsEnabled  bool       `json:"is_snapshots_enabled"`
-	IsBackupAvailable   bool       `json:"is_backup_available"`
-	BackupPrice         float32    `json:"backup_price"`
-	IsVisible           bool       `json:"is_visible"`
-	Limits              PlanLimits `json:"limits"`
-	TokensPerHour       float64    `json:"tokens_per_hour"`
-	TokensPerMonth      float64    `json:"tokens_per_month"`
-	Position            float64    `json:"position"`
-	Price               PlanPrice  `json:"price"`
+	ID                  int                  `json:"id"`
+	Name                string               `json:"name"`
+	Params              PlanParams           `json:"params"`
+	StorageType         string               `json:"storage_type"`
+	ImageFormat         string               `json:"image_format"`
+	IsDefault           bool                 `json:"is_default"`
+	IsSnapshotAvailable bool                 `json:"is_snapshot_available"`
+	IsSnapshotsEnabled  bool                 `json:"is_snapshots_enabled"`
+	IsBackupAvailable   bool                 `json:"is_backup_available"`
+	BackupPrice         float32              `json:"backup_price"`
+	IsVisible           bool                 `json:"is_visible"`
+	Limits              PlanLimits           `json:"limits"`
+	TokensPerHour       float64              `json:"tokens_per_hour"`
+	TokensPerMonth      float64              `json:"tokens_per_month"`
+	Position            float64              `json:"position"`
+	Price               PlanPrice            `json:"price"`
+	ResetLimitPolicy    PlanResetLimitPolicy `json:"reset_limit_policy"`
 }
 
 type PlanCreateRequest struct {
-	Name               string          `json:"name"`
-	Params             PlanParams      `json:"params"`
-	StorageType        StorageTypeName `json:"storage_type"`
-	ImageFormat        ImageFormat     `json:"image_format"`
-	Limits             PlanLimits      `json:"limits"`
-	TokensPerHour      float64         `json:"tokens_per_hour"`
-	TokensPerMonth     float64         `json:"tokens_per_month"`
-	Position           float64         `json:"position"`
-	IsVisible          bool            `json:"is_visible"`
-	IsDefault          bool            `json:"is_default"`
-	IsSnapshotsEnabled bool            `json:"is_snapshots_enabled"`
-	IsBackupAvailable  bool            `json:"is_backup_available"`
-	BackupPrice        float32         `json:"backup_price"`
+	Name               string               `json:"name"`
+	Params             PlanParams           `json:"params"`
+	StorageType        StorageTypeName      `json:"storage_type"`
+	ImageFormat        ImageFormat          `json:"image_format"`
+	Limits             PlanLimits           `json:"limits"`
+	TokensPerHour      float64              `json:"tokens_per_hour"`
+	TokensPerMonth     float64              `json:"tokens_per_month"`
+	Position           float64              `json:"position"`
+	IsVisible          bool                 `json:"is_visible"`
+	IsDefault          bool                 `json:"is_default"`
+	IsSnapshotsEnabled bool                 `json:"is_snapshots_enabled"`
+	IsBackupAvailable  bool                 `json:"is_backup_available"`
+	BackupPrice        float32              `json:"backup_price"`
+	ResetLimitPolicy   PlanResetLimitPolicy `json:"reset_limit_policy"`
 }
 
 type PlansResponse struct {
