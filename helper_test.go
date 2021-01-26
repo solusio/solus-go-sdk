@@ -155,13 +155,15 @@ var fakePlan = Plan{
 	BackupPrice:         11,
 	IsVisible:           true,
 	Limits: PlanLimits{
-		TotalBytes: PlanLimit{
+		DiskBandwidth: DiskBandwidthPlanLimit{
 			IsEnabled: true,
 			Limit:     2,
+			Unit:      DiskBandwidthPlanLimitUnitBps,
 		},
-		TotalIops: PlanLimit{
+		DiskIOPS: DiskIOPSPlanLimit{
 			IsEnabled: true,
 			Limit:     5,
+			Unit:      DiskIOPSPlanLimitUnitOPS,
 		},
 	},
 	TokensPerHour:  7,
