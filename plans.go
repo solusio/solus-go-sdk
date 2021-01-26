@@ -150,9 +150,43 @@ func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan
 	var resp struct {
 		Data Plan `json:"data"`
 	}
+
+	data.Limits = s.setDefaultForPlanLimits(data.Limits)
+
 	return resp.Data, s.client.create(ctx, "plans", data, &resp)
 }
 
 func (s *PlansService) Delete(ctx context.Context, id int) error {
 	return s.client.delete(ctx, fmt.Sprintf("plans/%d", id))
+}
+
+func (*PlansService) setDefaultForPlanLimits(p PlanLimits) PlanLimits {
+	if p.DiskBandwidth.Unit == "" {
+		p.DiskBandwidth.Unit = DiskBandwidthPlanLimitUnitBps
+	}
+
+	if p.DiskIOPS.Unit == "" {
+		p.DiskIOPS.Unit = DiskIOPSPlanLimitUnitOPS
+	}
+
+	if p.NetworkIncomingBandwidth.Unit == "" {
+		p.NetworkIncomingBandwidth.Unit = BandwidthPlanLimitUnitKbps
+	}
+
+	if p.NetworkOutgoingBandwidth.Unit == "" {
+		p.NetworkOutgoingBandwidth.Unit = BandwidthPlanLimitUnitKbps
+	}
+
+	if p.NetworkIncomingTraffic.Unit == "" {
+		p.NetworkIncomingTraffic.Unit = TrafficPlanLimitUnitKB
+	}
+
+	if p.NetworkOutgoingTraffic.Unit == "" {
+		p.NetworkOutgoingTraffic.Unit = TrafficPlanLimitUnitKB
+	}
+
+	if p.NetworkReduceBandwidth.Unit == "" {
+		p.NetworkReduceBandwidth.Unit = BandwidthPlanLimitUnitKbps
+	}
+	return p
 }
