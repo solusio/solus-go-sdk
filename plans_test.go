@@ -81,10 +81,13 @@ func TestPlansService_Create(t *testing.T) {
 		ResetLimitPolicy: PlanResetLimitPolicyVMCreatedDay,
 	}
 
+	expectedData := data
+	expectedData.Limits.NetworkReduceBandwidth.Unit = BandwidthPlanLimitUnitKbps
+
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/plans", r.URL.Path)
 		assert.Equal(t, http.MethodPost, r.Method)
-		assertRequestBody(t, r, data)
+		assertRequestBody(t, r, expectedData)
 
 		writeResponse(t, w, http.StatusCreated, fakePlan)
 	})
@@ -106,4 +109,52 @@ func TestPlansService_Delete(t *testing.T) {
 
 	err := createTestClient(t, s.URL).Plans.Delete(context.Background(), 10)
 	require.NoError(t, err)
+}
+
+func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
+	testCases := map[string]struct {
+		given    PlanLimits
+		expected PlanLimits
+	}{
+		"empty": {
+			PlanLimits{},
+			PlanLimits{
+				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
+				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
+				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
+				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
+				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
+			},
+		},
+
+		"with units": {
+			PlanLimits{
+				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitMbps},
+				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
+				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},
+				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
+				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
+			},
+			PlanLimits{
+				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitMbps},
+				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
+				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},
+				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
+				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
+			},
+		},
+	}
+
+	for name, tt := range testCases {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, new(PlansService).setDefaultForPlanLimits(tt.given))
+		})
+	}
 }
