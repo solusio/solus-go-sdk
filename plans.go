@@ -131,6 +131,24 @@ type PlanCreateRequest struct {
 	ResetLimitPolicy   PlanResetLimitPolicy `json:"reset_limit_policy"`
 }
 
+type PlanUpdateRequest struct {
+	Name               string               `json:"name"`
+	Limits             PlanLimits           `json:"limits"`
+	TokensPerHour      float64              `json:"tokens_per_hour"`
+	TokensPerMonth     float64              `json:"tokens_per_month"`
+	Position           float64              `json:"position"`
+	IsVisible          bool                 `json:"is_visible"`
+	IsDefault          bool                 `json:"is_default"`
+	IsSnapshotsEnabled bool                 `json:"is_snapshots_enabled"`
+	IsBackupAvailable  bool                 `json:"is_backup_available"`
+	BackupPrice        float32              `json:"backup_price"`
+	ResetLimitPolicy   PlanResetLimitPolicy `json:"reset_limit_policy"`
+}
+
+type planResponse struct {
+	Data Plan `json:"data"`
+}
+
 type PlansResponse struct {
 	paginatedResponse
 
@@ -147,13 +165,14 @@ func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
 }
 
 func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {
-	var resp struct {
-		Data Plan `json:"data"`
-	}
-
+	var resp planResponse
 	data.Limits = s.setDefaultForPlanLimits(data.Limits)
-
 	return resp.Data, s.client.create(ctx, "plans", data, &resp)
+}
+
+func (s *PlansService) Update(ctx context.Context, id int, data PlanUpdateRequest) (Plan, error) {
+	var resp planResponse
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("plans/%d", id), data, &resp)
 }
 
 func (s *PlansService) Delete(ctx context.Context, id int) error {
