@@ -134,6 +134,29 @@ func TestServersService_Backup(t *testing.T) {
 	require.Equal(t, fakeBackup, actual)
 }
 
+func TestServersService_resize(t *testing.T) {
+	data := ServerResizeRequest{
+		PreserveDisk: true,
+		PlanID:       42,
+		BackupSettings: ServerBackupSettings{
+			Enabled: true,
+		},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/resize", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusOK, fakeTask)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.Resize(context.Background(), 10, data)
+	require.NoError(t, err)
+	require.Equal(t, fakeTask, actual)
+}
+
 func TestServersService_Delete(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10", r.URL.Path)
