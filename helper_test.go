@@ -163,7 +163,7 @@ var fakePlan = Plan{
 		DiskIOPS: DiskIOPSPlanLimit{
 			IsEnabled: true,
 			Limit:     5,
-			Unit:      DiskIOPSPlanLimitUnitOPS,
+			Unit:      DiskIOPSPlanLimitUnitIOPS,
 		},
 	},
 	TokensPerHour:  7,
