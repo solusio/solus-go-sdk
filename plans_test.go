@@ -51,7 +51,7 @@ func TestPlansService_Create(t *testing.T) {
 			DiskIOPS: DiskIOPSPlanLimit{
 				IsEnabled: true,
 				Limit:     12,
-				Unit:      DiskIOPSPlanLimitUnitOPS,
+				Unit:      DiskIOPSPlanLimitUnitIOPS,
 			},
 			NetworkIncomingBandwidth: BandwidthPlanLimit{
 				IsEnabled: true,
@@ -120,7 +120,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 			PlanLimits{},
 			PlanLimits{
 				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
-				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitIOPS},
 				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
@@ -132,7 +132,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 		"with units": {
 			PlanLimits{
 				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
-				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitIOPS},
 				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitMbps},
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},
@@ -141,7 +141,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 			},
 			PlanLimits{
 				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
-				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitOPS},
+				DiskIOPS:                 DiskIOPSPlanLimit{Unit: DiskIOPSPlanLimitUnitIOPS},
 				NetworkIncomingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitMbps},
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},

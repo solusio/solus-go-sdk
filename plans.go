@@ -48,7 +48,7 @@ type DiskIOPSPlanLimit struct {
 type DiskIOPSPlanLimitUnit string
 
 const (
-	DiskIOPSPlanLimitUnitOPS DiskIOPSPlanLimitUnit = "ops"
+	DiskIOPSPlanLimitUnitIOPS DiskIOPSPlanLimitUnit = "iops"
 )
 
 type TrafficPlanLimit struct {
@@ -185,7 +185,7 @@ func (*PlansService) setDefaultForPlanLimits(p PlanLimits) PlanLimits {
 	}
 
 	if p.DiskIOPS.Unit == "" {
-		p.DiskIOPS.Unit = DiskIOPSPlanLimitUnitOPS
+		p.DiskIOPS.Unit = DiskIOPSPlanLimitUnitIOPS
 	}
 
 	if p.NetworkIncomingBandwidth.Unit == "" {
