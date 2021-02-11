@@ -138,7 +138,7 @@ func TestServersService_resize(t *testing.T) {
 	data := ServerResizeRequest{
 		PreserveDisk: true,
 		PlanID:       42,
-		BackupSettings: ServerBackupSettings{
+		BackupSettings: &ServerBackupSettings{
 			Enabled: true,
 		},
 	}

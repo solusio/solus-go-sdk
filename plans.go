@@ -165,12 +165,13 @@ func (s *PlansService) List(ctx context.Context) (PlansResponse, error) {
 }
 
 func (s *PlansService) Create(ctx context.Context, data PlanCreateRequest) (Plan, error) {
+	s.setDefaultsForPlanLimits(&data.Limits)
 	var resp planResponse
-	data.Limits = s.setDefaultForPlanLimits(data.Limits)
 	return resp.Data, s.client.create(ctx, "plans", data, &resp)
 }
 
 func (s *PlansService) Update(ctx context.Context, id int, data PlanUpdateRequest) (Plan, error) {
+	s.setDefaultsForPlanLimits(&data.Limits)
 	var resp planResponse
 	return resp.Data, s.client.update(ctx, fmt.Sprintf("plans/%d", id), data, &resp)
 }
@@ -179,7 +180,11 @@ func (s *PlansService) Delete(ctx context.Context, id int) error {
 	return s.client.delete(ctx, fmt.Sprintf("plans/%d", id))
 }
 
-func (*PlansService) setDefaultForPlanLimits(p PlanLimits) PlanLimits {
+func (*PlansService) setDefaultsForPlanLimits(p *PlanLimits) {
+	if p == nil {
+		return
+	}
+
 	if p.DiskBandwidth.Unit == "" {
 		p.DiskBandwidth.Unit = DiskBandwidthPlanLimitUnitBps
 	}
@@ -207,5 +212,4 @@ func (*PlansService) setDefaultForPlanLimits(p PlanLimits) PlanLimits {
 	if p.NetworkReduceBandwidth.Unit == "" {
 		p.NetworkReduceBandwidth.Unit = BandwidthPlanLimitUnitKbps
 	}
-	return p
 }
