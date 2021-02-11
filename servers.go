@@ -151,9 +151,9 @@ func (s *ServersService) Backup(ctx context.Context, id int) (Backup, error) {
 }
 
 type ServerResizeRequest struct {
-	PreserveDisk   bool                 `json:"preserve_disk"`
-	PlanID         int                  `json:"plan_id"`
-	BackupSettings ServerBackupSettings `json:"backup_settings"`
+	PreserveDisk   bool                  `json:"preserve_disk"`
+	PlanID         int                   `json:"plan_id"`
+	BackupSettings *ServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
 func (s *ServersService) Resize(ctx context.Context, id int, data ServerResizeRequest) (Task, error) {

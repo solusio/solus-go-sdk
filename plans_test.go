@@ -154,7 +154,8 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 	for name, tt := range testCases {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, new(PlansService).setDefaultForPlanLimits(tt.given))
+			new(PlansService).setDefaultsForPlanLimits(&tt.given)
+			assert.Equal(t, tt.expected, tt.given)
 		})
 	}
 }
