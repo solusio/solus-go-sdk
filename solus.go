@@ -1,4 +1,4 @@
-//go:generate go run paginatorgen.go
+//go:generate go run generators/paginatorgen.go
 
 package solus
 
@@ -23,6 +23,7 @@ type Client struct {
 	s service
 
 	Account           *AccountService
+	Applications      *ApplicationsService
 	BackupNodes       *BackupNodesService
 	Backups           *BackupsService
 	ComputeResources  *ComputeResourcesService
@@ -30,15 +31,15 @@ type Client struct {
 	License           *LicenseService
 	Locations         *LocationsService
 	OsImages          *OsImagesService
-	Applications      *ApplicationsService
+	Permission        *PermissionsService
 	Plans             *PlansService
 	Projects          *ProjectsService
 	Roles             *RolesService
-	Storage           *StorageService
+	SSHKeys           *SSHKeysService
 	Servers           *ServersService
 	ServersMigrations *ServersMigrationsService
+	Storage           *StorageService
 	StorageTypes      *StorageTypesService
-	SSHKeys           *SSHKeysService
 	Tasks             *TasksService
 	Users             *UsersService
 }
@@ -149,7 +150,9 @@ func NewClient(
 	client.Headers["Authorization"] = []string{client.Credentials.TokenType + " " + client.Credentials.AccessToken}
 
 	client.s.client = client
+
 	client.Account = (*AccountService)(&client.s)
+	client.Applications = (*ApplicationsService)(&client.s)
 	client.BackupNodes = (*BackupNodesService)(&client.s)
 	client.Backups = (*BackupsService)(&client.s)
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
@@ -157,15 +160,15 @@ func NewClient(
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
-	client.Applications = (*ApplicationsService)(&client.s)
+	client.Permission = (*PermissionsService)(&client.s)
 	client.Plans = (*PlansService)(&client.s)
 	client.Projects = (*ProjectsService)(&client.s)
 	client.Roles = (*RolesService)(&client.s)
-	client.Storage = (*StorageService)(&client.s)
+	client.SSHKeys = (*SSHKeysService)(&client.s)
 	client.Servers = (*ServersService)(&client.s)
 	client.ServersMigrations = (*ServersMigrationsService)(&client.s)
+	client.Storage = (*StorageService)(&client.s)
 	client.StorageTypes = (*StorageTypesService)(&client.s)
-	client.SSHKeys = (*SSHKeysService)(&client.s)
 	client.Tasks = (*TasksService)(&client.s)
 	client.Users = (*UsersService)(&client.s)
 

@@ -29,7 +29,7 @@ import (
 //  if resp.Err() != nil {
 //		handleAnError(resp.Err())
 //	}
-func (r *ProjectsResponse) Next(ctx context.Context) bool {
+func (r *PermissionResponse) Next(ctx context.Context) bool {
 	if (r.Links.Next == "") || (r.err != nil) {
 		return false
 	}
