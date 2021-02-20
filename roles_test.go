@@ -9,6 +9,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestRolesService_Create(t *testing.T) {
+	data := RoleCreateRequest{
+		Name:        "name",
+		Permissions: []int{1, 2, 3},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/roles", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusCreated, fakeRole)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Roles.Create(context.Background(), data)
+	require.NoError(t, err)
+	require.Equal(t, fakeRole, actual)
+}
+
 func TestRolesService_List(t *testing.T) {
 	expected := RolesResponse{
 		Data: []Role{
@@ -28,6 +48,20 @@ func TestRolesService_List(t *testing.T) {
 	require.NoError(t, err)
 	actual.service = nil
 	require.Equal(t, expected, actual)
+}
+
+func TestRolesService_Get(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/roles/10", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		writeResponse(t, w, http.StatusOK, fakeRole)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Roles.Get(context.Background(), 10)
+	require.NoError(t, err)
+	require.Equal(t, fakeRole, actual)
 }
 
 func TestRolesService_GetByName(t *testing.T) {
