@@ -11,7 +11,7 @@ import (
 
 func TestComputeResourcesService_StorageCreate(t *testing.T) {
 	data := ComputeResourceStorageCreateRequest{
-		TypeID:                  1,
+		Type:                    StorageTypeNameFB,
 		Path:                    "fake path",
 		ThinPool:                "fake thinpool",
 		IsAvailableForBalancing: true,
