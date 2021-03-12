@@ -8,12 +8,14 @@ import (
 
 type ComputeResourcesService service
 
+type ComputerResourceStatus string
+
 const (
-	ComputeResourceStatusActive           = "active"
-	ComputeResourceStatusCommissioning    = "commissioning"
-	ComputeResourceStatusConfigureNetwork = "configure_network"
-	ComputeResourceStatusFailed           = "failed"
-	ComputeResourceStatusUnavailable      = "unavailable"
+	ComputeResourceStatusActive           ComputerResourceStatus = "active"
+	ComputeResourceStatusCommissioning    ComputerResourceStatus = "commissioning"
+	ComputeResourceStatusConfigureNetwork ComputerResourceStatus = "configure_network"
+	ComputeResourceStatusFailed           ComputerResourceStatus = "failed"
+	ComputeResourceStatusUnavailable      ComputerResourceStatus = "unavailable"
 )
 
 type ComputeResourceBalanceStrategy string
@@ -95,11 +97,6 @@ type ComputeResourceNetwork struct {
 	IP           string `json:"ip"`
 	Mask         string `json:"mask"`
 	MaskSize     int    `json:"mask_size"`
-}
-
-type ComputerResourceStatus struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
 }
 
 type ComputeResourceAuthType string
