@@ -41,10 +41,7 @@ var fakeComputeResource = ComputeResource{
 	Name:      "fake compute resource",
 	Host:      "192.0.2.1",
 	AgentPort: 1337,
-	Status: ComputerResourceStatus{
-		ID:   2,
-		Name: "fake status",
-	},
+	Status:    ComputeResourceStatusActive,
 	Locations: []Location{
 		fakeLocation,
 	},
