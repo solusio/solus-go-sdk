@@ -73,12 +73,18 @@ func TestPlansService_Create(t *testing.T) {
 				Limit:     16,
 				Unit:      TrafficPlanLimitUnitMB,
 			},
+			NetworkTotalTraffic: TrafficPlanLimit{
+				IsEnabled: false,
+				Limit:     17,
+				Unit:      TrafficPlanLimitUnitMB,
+			},
 			NetworkReduceBandwidth: BandwidthPlanLimit{},
 		},
-		TokensPerHour:    4,
-		TokensPerMonth:   5,
-		Position:         6,
-		ResetLimitPolicy: PlanResetLimitPolicyVMCreatedDay,
+		TokensPerHour:           4,
+		TokensPerMonth:          5,
+		Position:                6,
+		ResetLimitPolicy:        PlanResetLimitPolicyVMCreatedDay,
+		NetworkTotalTrafficType: NetworkTotalTrafficTypeSeparate,
 	}
 
 	expectedData := data
@@ -125,6 +131,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
+				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 			},
 		},
@@ -137,6 +144,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
+				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 			},
 			PlanLimits{
@@ -146,6 +154,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingBandwidth: BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitGbps},
 				NetworkIncomingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitTB},
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
+				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
 			},
 		},
