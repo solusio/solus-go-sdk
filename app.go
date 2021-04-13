@@ -50,14 +50,14 @@ type service struct {
 
 // Authenticator interface for client authentication.
 type Authenticator interface {
-	// Authenticate authenticate client on SOLUS IO and return credentials
+	// Authenticate authenticate client and return credentials
 	// which should be used for making further API calls.
 	// The Client is fully initialized. Any endpoints which is not requires
 	// authentication may be called.
 	Authenticate(c *Client) (Credentials, error)
 }
 
-// EmailAndPasswordAuthenticator authenticate at SOLUS IO with specified email
+// EmailAndPasswordAuthenticator authenticate with specified email
 // and password.
 type EmailAndPasswordAuthenticator struct {
 	Email    string
@@ -75,7 +75,7 @@ func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, err
 	return resp.Credentials, nil
 }
 
-// APITokenAuthenticator authenticate at SOLUS IO by provided API token.
+// APITokenAuthenticator authenticate by provided API token.
 type APITokenAuthenticator struct {
 	Token string
 }
@@ -123,7 +123,7 @@ func NewClient(
 ) (*Client, error) {
 	client := &Client{
 		BaseURL:   baseURL,
-		UserAgent: "solus.io Go client",
+		UserAgent: "Go SDK client",
 		Headers: map[string][]string{
 			"Accept":       {"application/json"},
 			"Content-Type": {"application/json"},

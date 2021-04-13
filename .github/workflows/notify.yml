@@ -16,7 +16,7 @@ jobs:
           fields: author
           custom_payload: |
             {
-              username: 'solus-github-bot',
+              username: 'github-bot',
               icon_emoji: ':octocat:',
               attachments: [{
                 color: 'good',
