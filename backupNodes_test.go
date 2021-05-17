@@ -9,6 +9,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestBackupNodeSSHRsyncCredentials(t *testing.T) {
+	c := BackupNodeSSHRsyncCredentials("example.com", 22, "root", "private key", "/foo/bar")
+	assert.Equal(t, map[string]interface{}{
+		"host":         "example.com",
+		"port":         22,
+		"login":        "root",
+		"key":          "private key",
+		"storage_path": "/foo/bar",
+	}, c)
+}
+
+func TestBackupNodeHetznerStorageBoxCredentials(t *testing.T) {
+	c := BackupNodeHetznerStorageBoxCredentials("example.com", "root", "private key")
+	assert.Equal(t, map[string]interface{}{
+		"host":  "example.com",
+		"login": "root",
+		"key":   "private key",
+	}, c)
+}
+
 func TestBackupNodesService_Create(t *testing.T) {
 	data := BackupNodeRequest{
 		Name:             "name",
