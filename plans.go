@@ -25,6 +25,12 @@ const (
 	DiskBandwidthPlanLimitUnitBps DiskBandwidthPlanLimitUnit = "Bps"
 )
 
+func (s *DiskBandwidthPlanLimit) setDefault() {
+	if s.Unit == "" {
+		s.Unit = DiskBandwidthPlanLimitUnitBps
+	}
+}
+
 type BandwidthPlanLimit struct {
 	IsEnabled bool                   `json:"is_enabled"`
 	Limit     int                    `json:"limit"`
@@ -39,6 +45,12 @@ const (
 	BandwidthPlanLimitUnitGbps BandwidthPlanLimitUnit = "Gbps"
 )
 
+func (s *BandwidthPlanLimit) setDefault() {
+	if s.Unit == "" {
+		s.Unit = BandwidthPlanLimitUnitKbps
+	}
+}
+
 type DiskIOPSPlanLimit struct {
 	IsEnabled bool                  `json:"is_enabled"`
 	Limit     int                   `json:"limit"`
@@ -50,6 +62,12 @@ type DiskIOPSPlanLimitUnit string
 const (
 	DiskIOPSPlanLimitUnitIOPS DiskIOPSPlanLimitUnit = "iops"
 )
+
+func (s *DiskIOPSPlanLimit) setDefault() {
+	if s.Unit == "" {
+		s.Unit = DiskIOPSPlanLimitUnitIOPS
+	}
+}
 
 type TrafficPlanLimit struct {
 	IsEnabled bool                 `json:"is_enabled"`
@@ -67,6 +85,30 @@ const (
 	TrafficPlanLimitUnitPB TrafficPlanLimitUnit = "PB"
 )
 
+func (s *TrafficPlanLimit) setDefault() {
+	if s.Unit == "" {
+		s.Unit = TrafficPlanLimitUnitKB
+	}
+}
+
+type UnitPlanLimit struct {
+	IsEnabled bool          `json:"is_enabled"`
+	Limit     int           `json:"limit"`
+	Unit      PlanLimitUnit `json:"unit"`
+}
+
+type PlanLimitUnit string
+
+const (
+	PlanLimitUnits PlanLimitUnit = "units"
+)
+
+func (s *UnitPlanLimit) setDefault() {
+	if s.Unit == "" {
+		s.Unit = PlanLimitUnits
+	}
+}
+
 type PlanLimits struct {
 	DiskBandwidth            DiskBandwidthPlanLimit `json:"disk_bandwidth"`
 	DiskIOPS                 DiskIOPSPlanLimit      `json:"disk_iops"`
@@ -76,6 +118,7 @@ type PlanLimits struct {
 	NetworkOutgoingTraffic   TrafficPlanLimit       `json:"network_outgoing_traffic"`
 	NetworkTotalTraffic      TrafficPlanLimit       `json:"network_total_traffic"`
 	NetworkReduceBandwidth   BandwidthPlanLimit     `json:"network_reduce_bandwidth"`
+	BackupLimit              UnitPlanLimit          `json:"backup_limit"`
 }
 
 type PlanResetLimitPolicy string
@@ -203,35 +246,13 @@ func (*PlansService) setDefaultsForPlanLimits(p *PlanLimits) {
 		return
 	}
 
-	if p.DiskBandwidth.Unit == "" {
-		p.DiskBandwidth.Unit = DiskBandwidthPlanLimitUnitBps
-	}
-
-	if p.DiskIOPS.Unit == "" {
-		p.DiskIOPS.Unit = DiskIOPSPlanLimitUnitIOPS
-	}
-
-	if p.NetworkIncomingBandwidth.Unit == "" {
-		p.NetworkIncomingBandwidth.Unit = BandwidthPlanLimitUnitKbps
-	}
-
-	if p.NetworkOutgoingBandwidth.Unit == "" {
-		p.NetworkOutgoingBandwidth.Unit = BandwidthPlanLimitUnitKbps
-	}
-
-	if p.NetworkIncomingTraffic.Unit == "" {
-		p.NetworkIncomingTraffic.Unit = TrafficPlanLimitUnitKB
-	}
-
-	if p.NetworkOutgoingTraffic.Unit == "" {
-		p.NetworkOutgoingTraffic.Unit = TrafficPlanLimitUnitKB
-	}
-
-	if p.NetworkTotalTraffic.Unit == "" {
-		p.NetworkTotalTraffic.Unit = TrafficPlanLimitUnitKB
-	}
-
-	if p.NetworkReduceBandwidth.Unit == "" {
-		p.NetworkReduceBandwidth.Unit = BandwidthPlanLimitUnitKbps
-	}
+	p.DiskBandwidth.setDefault()
+	p.DiskIOPS.setDefault()
+	p.NetworkIncomingBandwidth.setDefault()
+	p.NetworkOutgoingBandwidth.setDefault()
+	p.NetworkReduceBandwidth.setDefault()
+	p.NetworkIncomingTraffic.setDefault()
+	p.NetworkOutgoingTraffic.setDefault()
+	p.NetworkTotalTraffic.setDefault()
+	p.BackupLimit.setDefault()
 }
