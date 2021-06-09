@@ -17,7 +17,7 @@ func TestComputeResourcesService_SettingsUpdate(t *testing.T) {
 		VNCProxyPort:    1337,
 		Limits:          ComputeResourceSettingsLimits{},
 		Network:         ComputeResourceSettingsNetwork{},
-		BalanceStrategy: ComputeResourceBalanceStrategyMostSpaceAvailable,
+		BalanceStrategy: ComputeResourceBalanceStrategyMostStorageAvailable,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {

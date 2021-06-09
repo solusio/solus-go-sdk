@@ -21,9 +21,9 @@ const (
 type ComputeResourceBalanceStrategy string
 
 const (
-	ComputeResourceBalanceStrategyRoundRobin         ComputeResourceBalanceStrategy = "round-robin"
-	ComputeResourceBalanceStrategyRandom             ComputeResourceBalanceStrategy = "random"
-	ComputeResourceBalanceStrategyMostSpaceAvailable ComputeResourceBalanceStrategy = "most-space-available"
+	ComputeResourceBalanceStrategyRoundRobin           ComputeResourceBalanceStrategy = "round-robin"
+	ComputeResourceBalanceStrategyRandom               ComputeResourceBalanceStrategy = "random"
+	ComputeResourceBalanceStrategyMostStorageAvailable ComputeResourceBalanceStrategy = "most-storage-available"
 )
 
 type ComputeResource struct {
