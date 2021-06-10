@@ -79,7 +79,7 @@ func TestPlansService_Create(t *testing.T) {
 				Unit:      TrafficPlanLimitUnitMB,
 			},
 			NetworkReduceBandwidth: BandwidthPlanLimit{},
-			BackupLimit: UnitPlanLimit{
+			BackupsNumber: UnitPlanLimit{
 				IsEnabled: true,
 				Limit:     7,
 				Unit:      PlanLimitUnits,
@@ -138,7 +138,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
-				BackupLimit:              UnitPlanLimit{Unit: PlanLimitUnits},
+				BackupsNumber:            UnitPlanLimit{Unit: PlanLimitUnits},
 			},
 		},
 
@@ -152,7 +152,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
 				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
-				BackupLimit:              UnitPlanLimit{Unit: PlanLimitUnits},
+				BackupsNumber:            UnitPlanLimit{Unit: PlanLimitUnits},
 			},
 			PlanLimits{
 				DiskBandwidth:            DiskBandwidthPlanLimit{Unit: DiskBandwidthPlanLimitUnitBps},
@@ -163,7 +163,7 @@ func TestPlansService_setDefaultForPlanLimits(t *testing.T) {
 				NetworkOutgoingTraffic:   TrafficPlanLimit{Unit: TrafficPlanLimitUnitMB},
 				NetworkTotalTraffic:      TrafficPlanLimit{Unit: TrafficPlanLimitUnitKB},
 				NetworkReduceBandwidth:   BandwidthPlanLimit{Unit: BandwidthPlanLimitUnitKbps},
-				BackupLimit:              UnitPlanLimit{Unit: PlanLimitUnits},
+				BackupsNumber:            UnitPlanLimit{Unit: PlanLimitUnits},
 			},
 		},
 	}
