@@ -118,7 +118,7 @@ type PlanLimits struct {
 	NetworkOutgoingTraffic   TrafficPlanLimit       `json:"network_outgoing_traffic"`
 	NetworkTotalTraffic      TrafficPlanLimit       `json:"network_total_traffic"`
 	NetworkReduceBandwidth   BandwidthPlanLimit     `json:"network_reduce_bandwidth"`
-	BackupLimit              UnitPlanLimit          `json:"backup_limit"`
+	BackupsNumber            UnitPlanLimit          `json:"backups_number"`
 }
 
 type PlanResetLimitPolicy string
@@ -254,5 +254,5 @@ func (*PlansService) setDefaultsForPlanLimits(p *PlanLimits) {
 	p.NetworkIncomingTraffic.setDefault()
 	p.NetworkOutgoingTraffic.setDefault()
 	p.NetworkTotalTraffic.setDefault()
-	p.BackupLimit.setDefault()
+	p.BackupsNumber.setDefault()
 }
