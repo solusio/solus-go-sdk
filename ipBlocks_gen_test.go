@@ -25,7 +25,22 @@ func TestIPBlocksResponse_Next(t *testing.T) {
 		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
-			writeJSON(t, w, http.StatusOK, IPBlocksResponse{Data: []IPBlock{{ID: int(p)}}})
+			writeJSON(t, w, http.StatusOK, IPBlocksResponse{
+				Data: []IPBlock{
+					{
+						ID: int(p),
+					},
+				},
+				paginatedResponse: paginatedResponse{
+					Links: ResponseLinks{
+						Next: r.URL.String(),
+					},
+					Meta: ResponseMeta{
+						CurrentPage: int(p),
+						LastPage:    3,
+					},
+				},
+			})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -39,6 +54,10 @@ func TestIPBlocksResponse_Next(t *testing.T) {
 				Links: ResponseLinks{
 					Next: r.URL.String(),
 				},
+				Meta: ResponseMeta{
+					CurrentPage: int(p),
+					LastPage:    3,
+				},
 			},
 			Data: []IPBlock{{ID: int(p)}},
 		})
@@ -49,6 +68,10 @@ func TestIPBlocksResponse_Next(t *testing.T) {
 		paginatedResponse: paginatedResponse{
 			Links: ResponseLinks{
 				Next: fmt.Sprintf("%s/ipblocks?page=1", s.URL),
+			},
+			Meta: ResponseMeta{
+				CurrentPage: 1,
+				LastPage:    3,
 			},
 			service: &service{createTestClient(t, s.URL)},
 		},

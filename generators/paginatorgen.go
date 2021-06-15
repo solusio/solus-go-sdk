@@ -252,7 +252,7 @@ import (
 //		handleAnError(resp.Err())
 //	}
 func ({{ .Receiver }} *{{ .Name }}) Next(ctx context.Context) bool {
-	if ({{ .Receiver }}.Links.Next == "") || ({{ .Receiver }}.err != nil) {
+	if ({{ .Receiver }}.Meta.LastPage == {{ .Receiver }}.Meta.CurrentPage) || ({{ .Receiver }}.err != nil) {
 		return false
 	}
 
@@ -305,7 +305,22 @@ func Test{{ .Name }}_Next(t *testing.T) {
 		assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 		if p == 3 {
-			writeJSON(t, w, http.StatusOK, {{ .Name }}{Data: []{{ .DataType }}{{"{{"}}ID: int(p){{"}}}"}})
+			writeJSON(t, w, http.StatusOK, {{ .Name }}{
+				Data: []{{ .DataType }}{
+					{
+						ID: int(p),
+					},
+				},
+				paginatedResponse: paginatedResponse{
+					Links: ResponseLinks{
+						Next: r.URL.String(),
+					},
+					Meta: ResponseMeta{
+						CurrentPage: int(p),
+						LastPage: 3,
+					},
+				},				
+			})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -319,6 +334,10 @@ func Test{{ .Name }}_Next(t *testing.T) {
 				Links: ResponseLinks{
 					Next: r.URL.String(),
 				},
+				Meta: ResponseMeta{
+					CurrentPage: int(p),
+					LastPage: 3,
+				},
 			},
 			Data: []{{ .DataType }}{{"{{"}}ID: int(p){{"}}"}},
 		})
@@ -329,6 +348,10 @@ func Test{{ .Name }}_Next(t *testing.T) {
 		paginatedResponse: paginatedResponse{
 			Links: ResponseLinks{
 				Next: fmt.Sprintf("%s/{{ .Entrypoint }}?page=1", s.URL),
+			},
+			Meta: ResponseMeta{
+				CurrentPage: 1,
+				LastPage: 3,
 			},
 			service: &service{createTestClient(t, s.URL)},
 		},

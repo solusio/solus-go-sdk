@@ -50,7 +50,22 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 		}
 
 		if p == 2 {
-			writeJSON(t, w, http.StatusOK, ProjectServersResponse{Data: []Server{{ID: int(p)}}})
+			writeJSON(t, w, http.StatusOK, ProjectServersResponse{
+				Data: []Server{
+					{
+						ID: int(p),
+					},
+				},
+				paginatedResponse: paginatedResponse{
+					Links: ResponseLinks{
+						Next: r.URL.String(),
+					},
+					Meta: ResponseMeta{
+						CurrentPage: int(p),
+						LastPage:    2,
+					},
+				},
+			})
 			return
 		}
 		atomic.AddInt32(&page, 1)
@@ -63,6 +78,10 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
 					Next: r.URL.String(),
+				},
+				Meta: ResponseMeta{
+					CurrentPage: 1,
+					LastPage:    2,
 				},
 			},
 			Data: []Server{{ID: int(p)}},
