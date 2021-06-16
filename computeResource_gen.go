@@ -30,7 +30,7 @@ import (
 //		handleAnError(resp.Err())
 //	}
 func (r *ComputeResourcesPaginatedResponse) Next(ctx context.Context) bool {
-	if (r.Links.Next == "") || (r.err != nil) {
+	if (r.Meta.LastPage == r.Meta.CurrentPage) || (r.err != nil) {
 		return false
 	}
 
