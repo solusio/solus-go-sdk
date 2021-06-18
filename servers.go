@@ -95,6 +95,7 @@ type ServerBackupSettingsSchedule struct {
 type ServerBackupSettings struct {
 	Enabled  bool                         `json:"enabled,omitempty"`
 	Schedule ServerBackupSettingsSchedule `json:"schedule,omitempty"`
+	Limit    UnitPlanLimit                `json:"limit,omitempty"`
 }
 
 type ServersResponse struct {
