@@ -121,6 +121,11 @@ type ComputerResourceCreateRequest struct {
 	Locations []int  `json:"locations,omitempty"`
 }
 
+type SetupNetworkRequest struct {
+	ID   string                             `json:"id"`
+	Type ComputeResourceSettingsNetworkType `json:"type"`
+}
+
 type ComputeResourcePhysicalVolume struct {
 	VGFree string `json:"vg_free"`
 	VGName string `json:"vg_name"`
@@ -213,12 +218,7 @@ func (s *ComputeResourcesService) Networks(ctx context.Context, id int) ([]Compu
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/networks", id), &resp)
 }
 
-func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, networkID string) error {
-	data := struct {
-		ID string `json:"id"`
-	}{
-		ID: networkID,
-	}
+func (s *ComputeResourcesService) SetUpNetwork(ctx context.Context, id int, data SetupNetworkRequest) error {
 	path := fmt.Sprintf("compute_resources/%d/setup_network", id)
 	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
 	if err != nil {

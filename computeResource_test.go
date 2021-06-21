@@ -125,15 +125,17 @@ func TestComputeResourcesService_SetUpNetwork(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/compute_resources/10/setup_network", r.URL.Path)
 		assert.Equal(t, http.MethodPost, r.Method)
-		assertRequestBody(t, r, struct {
-			ID string `json:"id"`
-		}{
-			ID: "42",
+		assertRequestBody(t, r, SetupNetworkRequest{
+			ID:   "42",
+			Type: ComputeResourceSettingsNetworkTypeBridged,
 		})
 	})
 	defer s.Close()
 
-	err := createTestClient(t, s.URL).ComputeResources.SetUpNetwork(context.Background(), 10, "42")
+	err := createTestClient(t, s.URL).ComputeResources.SetUpNetwork(context.Background(), 10, SetupNetworkRequest{
+		ID:   "42",
+		Type: ComputeResourceSettingsNetworkTypeBridged,
+	})
 	require.NoError(t, err)
 }
 
