@@ -279,7 +279,7 @@ var fakeBackupNode = BackupNode{
 
 var fakeBackup = Backup{
 	ID:                1,
-	Type:              BackupTypeAuto,
+	LaunchType:        BackupLaunchTypeAuto,
 	Status:            BackupStatusCreated,
 	Size:              1337,
 	ComputeResourceVM: fakeServer,
