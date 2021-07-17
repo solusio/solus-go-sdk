@@ -28,6 +28,7 @@ type Client struct {
 	Backups           *BackupsService
 	ComputeResources  *ComputeResourcesService
 	IPBlocks          *IPBlocksService
+	Icons             *IconsService
 	License           *LicenseService
 	Locations         *LocationsService
 	OsImages          *OsImagesService
@@ -108,7 +109,7 @@ func SetRetryPolicy(retries int, retryAfter time.Duration) ClientOption {
 	}
 }
 
-// AllowInsecure allow to skip certificate verify.
+// WithLogger inject specific logger into client.
 func WithLogger(logger Logger) ClientOption {
 	return func(c *Client) {
 		c.Logger = logger
@@ -157,6 +158,7 @@ func NewClient(
 	client.Backups = (*BackupsService)(&client.s)
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
 	client.IPBlocks = (*IPBlocksService)(&client.s)
+	client.Icons = (*IconsService)(&client.s)
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)

@@ -95,15 +95,17 @@ var fakeLicense = License{
 	UpdateDate:     "fake update date",
 }
 
+var fakeIcon = Icon{
+	ID:   2,
+	Name: "Fake location icon",
+	URL:  "http://example.com/image.png",
+	Type: IconTypeFlags,
+}
+
 var fakeLocation = Location{
-	ID:   1,
-	Name: "fake location",
-	Icon: Icon{
-		ID:   2,
-		Name: "Fake location icon",
-		URL:  "http://example.com/image.png",
-		Type: IconTypeFlags,
-	},
+	ID:          1,
+	Name:        "fake location",
+	Icon:        fakeIcon,
 	Description: "fake description",
 	IsDefault:   true,
 	IsVisible:   true,
