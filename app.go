@@ -97,7 +97,7 @@ type ClientOption func(c *Client)
 // AllowInsecure allows to skip certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
-		c.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
+		c.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // We should give an ability to disable cert check.
 	}
 }
 

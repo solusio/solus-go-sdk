@@ -10,8 +10,20 @@ import (
 )
 
 func TestHTTPError_Error(t *testing.T) {
-	err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte("foo"))
-	require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
+	t.Run("a JSON body", func(t *testing.T) {
+		err := newHTTPError(
+			http.MethodDelete,
+			"some/path",
+			http.StatusBadRequest,
+			[]byte(`{"message": "foo"}`),
+		)
+		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
+	})
+
+	t.Run("not a JSON body", func(t *testing.T) {
+		err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte("foo"))
+		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
+	})
 }
 
 func TestIsNotFound(t *testing.T) {
