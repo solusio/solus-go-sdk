@@ -208,6 +208,11 @@ var fakeRole = Role{
 	UsersCount: 42,
 }
 
+var fakePermission = Permission{
+	ID:   1,
+	Name: "fake permission",
+}
+
 var fakeServer = Server{
 	ID:          1,
 	Name:        "fake server",
@@ -320,7 +325,7 @@ func createTestClient(t *testing.T, addr string) *Client {
 	u, err := url.Parse(addr)
 	require.NoError(t, err)
 
-	c, err := NewClient(u, authenticator{})
+	c, err := NewClient(u, authenticator{}, SetRetryPolicy(0, 0))
 	require.NoError(t, err)
 	return c
 }

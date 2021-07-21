@@ -22,3 +22,16 @@ func TestStorageService_Get(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, fakeStorage, actual)
 }
+
+func TestStorageService_Delete(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/storages/10", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
+
+		w.WriteHeader(204)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Storage.Delete(context.Background(), 10)
+	require.NoError(t, err)
+}
