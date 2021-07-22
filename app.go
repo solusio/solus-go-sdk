@@ -31,6 +31,7 @@ type Client struct {
 	Icons             *IconsService
 	License           *LicenseService
 	Locations         *LocationsService
+	OsImageVersions   *OsImageVersionsService
 	OsImages          *OsImagesService
 	Permission        *PermissionsService
 	Plans             *PlansService
@@ -161,6 +162,7 @@ func NewClient(
 	client.Icons = (*IconsService)(&client.s)
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
+	client.OsImageVersions = (*OsImageVersionsService)(&client.s)
 	client.OsImages = (*OsImagesService)(&client.s)
 	client.Permission = (*PermissionsService)(&client.s)
 	client.Plans = (*PlansService)(&client.s)
