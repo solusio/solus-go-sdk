@@ -85,9 +85,13 @@ func TestPlansService_Create(t *testing.T) {
 				Unit:      PlanLimitUnits,
 			},
 		},
-		TokensPerHour:           4,
-		TokensPerMonth:          5,
-		Position:                6,
+		TokensPerHour:  4,
+		TokensPerMonth: 5,
+		Position:       6,
+		BackupSettings: PlanBackupSettings{
+			IsIncrementalBackupEnabled: false,
+			IncrementalBackupsLimit:    3,
+		},
 		ResetLimitPolicy:        PlanResetLimitPolicyVMCreatedDay,
 		NetworkTotalTrafficType: NetworkTotalTrafficTypeSeparate,
 	}

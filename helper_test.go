@@ -154,7 +154,11 @@ var fakePlan = Plan{
 	IsSnapshotsEnabled:  true,
 	IsBackupAvailable:   true,
 	BackupPrice:         11,
-	IsVisible:           true,
+	BackupSettings: PlanBackupSettings{
+		IsIncrementalBackupEnabled: false,
+		IncrementalBackupsLimit:    2,
+	},
+	IsVisible: true,
 	Limits: PlanLimits{
 		DiskBandwidth: DiskBandwidthPlanLimit{
 			IsEnabled: true,
@@ -288,6 +292,7 @@ var fakeBackupNode = BackupNode{
 
 var fakeBackup = Backup{
 	ID:                1,
+	Type:              BackupTypeFull,
 	CreationMethod:    BackupCreationMethodAuto,
 	Status:            BackupStatusCreated,
 	Size:              1337,
