@@ -130,11 +130,13 @@ var fakeOsImage = OsImage{
 }
 
 var fakeOsImageVersion = OsImageVersion{
-	ID:               1,
-	Position:         100,
-	Version:          "1337",
-	URL:              "http://example.com/os.qcow2",
-	CloudInitVersion: "v2",
+	ID:                 1,
+	Position:           100,
+	Version:            "1337",
+	URL:                "http://example.com/os.qcow2",
+	OsImageID:          2,
+	CloudInitVersion:   CloudInitVersionV2,
+	IsSSHKeysSupported: true,
 }
 
 var fakePlan = Plan{
