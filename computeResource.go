@@ -154,14 +154,14 @@ type computeResourceResponse struct {
 	Data ComputeResource `json:"data"`
 }
 
-type ComputeResourcesPaginatedResponse struct {
+type ComputeResourcesResponse struct {
 	paginatedResponse
 
 	Data []ComputeResource `json:"data"`
 }
 
-func (s *ComputeResourcesService) List(ctx context.Context) (ComputeResourcesPaginatedResponse, error) {
-	resp := ComputeResourcesPaginatedResponse{
+func (s *ComputeResourcesService) List(ctx context.Context) (ComputeResourcesResponse, error) {
+	resp := ComputeResourcesResponse{
 		paginatedResponse: paginatedResponse{
 			service: (*service)(s),
 		},

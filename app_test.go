@@ -96,7 +96,7 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 			require.NoError(t, err)
 
 			_, err = NewClient(u, authenticator)
-			require.EqualError(t, err, "HTTP POST auth/login returns 400 status code: ")
+			require.EqualError(t, err, "HTTP POST auth/login returns 400 status code")
 		})
 	})
 }

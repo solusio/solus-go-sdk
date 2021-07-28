@@ -14,19 +14,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
+func TestComputeResourcesResponse_Next(t *testing.T) {
 	t.Run("positive", func(t *testing.T) {
 		page := int32(1)
 
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			p := atomic.LoadInt32(&page)
 
-			assert.Equal(t, "/computeresourcespaginated", r.URL.Path)
+			assert.Equal(t, "/computeresources", r.URL.Path)
 			assert.Equal(t, http.MethodGet, r.Method)
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 			if p == 3 {
-				writeJSON(t, w, http.StatusOK, ComputeResourcesPaginatedResponse{
+				writeJSON(t, w, http.StatusOK, ComputeResourcesResponse{
 					Data: []ComputeResource{
 						{
 							ID: int(p),
@@ -50,7 +50,7 @@ func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
 			q.Set("page", strconv.Itoa(int(p)+1))
 			r.URL.RawQuery = q.Encode()
 
-			writeJSON(t, w, http.StatusOK, ComputeResourcesPaginatedResponse{
+			writeJSON(t, w, http.StatusOK, ComputeResourcesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: r.URL.String(),
@@ -65,10 +65,10 @@ func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
 		})
 		defer s.Close()
 
-		resp := ComputeResourcesPaginatedResponse{
+		resp := ComputeResourcesResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
-					Next: fmt.Sprintf("%s/computeresourcespaginated?page=1", s.URL),
+					Next: fmt.Sprintf("%s/computeresources?page=1", s.URL),
 				},
 				Meta: ResponseMeta{
 					CurrentPage: 1,
@@ -90,17 +90,17 @@ func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
 	t.Run("negative", func(t *testing.T) {
 		t.Run("unexpected status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/computeresourcespaginated", r.URL.Path)
+				assert.Equal(t, "/computeresources", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 				w.WriteHeader(http.StatusBadRequest)
 			})
 			defer s.Close()
 
-			resp := ComputeResourcesPaginatedResponse{
+			resp := ComputeResourcesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/computeresourcespaginated?page=1", s.URL),
+						Next: fmt.Sprintf("%s/computeresources?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -112,14 +112,14 @@ func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/computeresourcespaginated?page=1 returns 400 status code: ",
+				"HTTP GET %s/computeresources?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
 
 		t.Run("failed to unmarshal", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/computeresourcespaginated", r.URL.Path)
+				assert.Equal(t, "/computeresources", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 
@@ -129,10 +129,10 @@ func TestComputeResourcesPaginatedResponse_Next(t *testing.T) {
 			})
 			defer s.Close()
 
-			resp := ComputeResourcesPaginatedResponse{
+			resp := ComputeResourcesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/computeresourcespaginated?page=1", s.URL),
+						Next: fmt.Sprintf("%s/computeresources?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,

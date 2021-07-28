@@ -24,6 +24,11 @@ func TestHTTPError_Error(t *testing.T) {
 		err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte("foo"))
 		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
 	})
+
+	t.Run("empty message", func(t *testing.T) {
+		err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte{})
+		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code")
+	})
 }
 
 func TestIsNotFound(t *testing.T) {
