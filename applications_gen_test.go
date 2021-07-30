@@ -112,7 +112,7 @@ func TestApplicationsResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/applications?page=1 returns 400 status code: ",
+				"HTTP GET %s/applications?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
