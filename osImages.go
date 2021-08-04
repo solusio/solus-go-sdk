@@ -60,7 +60,7 @@ func (s *OsImagesService) Update(ctx context.Context, id int, data OsImageReques
 }
 
 func (s *OsImagesService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("os_images/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("os_images/%d", id))
 }
 
 func (s *OsImagesService) CreateVersion(

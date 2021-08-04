@@ -305,6 +305,14 @@ var fakeBackup = Backup{
 	Disk:              42,
 }
 
+var fakeSnapshot = Snapshot{
+	ID:        1,
+	Name:      "fake snapshot",
+	Size:      2,
+	Status:    SnapshotStatusAvailable,
+	CreatedAt: time.Now().String(),
+}
+
 func startTestServer(t *testing.T, h http.HandlerFunc) *httptest.Server {
 	listener, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)

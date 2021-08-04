@@ -75,5 +75,5 @@ func (s *BackupNodesService) Update(ctx context.Context, id int, data BackupNode
 }
 
 func (s *BackupNodesService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("backup_nodes/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("backup_nodes/%d", id))
 }

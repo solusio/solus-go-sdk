@@ -27,5 +27,5 @@ func (s *SSHKeysService) Create(ctx context.Context, data SSHKeyCreateRequest) (
 }
 
 func (s *SSHKeysService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("ssh_keys/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("ssh_keys/%d", id))
 }

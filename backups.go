@@ -3,7 +3,6 @@ package solus
 import (
 	"context"
 	"fmt"
-	"net/http"
 )
 
 type BackupsService service
@@ -61,20 +60,9 @@ func (s *BackupsService) Get(ctx context.Context, id int) (Backup, error) {
 }
 
 func (s *BackupsService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("backups/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("backups/%d", id))
 }
 
 func (s *BackupsService) Restore(ctx context.Context, id int) (Task, error) {
-	path := fmt.Sprintf("backups/%d/restore", id)
-	body, code, err := s.client.request(ctx, http.MethodPost, path)
-	if err != nil {
-		return Task{}, err
-	}
-
-	if code != http.StatusOK {
-		return Task{}, newHTTPError(http.MethodPost, path, code, body)
-	}
-
-	var resp taskResponse
-	return resp.Data, unmarshal(body, &resp)
+	return s.client.asyncPost(ctx, fmt.Sprintf("backups/%d/restore", id))
 }

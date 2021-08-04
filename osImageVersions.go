@@ -72,5 +72,5 @@ func (s *OsImageVersionsService) Update(
 }
 
 func (s *OsImageVersionsService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("os_image_versions/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("os_image_versions/%d", id))
 }

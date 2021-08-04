@@ -68,5 +68,5 @@ func (s *UsersService) Update(ctx context.Context, id int, data UserUpdateReques
 }
 
 func (s *UsersService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("users/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("users/%d", id))
 }

@@ -97,7 +97,7 @@ func (s *IPBlocksService) Update(ctx context.Context, id int, data IPBlockReques
 }
 
 func (s *IPBlocksService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("ip_blocks/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("ip_blocks/%d", id))
 }
 
 func (s *IPBlocksService) IPAddressCreate(ctx context.Context, ipBlockID int) (IPBlockIPAddress, error) {
@@ -118,5 +118,5 @@ func (s *IPBlocksService) IPAddressCreate(ctx context.Context, ipBlockID int) (I
 }
 
 func (s *IPBlocksService) IPAddressDelete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("ips/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("ips/%d", id))
 }
