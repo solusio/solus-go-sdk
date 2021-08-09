@@ -31,5 +31,5 @@ func (s *StorageService) Get(ctx context.Context, id int) (Storage, error) {
 }
 
 func (s *StorageService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("storages/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("storages/%d", id))
 }

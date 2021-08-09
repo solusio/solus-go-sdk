@@ -46,5 +46,5 @@ func (s *ProjectsService) List(ctx context.Context) (ProjectsResponse, error) {
 }
 
 func (s *ProjectsService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("projects/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("projects/%d", id))
 }

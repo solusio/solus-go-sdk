@@ -295,5 +295,5 @@ func (*PlansService) setUpdateRequestDefaults(data *PlanUpdateRequest) {
 }
 
 func (s *PlansService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("plans/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("plans/%d", id))
 }

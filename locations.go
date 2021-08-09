@@ -63,5 +63,5 @@ func (s *LocationsService) Update(ctx context.Context, id int, data LocationCrea
 }
 
 func (s *LocationsService) Delete(ctx context.Context, id int) error {
-	return s.client.delete(ctx, fmt.Sprintf("locations/%d", id))
+	return s.client.syncDelete(ctx, fmt.Sprintf("locations/%d", id))
 }

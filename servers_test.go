@@ -170,3 +170,22 @@ func TestServersService_Delete(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
+
+func TestServersService_SnapshotsCreate(t *testing.T) {
+	data := SnapshotRequest{
+		Name: "name",
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/snapshots", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusCreated, fakeSnapshot)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).Servers.SnapshotsCreate(context.Background(), 10, data)
+	require.NoError(t, err)
+	require.Equal(t, fakeSnapshot, actual)
+}

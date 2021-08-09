@@ -40,6 +40,7 @@ type Client struct {
 	SSHKeys           *SSHKeysService
 	Servers           *ServersService
 	ServersMigrations *ServersMigrationsService
+	Snapshots         *SnapshotsService
 	Storage           *StorageService
 	StorageTypes      *StorageTypesService
 	Tasks             *TasksService
@@ -52,7 +53,7 @@ type service struct {
 
 // Authenticator interface for client authentication.
 type Authenticator interface {
-	// Authenticate authenticate client and return credentials
+	// Authenticate authenticates client and return credentials
 	// which should be used for making further API calls.
 	// The Client is fully initialized. Any endpoints which is not requires
 	// authentication may be called.
@@ -95,7 +96,7 @@ func (a APITokenAuthenticator) Authenticate(*Client) (Credentials, error) {
 // ClientOption represent client initialization options.
 type ClientOption func(c *Client)
 
-// AllowInsecure allows to skip certificate verify.
+// AllowInsecure allows skipping certificate verify.
 func AllowInsecure() ClientOption {
 	return func(c *Client) {
 		c.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec // We should give an ability to disable cert check.
@@ -171,6 +172,7 @@ func NewClient(
 	client.SSHKeys = (*SSHKeysService)(&client.s)
 	client.Servers = (*ServersService)(&client.s)
 	client.ServersMigrations = (*ServersMigrationsService)(&client.s)
+	client.Snapshots = (*SnapshotsService)(&client.s)
 	client.Storage = (*StorageService)(&client.s)
 	client.StorageTypes = (*StorageTypesService)(&client.s)
 	client.Tasks = (*TasksService)(&client.s)

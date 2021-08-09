@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -125,15 +124,15 @@ func (s *ServersService) Patch(ctx context.Context, id int, data ServerUpdateReq
 }
 
 func (s *ServersService) Start(ctx context.Context, id int) (Task, error) {
-	return s.action(ctx, id, "start")
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/start", id))
 }
 
 func (s *ServersService) Stop(ctx context.Context, id int) (Task, error) {
-	return s.action(ctx, id, "stop")
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/stop", id))
 }
 
 func (s *ServersService) Restart(ctx context.Context, id int) (Task, error) {
-	return s.action(ctx, id, "restart")
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/restart", id))
 }
 
 func (s *ServersService) Backup(ctx context.Context, id int) (Backup, error) {
@@ -173,39 +172,10 @@ func (s *ServersService) Resize(ctx context.Context, id int, data ServerResizeRe
 }
 
 func (s *ServersService) Delete(ctx context.Context, id int) (Task, error) {
-	path := fmt.Sprintf("servers/%d", id)
-	body, code, err := s.client.request(ctx, http.MethodDelete, path)
-	if err != nil {
-		return Task{}, err
-	}
-
-	if code != http.StatusOK {
-		return Task{}, newHTTPError(http.MethodDelete, path, code, body)
-	}
-
-	var resp taskResponse
-	if err := unmarshal(body, &resp); err != nil {
-		return Task{}, err
-	}
-
-	if resp.Data.ID == 0 {
-		return Task{}, errors.New("task doesn't have an id")
-	}
-
-	return resp.Data, nil
+	return s.client.asyncDelete(ctx, fmt.Sprintf("servers/%d", id))
 }
 
-func (s *ServersService) action(ctx context.Context, id int, action string) (Task, error) {
-	path := fmt.Sprintf("servers/%d/%s", id, action)
-	body, code, err := s.client.request(ctx, http.MethodPost, path)
-	if err != nil {
-		return Task{}, err
-	}
-
-	if code != http.StatusOK {
-		return Task{}, newHTTPError(http.MethodPost, path, code, body)
-	}
-
-	var resp taskResponse
-	return resp.Data, unmarshal(body, &resp)
+func (s *ServersService) SnapshotsCreate(ctx context.Context, vmID int, data SnapshotRequest) (Snapshot, error) {
+	var resp snapshotResponse
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("servers/%d/snapshots", vmID), data, &resp)
 }
