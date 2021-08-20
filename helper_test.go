@@ -2,12 +2,14 @@ package solus
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -330,6 +332,25 @@ func startTestServer(t *testing.T, h http.HandlerFunc) *httptest.Server {
 	s.Start()
 
 	return s
+}
+
+func startBrokenTestServer(t *testing.T) (func(t *testing.T, method, path string, err error), string) {
+	listener, err := net.Listen("tcp", "localhost:0")
+	require.NoError(t, err)
+	err = listener.Close()
+	require.NoError(t, err)
+
+	addr := fmt.Sprintf("https://%s", listener.Addr().String())
+
+	return func(t *testing.T, method, path string, err error) {
+		assert.EqualError(t, err, fmt.Sprintf(
+			`%s "%s%s": dial tcp %s: connect: connection refused`,
+			strings.Title(strings.ToLower(method)),
+			addr,
+			path,
+			listener.Addr(),
+		))
+	}, addr
 }
 
 type authenticator struct{}

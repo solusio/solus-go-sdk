@@ -3,6 +3,7 @@ package solus
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -65,6 +66,32 @@ func TestComputeResourcesService_Patch(t *testing.T) {
 	require.Equal(t, fakeComputeResource, actual)
 }
 
+func TestComputeResourcesService_List(t *testing.T) {
+	expected := ComputeResourcesResponse{
+		Data: []ComputeResource{
+			fakeComputeResource,
+		},
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/compute_resources", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		assertRequestQuery(t, r, url.Values{
+			"filter[search]": []string{"name"},
+		})
+
+		writeJSON(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	f := (&FilterComputeResources{}).ByName("name")
+
+	actual, err := createTestClient(t, s.URL).ComputeResources.List(context.Background(), f)
+	require.NoError(t, err)
+	actual.service = nil
+	require.Equal(t, expected, actual)
+}
+
 func TestComputeResourcesService_Get(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/compute_resources/10", r.URL.Path)
@@ -80,19 +107,45 @@ func TestComputeResourcesService_Get(t *testing.T) {
 }
 
 func TestComputeResourcesService_Delete(t *testing.T) {
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/compute_resources/10", r.URL.Path)
-		assert.Equal(t, http.MethodDelete, r.Method)
-		assertRequestBody(t, r, deleteRequest{
-			Force: true,
+	t.Run("positive", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/compute_resources/10", r.URL.Path)
+			assert.Equal(t, http.MethodDelete, r.Method)
+			assertRequestBody(t, r, deleteRequest{
+				Force: true,
+			})
+
+			w.WriteHeader(http.StatusNoContent)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).ComputeResources.Delete(context.Background(), 10, true)
+		require.NoError(t, err)
+	})
+
+	t.Run("negative", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			asserter, addr := startBrokenTestServer(t)
+			err := createTestClient(t, addr).ComputeResources.Delete(context.Background(), 10, true)
+			asserter(t, http.MethodDelete, "/compute_resources/10", err)
 		})
 
-		w.WriteHeader(204)
-	})
-	defer s.Close()
+		t.Run("invalid status code", func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/compute_resources/10", r.URL.Path)
+				assert.Equal(t, http.MethodDelete, r.Method)
+				assertRequestBody(t, r, deleteRequest{
+					Force: true,
+				})
 
-	err := createTestClient(t, s.URL).ComputeResources.Delete(context.Background(), 10, true)
-	require.NoError(t, err)
+				w.WriteHeader(http.StatusBadRequest)
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).ComputeResources.Delete(context.Background(), 10, true)
+			assert.EqualError(t, err, "HTTP DELETE compute_resources/10 returns 400 status code")
+		})
+	})
 }
 
 func TestComputeResourcesService_Networks(t *testing.T) {
@@ -122,21 +175,57 @@ func TestComputeResourcesService_Networks(t *testing.T) {
 }
 
 func TestComputeResourcesService_SetUpNetwork(t *testing.T) {
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/compute_resources/10/setup_network", r.URL.Path)
-		assert.Equal(t, http.MethodPost, r.Method)
-		assertRequestBody(t, r, SetupNetworkRequest{
+	t.Run("positive", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/compute_resources/10/setup_network", r.URL.Path)
+			assert.Equal(t, http.MethodPost, r.Method)
+			assertRequestBody(t, r, SetupNetworkRequest{
+				ID:   "42",
+				Type: ComputeResourceSettingsNetworkTypeBridged,
+			})
+			w.WriteHeader(http.StatusOK)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).ComputeResources.SetUpNetwork(context.Background(), 10, SetupNetworkRequest{
 			ID:   "42",
 			Type: ComputeResourceSettingsNetworkTypeBridged,
 		})
+		require.NoError(t, err)
 	})
-	defer s.Close()
 
-	err := createTestClient(t, s.URL).ComputeResources.SetUpNetwork(context.Background(), 10, SetupNetworkRequest{
-		ID:   "42",
-		Type: ComputeResourceSettingsNetworkTypeBridged,
+	t.Run("negative", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			asserter, addr := startBrokenTestServer(t)
+
+			err := createTestClient(t, addr).ComputeResources.
+				SetUpNetwork(context.Background(), 10, SetupNetworkRequest{
+					ID:   "42",
+					Type: ComputeResourceSettingsNetworkTypeBridged,
+				})
+			asserter(t, http.MethodPost, "/compute_resources/10/setup_network", err)
+		})
+
+		t.Run("invalid status code", func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/compute_resources/10/setup_network", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+				assertRequestBody(t, r, SetupNetworkRequest{
+					ID:   "42",
+					Type: ComputeResourceSettingsNetworkTypeBridged,
+				})
+				w.WriteHeader(http.StatusBadRequest)
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).ComputeResources.
+				SetUpNetwork(context.Background(), 10, SetupNetworkRequest{
+					ID:   "42",
+					Type: ComputeResourceSettingsNetworkTypeBridged,
+				})
+			assert.EqualError(t, err, "HTTP POST compute_resources/10/setup_network returns 400 status code")
+		})
 	})
-	require.NoError(t, err)
 }
 
 func TestComputeResourcesService_PhysicalVolumes(t *testing.T) {

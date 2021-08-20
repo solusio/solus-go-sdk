@@ -88,7 +88,7 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 
 		t.Run("invalid status", func(t *testing.T) {
 			s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 			}))
 			defer s.Close()
 

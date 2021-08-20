@@ -88,7 +88,27 @@ func TestIconsResponse_Next(t *testing.T) {
 	})
 
 	t.Run("negative", func(t *testing.T) {
-		t.Run("unexpected status code", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			asserter, addr := startBrokenTestServer(t)
+
+			resp := IconsResponse{
+				paginatedResponse: paginatedResponse{
+					Links: ResponseLinks{
+						Next: fmt.Sprintf("%s/icons?page=1", addr),
+					},
+					Meta: ResponseMeta{
+						CurrentPage: 1,
+						LastPage:    3,
+					},
+					service: &service{createTestClient(t, addr)},
+				},
+			}
+
+			resp.Next(context.Background())
+			asserter(t, http.MethodGet, "/icons?page=1", resp.Err())
+		})
+
+		t.Run("invalid status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, "/icons", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)

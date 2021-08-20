@@ -121,17 +121,40 @@ func TestServersService_Restart(t *testing.T) {
 }
 
 func TestServersService_Backup(t *testing.T) {
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/servers/10/backups", r.URL.Path)
-		assert.Equal(t, http.MethodPost, r.Method)
+	t.Run("positive", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/servers/10/backups", r.URL.Path)
+			assert.Equal(t, http.MethodPost, r.Method)
 
-		writeResponse(t, w, http.StatusCreated, fakeBackup)
+			writeResponse(t, w, http.StatusCreated, fakeBackup)
+		})
+		defer s.Close()
+
+		actual, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
+		require.NoError(t, err)
+		require.Equal(t, fakeBackup, actual)
 	})
-	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
-	require.NoError(t, err)
-	require.Equal(t, fakeBackup, actual)
+	t.Run("negative", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			asserter, addr := startBrokenTestServer(t)
+
+			_, err := createTestClient(t, addr).Servers.Backup(context.Background(), 10)
+			asserter(t, http.MethodPost, "/servers/10/backups", err)
+		})
+
+		t.Run("invalid status code", func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/servers/10/backups", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+				w.WriteHeader(http.StatusBadRequest)
+			})
+			defer s.Close()
+
+			_, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
+			assert.EqualError(t, err, "HTTP POST servers/10/backups returns 400 status code")
+		})
+	})
 }
 
 func TestServersService_resize(t *testing.T) {
