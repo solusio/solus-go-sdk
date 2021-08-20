@@ -19,10 +19,32 @@ type SSHKeyCreateRequest struct {
 	UserID int    `json:"user_id"`
 }
 
-func (s *SSHKeysService) Create(ctx context.Context, data SSHKeyCreateRequest) (SSHKey, error) {
-	var resp struct {
-		Data SSHKey `json:"data"`
+type SSHKeysResponse struct {
+	paginatedResponse
+
+	Data []SSHKey `json:"data"`
+}
+
+type sshKeyResponse struct {
+	Data SSHKey `json:"data"`
+}
+
+func (s *SSHKeysService) List(ctx context.Context, filter *FilterSSHKeys) (SSHKeysResponse, error) {
+	resp := SSHKeysResponse{
+		paginatedResponse: paginatedResponse{
+			service: (*service)(s),
+		},
 	}
+	return resp, s.client.list(ctx, "ssh_keys", &resp, withFilter(filter.data))
+}
+
+func (s *SSHKeysService) Get(ctx context.Context, id int) (SSHKey, error) {
+	var resp sshKeyResponse
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("ssh_keys/%d", id), &resp)
+}
+
+func (s *SSHKeysService) Create(ctx context.Context, data SSHKeyCreateRequest) (SSHKey, error) {
+	var resp sshKeyResponse
 	return resp.Data, s.client.create(ctx, "ssh_keys", data, &resp)
 }
 
