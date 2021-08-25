@@ -45,7 +45,7 @@ func TestBackupsService_Delete(t *testing.T) {
 		assert.Equal(t, "/backups/10", r.URL.Path)
 		assert.Equal(t, http.MethodDelete, r.Method)
 
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusNoContent)
 	})
 	defer s.Close()
 

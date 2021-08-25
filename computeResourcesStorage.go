@@ -22,8 +22,8 @@ func (s *ComputeResourcesService) StorageCreate(
 }
 
 func (s *ComputeResourcesService) StorageList(ctx context.Context, id int) ([]Storage, error) {
-	resp := struct {
+	var resp struct {
 		Data []Storage `json:"data"`
-	}{}
+	}
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/storages", id), &resp)
 }

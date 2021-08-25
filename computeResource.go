@@ -160,13 +160,16 @@ type ComputeResourcesResponse struct {
 	Data []ComputeResource `json:"data"`
 }
 
-func (s *ComputeResourcesService) List(ctx context.Context) (ComputeResourcesResponse, error) {
+func (s *ComputeResourcesService) List(
+	ctx context.Context,
+	filter *FilterComputeResources,
+) (ComputeResourcesResponse, error) {
 	resp := ComputeResourcesResponse{
 		paginatedResponse: paginatedResponse{
 			service: (*service)(s),
 		},
 	}
-	return resp, s.client.list(ctx, "compute_resources", &resp)
+	return resp, s.client.list(ctx, "compute_resources", &resp, withFilter(filter.data))
 }
 
 func (s *ComputeResourcesService) Create(

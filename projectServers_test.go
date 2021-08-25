@@ -36,69 +36,84 @@ func TestProjectsService_ServersCreate(t *testing.T) {
 }
 
 func TestProjectsService_ServersListAll(t *testing.T) {
-	page := int32(0)
+	t.Run("positive", func(t *testing.T) {
+		page := int32(0)
 
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		p := atomic.LoadInt32(&page)
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			p := atomic.LoadInt32(&page)
 
-		assert.Equal(t, "/projects/1/servers", r.URL.Path)
-		assert.Equal(t, http.MethodGet, r.Method)
-		if page == 0 {
-			assert.Equal(t, "", r.URL.Query().Get("page"))
-		} else {
-			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
-		}
+			assert.Equal(t, "/projects/1/servers", r.URL.Path)
+			assert.Equal(t, http.MethodGet, r.Method)
+			if page == 0 {
+				assert.Equal(t, "", r.URL.Query().Get("page"))
+			} else {
+				assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
+			}
 
-		if p == 2 {
-			writeJSON(t, w, http.StatusOK, ProjectServersResponse{
-				Data: []Server{
-					{
-						ID: int(p),
+			if p == 2 {
+				writeJSON(t, w, http.StatusOK, ProjectServersResponse{
+					Data: []Server{
+						{
+							ID: int(p),
+						},
 					},
-				},
+					paginatedResponse: paginatedResponse{
+						Links: ResponseLinks{
+							Next: r.URL.String(),
+						},
+						Meta: ResponseMeta{
+							CurrentPage: int(p),
+							LastPage:    2,
+						},
+					},
+				})
+				return
+			}
+			atomic.AddInt32(&page, 1)
+
+			q := r.URL.Query()
+			q.Set("page", strconv.Itoa(int(p)+1))
+			r.URL.RawQuery = q.Encode()
+
+			writeJSON(t, w, http.StatusOK, ProjectServersResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: r.URL.String(),
 					},
 					Meta: ResponseMeta{
-						CurrentPage: int(p),
+						CurrentPage: 1,
 						LastPage:    2,
 					},
 				},
+				Data: []Server{{ID: int(p)}},
 			})
-			return
-		}
-		atomic.AddInt32(&page, 1)
-
-		q := r.URL.Query()
-		q.Set("page", strconv.Itoa(int(p)+1))
-		r.URL.RawQuery = q.Encode()
-
-		writeJSON(t, w, http.StatusOK, ProjectServersResponse{
-			paginatedResponse: paginatedResponse{
-				Links: ResponseLinks{
-					Next: r.URL.String(),
-				},
-				Meta: ResponseMeta{
-					CurrentPage: 1,
-					LastPage:    2,
-				},
-			},
-			Data: []Server{{ID: int(p)}},
 		})
+		defer s.Close()
+
+		c := createTestClient(t, s.URL)
+
+		actual, err := c.Projects.ServersListAll(context.Background(), 1)
+		require.NoError(t, err)
+
+		require.Equal(t, []Server{
+			{ID: 0},
+			{ID: 1},
+			{ID: 2},
+		}, actual)
 	})
-	defer s.Close()
 
-	c := createTestClient(t, s.URL)
+	t.Run("negative", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/projects/1/servers", r.URL.Path)
+			assert.Equal(t, http.MethodGet, r.Method)
+			assert.Equal(t, "", r.URL.Query().Get("page"))
+			w.WriteHeader(http.StatusBadRequest)
+		})
+		defer s.Close()
 
-	actual, err := c.Projects.ServersListAll(context.Background(), 1)
-	require.NoError(t, err)
-
-	require.Equal(t, []Server{
-		{ID: 0},
-		{ID: 1},
-		{ID: 2},
-	}, actual)
+		_, err := createTestClient(t, s.URL).Projects.ServersListAll(context.Background(), 1)
+		assert.EqualError(t, err, "HTTP GET projects/1/servers returns 400 status code")
+	})
 }
 
 func TestProjectsService_Servers(t *testing.T) {

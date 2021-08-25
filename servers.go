@@ -157,18 +157,7 @@ type ServerResizeRequest struct {
 }
 
 func (s *ServersService) Resize(ctx context.Context, id int, data ServerResizeRequest) (Task, error) {
-	path := fmt.Sprintf("servers/%d/resize", id)
-	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
-	if err != nil {
-		return Task{}, err
-	}
-
-	if code != http.StatusOK {
-		return Task{}, newHTTPError(http.MethodPost, path, code, body)
-	}
-
-	var resp taskResponse
-	return resp.Data, unmarshal(body, &resp)
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/resize", id), withBody(data))
 }
 
 func (s *ServersService) Delete(ctx context.Context, id int) (Task, error) {

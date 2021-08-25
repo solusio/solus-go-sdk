@@ -3,7 +3,6 @@ package solus
 import (
 	"context"
 	"fmt"
-	"net/http"
 )
 
 type IPBlocksService service
@@ -101,20 +100,10 @@ func (s *IPBlocksService) Delete(ctx context.Context, id int) error {
 }
 
 func (s *IPBlocksService) IPAddressCreate(ctx context.Context, ipBlockID int) (IPBlockIPAddress, error) {
-	path := fmt.Sprintf("ip_blocks/%d/ips", ipBlockID)
-	body, code, err := s.client.request(ctx, http.MethodPost, path)
-	if err != nil {
-		return IPBlockIPAddress{}, err
-	}
-
-	if code != http.StatusCreated {
-		return IPBlockIPAddress{}, newHTTPError(http.MethodPost, path, code, body)
-	}
-
 	var resp struct {
 		Data IPBlockIPAddress `json:"data"`
 	}
-	return resp.Data, unmarshal(body, &resp)
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("ip_blocks/%d/ips", ipBlockID), nil, &resp)
 }
 
 func (s *IPBlocksService) IPAddressDelete(ctx context.Context, id int) error {

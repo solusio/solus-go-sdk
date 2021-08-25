@@ -365,7 +365,7 @@ issues:
     - "ineffective break statement. Did you mean to break out of the outer loop"
 
   exclude-rules:
-    - path: (_test\.go|internal/apiTests)
+    - path: _test\.go
       linters:
         - dupl
         - errcheck

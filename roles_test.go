@@ -71,7 +71,6 @@ func TestRolesService_GetByName(t *testing.T) {
 			{Name: "bar"},
 		},
 	}
-
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/roles", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -86,8 +85,16 @@ func TestRolesService_GetByName(t *testing.T) {
 		require.Equal(t, Role{Name: "foo"}, actual)
 	})
 
-	t.Run("positive", func(t *testing.T) {
-		_, err := createTestClient(t, s.URL).Roles.GetByName(context.Background(), "fizz")
-		require.EqualError(t, err, `failed to get role by name "fizz": role not found`)
+	t.Run("negative", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			asserter, addr := startBrokenTestServer(t)
+			_, err := createTestClient(t, addr).Roles.GetByName(context.Background(), "fizz")
+			asserter(t, http.MethodGet, "/roles", err)
+		})
+
+		t.Run("not found", func(t *testing.T) {
+			_, err := createTestClient(t, s.URL).Roles.GetByName(context.Background(), "fizz")
+			require.EqualError(t, err, `failed to get role by name "fizz": role not found`)
+		})
 	})
 }
