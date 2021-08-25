@@ -236,7 +236,7 @@ var fakeTask = Task{
 	ID:                1,
 	ComputeResourceID: 2,
 	Queue:             "fake queue",
-	Action:            ServerActionCreate,
+	Action:            TaskActionServerCreate,
 	Status:            TaskStatusDone,
 	Output:            "fake output",
 	Progress:          42,
