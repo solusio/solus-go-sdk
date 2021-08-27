@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// Client a Solus API client.
 type Client struct {
 	BaseURL     *url.URL
 	UserAgent   string
@@ -69,6 +70,7 @@ type EmailAndPasswordAuthenticator struct {
 
 var _ Authenticator = EmailAndPasswordAuthenticator{}
 
+// Authenticate authenticates by email and password.
 func (a EmailAndPasswordAuthenticator) Authenticate(c *Client) (Credentials, error) {
 	resp, err := c.authLogin(context.Background(), AuthLoginRequest(a))
 	if err != nil {
@@ -85,6 +87,7 @@ type APITokenAuthenticator struct {
 
 var _ Authenticator = APITokenAuthenticator{}
 
+// Authenticate authenticates by API token.
 func (a APITokenAuthenticator) Authenticate(*Client) (Credentials, error) {
 	return Credentials{
 		AccessToken: a.Token,
