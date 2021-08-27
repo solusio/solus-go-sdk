@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// ProjectServersCreateRequest represents available properties for creating a new
+// server on a project.
 type ProjectServersCreateRequest struct {
 	Name             string                `json:"name"`
 	PlanID           int                   `json:"plan_id"`

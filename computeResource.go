@@ -42,11 +42,11 @@ const (
 	// for setting up a network.
 	ComputeResourceStatusConfigureNetwork ComputerResourceStatus = "configure_network"
 
-	// ComputeResourceStatusCommissioning indicates compute resource commissioning
+	// ComputeResourceStatusFailed indicates compute resource commissioning
 	// was failed.
 	ComputeResourceStatusFailed ComputerResourceStatus = "failed"
 
-	// ComputeResourceStatusCommissioning indicates compute resource is unavailable
+	// ComputeResourceStatusUnavailable indicates compute resource is unavailable
 	// due to some reason.
 	ComputeResourceStatusUnavailable ComputerResourceStatus = "unavailable"
 )
@@ -62,12 +62,12 @@ const (
 	// be choosing by round-robin algorithm.
 	ComputeResourceBalanceStrategyRoundRobin ComputeResourceBalanceStrategy = "round-robin"
 
-	// ComputeResourceBalanceStrategyRoundRobin indicates compute resource will
-	// be chosen randomly.
+	// ComputeResourceBalanceStrategyRandom indicates compute resource will be
+	// chosen randomly.
 	ComputeResourceBalanceStrategyRandom ComputeResourceBalanceStrategy = "random"
 
-	// ComputeResourceBalanceStrategyRoundRobin indicates compute resource with
-	// most available storage space will be chosen.
+	// ComputeResourceBalanceStrategyMostStorageAvailable indicates compute resource
+	// with most available storage space will be chosen.
 	ComputeResourceBalanceStrategyMostStorageAvailable ComputeResourceBalanceStrategy = "most-storage-available"
 )
 
@@ -139,12 +139,12 @@ type ComputeResourceMetrics struct {
 	Network ComputeResourceMetricsNetwork `json:"network"`
 }
 
-// ComputeResourceMetrics represents compute resource's network metrics.
+// ComputeResourceMetricsNetwork represents compute resource's network metrics.
 type ComputeResourceMetricsNetwork struct {
 	IPv6Enabled bool `json:"ipv6_enabled"`
 }
 
-// ComputeResourceMetrics represents compute resource's network.
+// ComputeResourceNetwork represents compute resource's network.
 type ComputeResourceNetwork struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

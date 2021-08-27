@@ -48,7 +48,7 @@ const (
 	BackupCreationMethodManual BackupCreationMethod = "manual"
 )
 
-// BackupsStatus represents available backup's statuses.
+// BackupStatus represents available backup's statuses.
 type BackupStatus string
 
 const (
@@ -59,10 +59,10 @@ const (
 	// BackupStatusInProgress indicates backup is processing right now.
 	BackupStatusInProgress BackupStatus = "in_progress"
 
-	// BackupStatusInProgress indicates backup was successfully created.
+	// BackupStatusCreated indicates backup was successfully created.
 	BackupStatusCreated BackupStatus = "created"
 
-	// BackupStatusInProgress indicates backup wasn't created due to some reason.
+	// BackupStatusFailed indicates backup wasn't created due to some reason.
 	BackupStatusFailed BackupStatus = "failed"
 )
 

@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+// HTTPError represents errors occurred when some action failed due to some problem
+// with request.
 type HTTPError struct {
 	Method   string
 	Path     string
