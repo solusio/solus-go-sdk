@@ -54,7 +54,7 @@ const (
 	// TaskActionServerPasswordChange indicates server password change task.
 	TaskActionServerPasswordChange TaskAction = "vm-password-change"
 
-	// TaskActionServerCreate indicates server create task.
+	// TaskActionServerStart indicates server create task.
 	TaskActionServerStart TaskAction = "vm-start"
 
 	// TaskActionServerStop indicates server stop task.

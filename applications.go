@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// AccountService handles all available methods with an application.
+// ApplicationsService handles all available methods with applications.
 type ApplicationsService service
 
 // Application represents an application.

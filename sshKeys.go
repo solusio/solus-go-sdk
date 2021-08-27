@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// StorageService handles all available methods with storages.
+// SSHKeysService handles all available methods with SSH keys.
 type SSHKeysService service
 
 // SSHKey represents a SSH key.

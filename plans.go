@@ -82,10 +82,10 @@ const (
 	// BandwidthPlanLimitUnitKbps indicates kilobits per second unit.
 	BandwidthPlanLimitUnitKbps BandwidthPlanLimitUnit = "Kbps"
 
-	// BandwidthPlanLimitUnitKbps indicates megabits per second unit.
+	// BandwidthPlanLimitUnitMbps indicates megabits per second unit.
 	BandwidthPlanLimitUnitMbps BandwidthPlanLimitUnit = "Mbps"
 
-	// BandwidthPlanLimitUnitKbps indicates gigabits per second unit.
+	// BandwidthPlanLimitUnitGbps indicates gigabits per second unit.
 	BandwidthPlanLimitUnitGbps BandwidthPlanLimitUnit = "Gbps"
 )
 
@@ -131,16 +131,16 @@ const (
 	// TrafficPlanLimitUnitKB indicates kilobytes unit.
 	TrafficPlanLimitUnitKB TrafficPlanLimitUnit = "KB"
 
-	// TrafficPlanLimitUnitKB indicates megabytes unit.
+	// TrafficPlanLimitUnitMB indicates megabytes unit.
 	TrafficPlanLimitUnitMB TrafficPlanLimitUnit = "MB"
 
-	// TrafficPlanLimitUnitKB indicates gigabytes unit.
+	// TrafficPlanLimitUnitGB indicates gigabytes unit.
 	TrafficPlanLimitUnitGB TrafficPlanLimitUnit = "GB"
 
-	// TrafficPlanLimitUnitKB indicates terabytes unit.
+	// TrafficPlanLimitUnitTB indicates terabytes unit.
 	TrafficPlanLimitUnitTB TrafficPlanLimitUnit = "TB"
 
-	// TrafficPlanLimitUnitKB indicates petabytes unit.
+	// TrafficPlanLimitUnitPB indicates petabytes unit.
 	TrafficPlanLimitUnitPB TrafficPlanLimitUnit = "PB"
 )
 
@@ -184,7 +184,7 @@ type PlanLimits struct {
 	BackupsNumber            UnitPlanLimit          `json:"backups_number"`
 }
 
-// PlanLimits represents all available limits for updating a plan.
+// PlanUpdateLimits represents all available limits for updating a plan.
 type PlanUpdateLimits struct {
 	NetworkIncomingBandwidth BandwidthPlanLimit `json:"network_incoming_bandwidth"`
 	NetworkOutgoingBandwidth BandwidthPlanLimit `json:"network_outgoing_bandwidth"`

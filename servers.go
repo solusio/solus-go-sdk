@@ -37,15 +37,28 @@ type Server struct {
 type ServerStatus string
 
 const (
-	ServerStatusNotExists   ServerStatus = "not exists"
-	ServerStatusProcessing  ServerStatus = "processing"
-	ServerStatusStarted     ServerStatus = "started"
-	ServerStatusStopped     ServerStatus = "stopped"
-	ServerStatusPaused      ServerStatus = "paused"
+	// ServerStatusNotExists indicates server didn't exists.
+	ServerStatusNotExists ServerStatus = "not exists"
+
+	// ServerStatusProcessing indicates some action is performed right now on a
+	// server.
+	ServerStatusProcessing ServerStatus = "processing"
+
+	// ServerStatusStarted indicates server is started.
+	ServerStatusStarted ServerStatus = "started"
+
+	// ServerStatusStopped indicates server is stopped.
+	ServerStatusStopped ServerStatus = "stopped"
+
+	// ServerStatusPaused indicates server is paused.
+	ServerStatusPaused ServerStatus = "paused"
+
+	// ServerStatusUnavailable indicates server is unavailable.
+	// This may happen due to some problem with a compute resource or a server.
 	ServerStatusUnavailable ServerStatus = "unavailable"
 )
 
-// ServerStatus represents available server boot modes.
+// BootMode represents available server boot modes.
 type BootMode string
 
 const (
