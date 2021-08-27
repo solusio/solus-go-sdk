@@ -4,6 +4,7 @@ SOLUS IO GoLang SDK
 [![Go Reference](https://pkg.go.dev/badge/github.com/solusio/solus-go-sdk.svg)](https://pkg.go.dev/github.com/solusio/solus-go-sdk)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/solusio/solus-go-sdk/main?label=main&logo=github)
 [![Report Card](https://goreportcard.com/badge/github.com/solusio/solus-go-sdk)](https://goreportcard.com/report/github.com/solusio/solus-go-sdk)
+[![Coverage Status](https://coveralls.io/repos/github/solusio/solus-go-sdk/badge.svg?branch=master)](https://coveralls.io/github/solusio/solus-go-sdk?branch=master)
 
 https://goreportcard.com/badge/github.com/solusio/solus-go-sdk
 

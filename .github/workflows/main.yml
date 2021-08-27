@@ -28,6 +28,10 @@ jobs:
         with:
           fetch-depth: 1
       - name: Test
-        run: go test
+        run: go test -coverprofile=profile.cov
+      - name: Send coverage
+        uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: profile.cov
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
