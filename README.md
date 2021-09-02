@@ -6,8 +6,6 @@ SOLUS IO GoLang SDK
 [![Report Card](https://goreportcard.com/badge/github.com/solusio/solus-go-sdk)](https://goreportcard.com/report/github.com/solusio/solus-go-sdk)
 [![Coverage Status](https://coveralls.io/repos/github/solusio/solus-go-sdk/badge.svg?branch=master)](https://coveralls.io/github/solusio/solus-go-sdk?branch=master)
 
-https://goreportcard.com/badge/github.com/solusio/solus-go-sdk
-
 solus-go-sdk is a Go client for accessing [SOLUS IO API v1](https://docs.solus.io/api/)
 
 SOLUS IO is a virtual infrastructure management solution that facilitates
