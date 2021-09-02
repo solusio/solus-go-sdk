@@ -139,6 +139,7 @@ var fakeOsImageVersion = OsImageVersion{
 	OsImageID:          2,
 	CloudInitVersion:   CloudInitVersionV2,
 	IsSSHKeysSupported: true,
+	IsVisible:          true,
 }
 
 var fakePlan = Plan{
