@@ -16,6 +16,7 @@ type OsImageVersion struct {
 	URL                string           `json:"url"`
 	CloudInitVersion   CloudInitVersion `json:"cloud_init_version"`
 	OsImageID          int              `json:"os_image_id"`
+	IsVisible          bool             `json:"is_visible"`
 	IsSSHKeysSupported bool             `json:"is_ssh_keys_supported"`
 }
 
@@ -77,6 +78,7 @@ type OsImageVersionRequest struct {
 	Version          string           `json:"version"`
 	URL              string           `json:"url"`
 	CloudInitVersion CloudInitVersion `json:"cloud_init_version"`
+	IsVisible        bool             `json:"is_visible"`
 }
 
 type osImageVersionResponse struct {

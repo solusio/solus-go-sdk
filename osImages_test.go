@@ -157,6 +157,7 @@ func TestOsImagesService_CreateVersion(t *testing.T) {
 		Version:          "version",
 		URL:              "http://example.com",
 		CloudInitVersion: "v2",
+		IsVisible:        true,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
