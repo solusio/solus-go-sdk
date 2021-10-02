@@ -392,6 +392,11 @@ func writeJSON(t *testing.T, w http.ResponseWriter, statusCode int, r interface{
 }
 
 func writeResponse(t *testing.T, w http.ResponseWriter, statusCode int, r interface{}) {
+	if s, ok := r.([]byte); ok {
+		_, err := w.Write(s)
+		require.NoError(t, err)
+		return
+	}
 	writeJSON(t, w, statusCode, struct {
 		Data interface{} `json:"data"`
 	}{r})

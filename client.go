@@ -41,6 +41,7 @@ type Client struct {
 	SSHKeys           *SSHKeysService
 	Servers           *ServersService
 	ServersMigrations *ServersMigrationsService
+	Settings          *SettingsService
 	Snapshots         *SnapshotsService
 	Storage           *StorageService
 	StorageTypes      *StorageTypesService
@@ -175,6 +176,7 @@ func NewClient(
 	client.SSHKeys = (*SSHKeysService)(&client.s)
 	client.Servers = (*ServersService)(&client.s)
 	client.ServersMigrations = (*ServersMigrationsService)(&client.s)
+	client.Settings = (*SettingsService)(&client.s)
 	client.Snapshots = (*SnapshotsService)(&client.s)
 	client.Storage = (*StorageService)(&client.s)
 	client.StorageTypes = (*StorageTypesService)(&client.s)
