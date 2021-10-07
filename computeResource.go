@@ -6,6 +6,17 @@ import (
 	"net/http"
 )
 
+// VirtualizationTypeName represents available virtualization types.
+type VirtualizationTypeName string
+
+const (
+	// VirtualizationTypeKVM indicates KVM virtualization type.
+	VirtualizationTypeKVM VirtualizationTypeName = "kvm"
+
+	// VirtualizationTypeVZ indicates VZ virtualization type.
+	VirtualizationTypeVZ VirtualizationTypeName = "vz"
+)
+
 // ComputeResourcesService handles all available methods with compute
 // resources.
 type ComputeResourcesService service

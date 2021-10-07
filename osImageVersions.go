@@ -10,14 +10,15 @@ type OsImageVersionsService service
 
 // OsImageVersion represents an OS image version.
 type OsImageVersion struct {
-	ID                 int              `json:"id"`
-	Position           float64          `json:"position"`
-	Version            string           `json:"version"`
-	URL                string           `json:"url"`
-	CloudInitVersion   CloudInitVersion `json:"cloud_init_version"`
-	OsImageID          int              `json:"os_image_id"`
-	IsVisible          bool             `json:"is_visible"`
-	IsSSHKeysSupported bool             `json:"is_ssh_keys_supported"`
+	ID                 int                    `json:"id"`
+	VirtualizationType VirtualizationTypeName `json:"virtualization_type"`
+	Position           float64                `json:"position"`
+	Version            string                 `json:"version"`
+	URL                string                 `json:"url"`
+	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
+	OsImageID          int                    `json:"os_image_id"`
+	IsVisible          bool                   `json:"is_visible"`
+	IsSSHKeysSupported bool                   `json:"is_ssh_keys_supported"`
 }
 
 // CloudInitVersion represents available cloud-init config versions.
@@ -74,11 +75,12 @@ func IsValidCloudInitVersion(v string) bool {
 // OsImageVersionRequest represents available properties for creating a new OS image
 // version.
 type OsImageVersionRequest struct {
-	Position         float64          `json:"position,omitempty"`
-	Version          string           `json:"version"`
-	URL              string           `json:"url"`
-	CloudInitVersion CloudInitVersion `json:"cloud_init_version"`
-	IsVisible        bool             `json:"is_visible"`
+	Position           float64                `json:"position,omitempty"`
+	Version            string                 `json:"version"`
+	VirtualizationType VirtualizationTypeName `json:"virtualization_type"`
+	URL                string                 `json:"url"`
+	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
+	IsVisible          bool                   `json:"is_visible"`
 }
 
 type osImageVersionResponse struct {
