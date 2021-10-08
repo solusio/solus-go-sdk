@@ -12,6 +12,7 @@ type PlansService service
 type Plan struct {
 	ID                       int                         `json:"id"`
 	Name                     string                      `json:"name"`
+	VirtualizationType       VirtualizationTypeName      `json:"virtualization_type"`
 	Params                   PlanParams                  `json:"params"`
 	StorageType              string                      `json:"storage_type"`
 	ImageFormat              string                      `json:"image_format"`
@@ -36,9 +37,12 @@ type Plan struct {
 
 // PlanParams represents a plan's parameters.
 type PlanParams struct {
-	Disk int `json:"disk"`
-	RAM  int `json:"ram"`
-	VCPU int `json:"vcpu"`
+	Disk       int `json:"disk"`
+	RAM        int `json:"ram"`
+	VCPU       int `json:"vcpu"`
+	VCPUUnits  int `json:"vcpu_units"`
+	VCPULimit  int `json:"vcpu_limit"`
+	IOPriority int `json:"io_priority"`
 }
 
 // PlanBackupSettings represents a plan's backup settings.
@@ -241,6 +245,7 @@ type PlanPrice struct {
 // PlanCreateRequest represents available properties for creating a new plan.
 type PlanCreateRequest struct {
 	Name                     string                      `json:"name"`
+	VirtualizationType       VirtualizationTypeName      `json:"virtualization_type"`
 	Params                   PlanParams                  `json:"params"`
 	StorageType              StorageTypeName             `json:"storage_type"`
 	ImageFormat              ImageFormat                 `json:"image_format"`

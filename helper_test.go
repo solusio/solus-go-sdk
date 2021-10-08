@@ -156,8 +156,9 @@ var fakeVzOsImageVersion = OsImageVersion{
 }
 
 var fakePlan = Plan{
-	ID:   1,
-	Name: "fake plan",
+	ID:                 1,
+	Name:               "fake plan",
+	VirtualizationType: VirtualizationTypeKVM,
 	Params: PlanParams{
 		Disk: 42,
 		RAM:  1337,
