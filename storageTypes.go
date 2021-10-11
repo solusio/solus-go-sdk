@@ -22,6 +22,9 @@ const (
 
 	// StorageTypeNameNFS indicates NFS storage.
 	StorageTypeNameNFS StorageTypeName = "nfs"
+
+	// StorageTypeNameVZ indicates VZ storage.
+	StorageTypeNameVZ StorageTypeName = "vz"
 )
 
 // ImageFormat represents available image formats.
@@ -34,6 +37,9 @@ const (
 
 	// ImageFormatRaw indicates RAW disk image.
 	ImageFormatRaw ImageFormat = "raw"
+
+	// ImageFormatPLOOP indicates PLOOP disk image.
+	ImageFormatPLOOP ImageFormat = "ploop"
 )
 
 // StorageType represents a storage type.

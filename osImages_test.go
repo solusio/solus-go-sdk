@@ -33,8 +33,9 @@ func TestIsValidCloudInitVersion(t *testing.T) {
 	})
 
 	t.Run("negative", func(t *testing.T) {
-		actual := IsValidCloudInitVersion("invalid")
-		assert.False(t, actual)
+		assert.False(t, IsValidCloudInitVersion("invalid"))
+		assert.False(t, IsValidCloudInitVersion("null"))
+		assert.False(t, IsValidCloudInitVersion(""))
 	})
 }
 
@@ -135,7 +136,8 @@ func TestOsImagesService_Delete(t *testing.T) {
 
 func TestOsImagesService_ListVersion(t *testing.T) {
 	expected := []OsImageVersion{
-		fakeOsImageVersion,
+		fakeKvmOsImageVersion,
+		fakeVzOsImageVersion,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -153,11 +155,12 @@ func TestOsImagesService_ListVersion(t *testing.T) {
 
 func TestOsImagesService_CreateVersion(t *testing.T) {
 	data := OsImageVersionRequest{
-		Position:         1,
-		Version:          "version",
-		URL:              "http://example.com",
-		CloudInitVersion: "v2",
-		IsVisible:        true,
+		Position:           1,
+		Version:            "version",
+		VirtualizationType: VirtualizationTypeKVM,
+		URL:                "http://example.com",
+		CloudInitVersion:   CloudInitVersionV2,
+		IsVisible:          true,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -165,11 +168,11 @@ func TestOsImagesService_CreateVersion(t *testing.T) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusCreated, fakeOsImageVersion)
+		writeResponse(t, w, http.StatusCreated, fakeKvmOsImageVersion)
 	})
 	defer s.Close()
 
 	actual, err := createTestClient(t, s.URL).OsImages.CreateVersion(context.Background(), 10, data)
 	require.NoError(t, err)
-	require.Equal(t, fakeOsImageVersion, actual)
+	require.Equal(t, fakeKvmOsImageVersion, actual)
 }

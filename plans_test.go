@@ -128,6 +128,7 @@ func TestPlansService_Create(t *testing.T) {
 			RAM:  2,
 			VCPU: 3,
 		},
+		VirtualizationType: VirtualizationTypeKVM,
 		StorageType:        "storage type",
 		ImageFormat:        "image format",
 		IsVisible:          true,

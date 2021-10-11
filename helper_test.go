@@ -126,25 +126,39 @@ var fakeOsImage = OsImage{
 		Type: IconTypeOS,
 	},
 	Versions: []OsImageVersion{
-		fakeOsImageVersion,
+		fakeKvmOsImageVersion,
+		fakeVzOsImageVersion,
 	},
 	IsDefault: false,
 }
 
-var fakeOsImageVersion = OsImageVersion{
+var fakeKvmOsImageVersion = OsImageVersion{
 	ID:                 1,
 	Position:           100,
 	Version:            "1337",
+	VirtualizationType: VirtualizationTypeKVM,
 	URL:                "http://example.com/os.qcow2",
-	OsImageID:          2,
+	OsImageID:          1,
 	CloudInitVersion:   CloudInitVersionV2,
 	IsSSHKeysSupported: true,
 	IsVisible:          true,
 }
 
+var fakeVzOsImageVersion = OsImageVersion{
+	ID:                 2,
+	Position:           200,
+	Version:            "1337",
+	VirtualizationType: VirtualizationTypeVZ,
+	URL:                "centos-8-x86_64",
+	OsImageID:          1,
+	IsSSHKeysSupported: true,
+	IsVisible:          true,
+}
+
 var fakePlan = Plan{
-	ID:   1,
-	Name: "fake plan",
+	ID:                 1,
+	Name:               "fake plan",
+	VirtualizationType: VirtualizationTypeKVM,
 	Params: PlanParams{
 		Disk: 42,
 		RAM:  1337,
@@ -223,11 +237,12 @@ var fakePermission = Permission{
 }
 
 var fakeServer = Server{
-	ID:          1,
-	Name:        "fake server",
-	Description: "fake description",
-	UUID:        "123e4567-e89b-12d3-a456-426655440000",
-	Status:      "running",
+	ID:                 1,
+	Name:               "fake server",
+	Description:        "fake description",
+	VirtualizationType: VirtualizationTypeKVM,
+	UUID:               "123e4567-e89b-12d3-a456-426655440000",
+	Status:             "running",
 	IPs: []IPBlockIPAddress{
 		fakeIPBlockIPAddress,
 	},

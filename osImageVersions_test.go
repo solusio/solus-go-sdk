@@ -10,26 +10,38 @@ import (
 )
 
 func TestOsImageVersionsService_Get(t *testing.T) {
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/os_image_versions/10", r.URL.Path)
-		assert.Equal(t, http.MethodGet, r.Method)
+	t.Run("positive", func(t *testing.T) {
+		versions := map[string]OsImageVersion{
+			"kvm": fakeKvmOsImageVersion,
+			"vz":  fakeVzOsImageVersion,
+		}
 
-		writeResponse(t, w, http.StatusOK, fakeOsImageVersion)
+		for name, version := range versions {
+			t.Run(name, func(t *testing.T) {
+				s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, "/os_image_versions/10", r.URL.Path)
+					assert.Equal(t, http.MethodGet, r.Method)
+
+					writeResponse(t, w, http.StatusOK, version)
+				})
+				defer s.Close()
+
+				actual, err := createTestClient(t, s.URL).OsImageVersions.Get(context.Background(), 10)
+				require.NoError(t, err)
+				require.Equal(t, version, actual)
+			})
+		}
 	})
-	defer s.Close()
-
-	actual, err := createTestClient(t, s.URL).OsImageVersions.Get(context.Background(), 10)
-	require.NoError(t, err)
-	require.Equal(t, fakeOsImageVersion, actual)
 }
 
 func TestOsImageVersionsService_Update(t *testing.T) {
 	data := OsImageVersionRequest{
-		Position:         1.5,
-		Version:          "version",
-		URL:              "http://foo/bar",
-		CloudInitVersion: CloudInitVersionV0,
-		IsVisible:        true,
+		Position:           1.5,
+		Version:            "version",
+		VirtualizationType: VirtualizationTypeKVM,
+		URL:                "http://foo/bar",
+		CloudInitVersion:   CloudInitVersionV0,
+		IsVisible:          true,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -37,13 +49,13 @@ func TestOsImageVersionsService_Update(t *testing.T) {
 		assert.Equal(t, http.MethodPut, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusOK, fakeOsImageVersion)
+		writeResponse(t, w, http.StatusOK, fakeKvmOsImageVersion)
 	})
 	defer s.Close()
 
 	actual, err := createTestClient(t, s.URL).OsImageVersions.Update(context.Background(), 10, data)
 	require.NoError(t, err)
-	require.Equal(t, fakeOsImageVersion, actual)
+	require.Equal(t, fakeKvmOsImageVersion, actual)
 }
 
 func TestOsImageVersionsService_Delete(t *testing.T) {
