@@ -237,11 +237,12 @@ var fakePermission = Permission{
 }
 
 var fakeServer = Server{
-	ID:          1,
-	Name:        "fake server",
-	Description: "fake description",
-	UUID:        "123e4567-e89b-12d3-a456-426655440000",
-	Status:      "running",
+	ID:                 1,
+	Name:               "fake server",
+	Description:        "fake description",
+	VirtualizationType: VirtualizationTypeKVM,
+	UUID:               "123e4567-e89b-12d3-a456-426655440000",
+	Status:             "running",
 	IPs: []IPBlockIPAddress{
 		fakeIPBlockIPAddress,
 	},
