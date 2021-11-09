@@ -11,13 +11,14 @@ import (
 
 func TestComputeResourcesService_SettingsUpdate(t *testing.T) {
 	data := ComputeResourceSettings{
-		CachePath:       "fake cache path",
-		ISOPath:         "fake ISO path",
-		BackupTmpPath:   "fake backup tmp path",
-		VNCProxyPort:    1337,
-		Limits:          ComputeResourceSettingsLimits{},
-		Network:         ComputeResourceSettingsNetwork{},
-		BalanceStrategy: ComputeResourceBalanceStrategyMostStorageAvailable,
+		CachePath:           "fake cache path",
+		ISOPath:             "fake ISO path",
+		BackupTmpPath:       "fake backup tmp path",
+		VNCProxyPort:        1337,
+		Limits:              ComputeResourceSettingsLimits{},
+		Network:             ComputeResourceSettingsNetwork{},
+		BalanceStrategy:     ComputeResourceBalanceStrategyMostStorageAvailable,
+		VirtualizationTypes: []VirtualizationTypeName{VirtualizationTypeKVM, VirtualizationTypeVZ},
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
