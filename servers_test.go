@@ -24,6 +24,7 @@ func TestServersService_List(t *testing.T) {
 			"filter[user_id]":             []string{"1"},
 			"filter[compute_resource_id]": []string{"2"},
 			"filter[status]":              []string{"status"},
+			"filter[virtualization_type]": []string{string(VirtualizationTypeKVM)},
 		})
 
 		writeJSON(t, w, http.StatusOK, expected)
@@ -33,7 +34,8 @@ func TestServersService_List(t *testing.T) {
 	f := (&FilterServers{}).
 		ByUserID(1).
 		ByComputeResourceID(2).
-		ByStatus("status")
+		ByStatus("status").
+		ByVirtualizationType(VirtualizationTypeKVM)
 
 	actual, err := createTestClient(t, s.URL).Servers.List(context.Background(), f)
 	require.NoError(t, err)
