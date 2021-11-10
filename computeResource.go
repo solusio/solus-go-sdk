@@ -84,13 +84,14 @@ const (
 
 // ComputeResourceSettings represents available compute resource's settings.
 type ComputeResourceSettings struct {
-	CachePath       string                         `json:"cache_path"`
-	ISOPath         string                         `json:"iso_path"`
-	BackupTmpPath   string                         `json:"backup_tmp_path"`
-	VNCProxyPort    int                            `json:"vnc_proxy_port"`
-	Limits          ComputeResourceSettingsLimits  `json:"limits"`
-	Network         ComputeResourceSettingsNetwork `json:"network"`
-	BalanceStrategy ComputeResourceBalanceStrategy `json:"balance_strategy"`
+	CachePath           string                         `json:"cache_path"`
+	ISOPath             string                         `json:"iso_path"`
+	BackupTmpPath       string                         `json:"backup_tmp_path"`
+	VNCProxyPort        int                            `json:"vnc_proxy_port"`
+	Limits              ComputeResourceSettingsLimits  `json:"limits"`
+	Network             ComputeResourceSettingsNetwork `json:"network"`
+	BalanceStrategy     ComputeResourceBalanceStrategy `json:"balance_strategy"`
+	VirtualizationTypes []VirtualizationTypeName       `json:"virtualization_types"`
 }
 
 // ComputeResourceSettingsLimits represents available compute resources limits
