@@ -33,6 +33,15 @@ type Plan struct {
 	Price                    PlanPrice                   `json:"price"`
 	ResetLimitPolicy         PlanResetLimitPolicy        `json:"reset_limit_policy"`
 	NetworkTotalTrafficType  PlanNetworkTotalTrafficType `json:"network_traffic_limit_type"`
+	AvailableLocations       []ShortLocation             `json:"available_locations"`
+	AvailableOsImageVersions []ShortOsImageVersion       `json:"available_os_image_versions"`
+	AvailableApplications    []ShortOsImageVersion       `json:"available_applications"`
+}
+
+// ShortPlan represents only ID and name of plan.
+type ShortPlan struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // PlanParams represents a plan's parameters.
@@ -263,6 +272,9 @@ type PlanCreateRequest struct {
 	BackupPrice              float64                     `json:"backup_price"`
 	ResetLimitPolicy         PlanResetLimitPolicy        `json:"reset_limit_policy"`
 	NetworkTotalTrafficType  PlanNetworkTotalTrafficType `json:"network_traffic_limit_type"`
+	AvailableLocations       []int                       `json:"available_locations,omitempty"`
+	AvailableOsImageVersions []int                       `json:"available_os_image_versions,omitempty"`
+	AvailableApplications    []int                       `json:"available_applications,omitempty"`
 }
 
 // PlanUpdateRequest represents available properties for updating an existing plan.
@@ -282,6 +294,9 @@ type PlanUpdateRequest struct {
 	BackupPrice              float64                     `json:"backup_price"`
 	ResetLimitPolicy         PlanResetLimitPolicy        `json:"reset_limit_policy"`
 	NetworkTotalTrafficType  PlanNetworkTotalTrafficType `json:"network_traffic_limit_type"`
+	AvailableLocations       []int                       `json:"available_locations,omitempty"`
+	AvailableOsImageVersions []int                       `json:"available_os_image_versions,omitempty"`
+	AvailableApplications    []int                       `json:"available_applications,omitempty"`
 }
 
 // PlansResponse represents paginated list of plans.

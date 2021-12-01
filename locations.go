@@ -19,6 +19,13 @@ type Location struct {
 	IsDefault        bool              `json:"is_default"`
 	IsVisible        bool              `json:"is_visible"`
 	ComputeResources []ComputeResource `json:"compute_resources"`
+	AvailablePlans   []ShortPlan       `json:"available_plans"`
+}
+
+// ShortLocation represents only ID and name of location.
+type ShortLocation struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // LocationCreateRequest represents available properties for creating a new location.
@@ -29,6 +36,7 @@ type LocationCreateRequest struct {
 	IsDefault        bool     `json:"is_default"`
 	IsVisible        bool     `json:"is_visible"`
 	ComputeResources []int    `json:"compute_resources,omitempty"`
+	AvailablePlans   []int    `json:"available_plans,omitempty"`
 }
 
 // LocationsResponse represents paginated list of locations.
