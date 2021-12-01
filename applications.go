@@ -9,17 +9,24 @@ type ApplicationsService service
 
 // Application represents an application.
 type Application struct {
-	ID               int       `json:"id"`
-	Name             string    `json:"name"`
-	Icon             Icon      `json:"icon"`
-	URL              string    `json:"url"`
-	CloudInitVersion string    `json:"cloud_init_version"`
-	UserData         string    `json:"user_data_template"`
-	LoginLink        LoginLink `json:"login_link"`
-	JSONSchema       string    `json:"json_schema"`
-	IsDefault        bool      `json:"is_default"`
-	IsVisible        bool      `json:"is_visible"`
-	IsBuiltin        bool      `json:"is_buildin"`
+	ID               int         `json:"id"`
+	Name             string      `json:"name"`
+	Icon             Icon        `json:"icon"`
+	URL              string      `json:"url"`
+	CloudInitVersion string      `json:"cloud_init_version"`
+	UserData         string      `json:"user_data_template"`
+	LoginLink        LoginLink   `json:"login_link"`
+	JSONSchema       string      `json:"json_schema"`
+	IsDefault        bool        `json:"is_default"`
+	IsVisible        bool        `json:"is_visible"`
+	IsBuiltin        bool        `json:"is_buildin"`
+	AvailablePlans   []ShortPlan `json:"available_plans"`
+}
+
+// ShortApplication represents only ID and name of application.
+type ShortApplication struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // LoginLinkType a type of login link to the application.
@@ -56,6 +63,7 @@ type ApplicationCreateRequest struct {
 	JSONSchema       string    `json:"json_schema"`
 	IsVisible        bool      `json:"is_visible"`
 	LoginLink        LoginLink `json:"login_link"`
+	AvailablePlans   []int     `json:"available_plans,omitempty"`
 }
 
 // ApplicationsResponse represents paginated list of applications.

@@ -19,6 +19,13 @@ type OsImageVersion struct {
 	OsImageID          int                    `json:"os_image_id"`
 	IsVisible          bool                   `json:"is_visible"`
 	IsSSHKeysSupported bool                   `json:"is_ssh_keys_supported"`
+	AvailablePlans     []ShortPlan            `json:"available_plans"`
+}
+
+// ShortOsImageVersion represents only ID and name of OS image version.
+type ShortOsImageVersion struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // CloudInitVersion represents available cloud-init config versions.
@@ -81,6 +88,7 @@ type OsImageVersionRequest struct {
 	URL                string                 `json:"url"`
 	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
 	IsVisible          bool                   `json:"is_visible"`
+	AvailablePlans     []ShortPlan            `json:"available_plans,omitempty"`
 }
 
 type osImageVersionResponse struct {
