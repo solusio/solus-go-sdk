@@ -88,7 +88,7 @@ type OsImageVersionRequest struct {
 	URL                string                 `json:"url"`
 	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
 	IsVisible          bool                   `json:"is_visible"`
-	AvailablePlans     []ShortPlan            `json:"available_plans,omitempty"`
+	AvailablePlans     []int                  `json:"available_plans,omitempty"`
 }
 
 type osImageVersionResponse struct {
