@@ -158,10 +158,12 @@ type SettingsUpdate struct {
 
 // SettingsFeatures represents application features settings.
 type SettingsFeatures struct {
-	HidePlanName      bool `json:"hide_plan_name,omitempty"`
-	HideUserData      bool `json:"hide_user_data,omitempty"`
-	HidePlanSection   bool `json:"hide_plan_section,omitempty"`
-	AllowRegistration bool `json:"allow_registration,omitempty"`
+	HidePlanName          bool `json:"hide_plan_name"`
+	HideUserData          bool `json:"hide_user_data"`
+	HidePlanSection       bool `json:"hide_plan_section"`
+	HideLocationSection   bool `json:"hide_location_section"`
+	AllowRegistration     bool `json:"allow_registration"`
+	AllowPasswordRecovery bool `json:"allow_password_recovery"`
 }
 
 type settingsResponse struct {
