@@ -24,6 +24,7 @@ type Client struct {
 	s service
 
 	Account           *AccountService
+	ActivityLogs      *ActivityLogsService
 	Applications      *ApplicationsService
 	BackupNodes       *BackupNodesService
 	Backups           *BackupsService
@@ -159,6 +160,7 @@ func NewClient(
 	client.s.client = client
 
 	client.Account = (*AccountService)(&client.s)
+	client.ActivityLogs = (*ActivityLogsService)(&client.s)
 	client.Applications = (*ApplicationsService)(&client.s)
 	client.BackupNodes = (*BackupNodesService)(&client.s)
 	client.Backups = (*BackupsService)(&client.s)
