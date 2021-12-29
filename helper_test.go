@@ -332,6 +332,8 @@ var fakeSnapshot = Snapshot{
 }
 
 func startTestServer(t *testing.T, h http.HandlerFunc) *httptest.Server {
+	t.Helper()
+
 	listener, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)
 
@@ -351,6 +353,8 @@ func startTestServer(t *testing.T, h http.HandlerFunc) *httptest.Server {
 }
 
 func startBrokenTestServer(t *testing.T) (func(t *testing.T, method, path string, err error), string) {
+	t.Helper()
+
 	listener, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)
 	err = listener.Close()
@@ -374,6 +378,8 @@ type authenticator struct{}
 func (authenticator) Authenticate(*Client) (Credentials, error) { return Credentials{}, nil }
 
 func createTestClient(t *testing.T, addr string) *Client {
+	t.Helper()
+
 	u, err := url.Parse(addr)
 	require.NoError(t, err)
 
@@ -383,10 +389,14 @@ func createTestClient(t *testing.T, addr string) *Client {
 }
 
 func assertRequestQuery(t *testing.T, r *http.Request, expected url.Values) {
+	t.Helper()
+
 	assert.Equal(t, expected.Encode(), r.URL.Query().Encode())
 }
 
 func assertRequestBody(t *testing.T, r *http.Request, expected interface{}) {
+	t.Helper()
+
 	b, err := ioutil.ReadAll(r.Body)
 	require.NoError(t, err)
 
@@ -398,6 +408,8 @@ func assertRequestBody(t *testing.T, r *http.Request, expected interface{}) {
 }
 
 func writeJSON(t *testing.T, w http.ResponseWriter, statusCode int, r interface{}) {
+	t.Helper()
+
 	data, err := json.Marshal(r)
 	require.NoError(t, err)
 
@@ -407,11 +419,14 @@ func writeJSON(t *testing.T, w http.ResponseWriter, statusCode int, r interface{
 }
 
 func writeResponse(t *testing.T, w http.ResponseWriter, statusCode int, r interface{}) {
+	t.Helper()
+
 	if s, ok := r.([]byte); ok {
 		_, err := w.Write(s)
 		require.NoError(t, err)
 		return
 	}
+
 	writeJSON(t, w, statusCode, struct {
 		Data interface{} `json:"data"`
 	}{r})

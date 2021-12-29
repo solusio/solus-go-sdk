@@ -108,6 +108,31 @@ func TestClient_create(t *testing.T) {
 			err := createTestClient(t, s.URL).create(context.Background(), "/foo", nil, nil)
 			assert.EqualError(t, err, "HTTP POST /foo returns 400 status code")
 		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).create(context.Background(), "/foo", nil, nil)
+			assert.EqualError(t, err, "HTTP POST /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
+		})
 	})
 }
 
@@ -240,6 +265,31 @@ func TestClient_update(t *testing.T) {
 			err := createTestClient(t, s.URL).update(context.Background(), "/foo", nil, nil)
 			assert.EqualError(t, err, "HTTP PUT /foo returns 400 status code")
 		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPut, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).update(context.Background(), "/foo", nil, nil)
+			assert.EqualError(t, err, "HTTP PUT /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
+		})
 	})
 }
 
@@ -283,6 +333,31 @@ func TestClient_patch(t *testing.T) {
 
 			err := createTestClient(t, s.URL).patch(context.Background(), "/foo", nil, nil)
 			assert.EqualError(t, err, "HTTP PATCH /foo returns 400 status code")
+		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPatch, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).patch(context.Background(), "/foo", nil, nil)
+			assert.EqualError(t, err, "HTTP PATCH /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
 		})
 	})
 }
@@ -351,6 +426,31 @@ func TestClient_asyncDelete(t *testing.T) {
 			_, err := createTestClient(t, s.URL).asyncDelete(context.Background(), "/foo")
 			assert.EqualError(t, err, "task doesn't have an id")
 		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodDelete, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			_, err := createTestClient(t, s.URL).asyncDelete(context.Background(), "/foo")
+			assert.EqualError(t, err, "HTTP DELETE /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
+		})
 	})
 }
 
@@ -389,6 +489,31 @@ func TestClient_syncDelete(t *testing.T) {
 
 			err := createTestClient(t, s.URL).syncDelete(context.Background(), "/foo")
 			assert.EqualError(t, err, "HTTP DELETE /foo returns 400 status code")
+		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodDelete, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).syncDelete(context.Background(), "/foo")
+			assert.EqualError(t, err, "HTTP DELETE /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
 		})
 	})
 }
@@ -456,6 +581,31 @@ func TestClient_asyncPost(t *testing.T) {
 
 			_, err := createTestClient(t, s.URL).asyncPost(context.Background(), "/foo")
 			assert.EqualError(t, err, "task doesn't have an id")
+		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			_, err := createTestClient(t, s.URL).asyncPost(context.Background(), "/foo")
+			assert.EqualError(t, err, "HTTP POST /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
 		})
 	})
 }

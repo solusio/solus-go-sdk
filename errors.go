@@ -1,6 +1,7 @@
 package solus
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,15 +13,24 @@ import (
 type HTTPError struct {
 	Method   string
 	Path     string
-	HTTPCode int    `json:"http_code"`
-	Message  string `json:"message"`
+	HTTPCode int                 `json:"http_code"`
+	Message  string              `json:"message"`
+	Errors   map[string][]string `json:"errors"`
 }
 
 func (e HTTPError) Error() string {
-	if e.Message != "" {
-		return fmt.Sprintf("HTTP %s %s returns %d status code: %s", e.Method, e.Path, e.HTTPCode, e.Message)
+	buf := bytes.NewBufferString(fmt.Sprintf("HTTP %s %s returns %d status code", e.Method, e.Path, e.HTTPCode))
+
+	if len(e.Errors) > 0 {
+		buf.WriteString(" with errors")
 	}
-	return fmt.Sprintf("HTTP %s %s returns %d status code", e.Method, e.Path, e.HTTPCode)
+
+	if e.Message != "" {
+		//goland:noinspection GrazieInspection
+		buf.WriteString(fmt.Sprintf(": %s", e.Message))
+	}
+
+	return buf.String()
 }
 
 func newHTTPError(method, path string, httpCode int, body []byte) error {
