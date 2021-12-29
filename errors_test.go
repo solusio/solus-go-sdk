@@ -10,25 +10,90 @@ import (
 )
 
 func TestHTTPError_Error(t *testing.T) {
-	t.Run("a JSON body", func(t *testing.T) {
-		err := newHTTPError(
-			http.MethodDelete,
-			"some/path",
-			http.StatusBadRequest,
-			[]byte(`{"message": "foo"}`),
-		)
-		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
-	})
+	cc := map[string]struct {
+		body            string
+		expectedMessage string
+		expectedErrors  map[string][]string
+	}{
+		"empty body": {
+			body:            "",
+			expectedMessage: "HTTP DELETE some/path returns 400 status code",
+		},
 
-	t.Run("not a JSON body", func(t *testing.T) {
-		err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte("foo"))
-		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code: foo")
-	})
+		"not a JSON body": {
+			body:            "foo",
+			expectedMessage: "HTTP DELETE some/path returns 400 status code: foo",
+		},
 
-	t.Run("empty message", func(t *testing.T) {
-		err := newHTTPError(http.MethodDelete, "some/path", http.StatusBadRequest, []byte{})
-		require.EqualError(t, err, "HTTP DELETE some/path returns 400 status code")
-	})
+		"empty message": {
+			body: `{
+	"message": ""
+}`,
+			expectedMessage: "HTTP DELETE some/path returns 400 status code",
+		},
+
+		"with message only": {
+			body: `{
+	"message": "foo"
+}`,
+			expectedMessage: "HTTP DELETE some/path returns 400 status code: foo",
+		},
+
+		"with errors only": {
+			body: `{
+	"errors": {
+		"foo": [
+			"fizz",
+			"buzz"
+		],
+		"bar": [
+			"foo"
+		]
+	}
+}`,
+			expectedMessage: `HTTP DELETE some/path returns 400 status code with errors`,
+			expectedErrors: map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			},
+		},
+
+		"with message and errors": {
+			body: `{
+	"message": "foo",
+	"errors": {
+		"foo": [
+			"fizz",
+			"buzz"
+		],
+		"bar": [
+			"foo"
+		]
+	}
+}`,
+			expectedMessage: `HTTP DELETE some/path returns 400 status code with errors: foo`,
+			expectedErrors: map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			},
+		},
+	}
+
+	for n, c := range cc {
+		t.Run(n, func(t *testing.T) {
+			err := newHTTPError(
+				http.MethodDelete,
+				"some/path",
+				http.StatusBadRequest,
+				[]byte(c.body),
+			)
+			require.EqualError(t, err, c.expectedMessage)
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, c.expectedErrors, e.Errors)
+		})
+	}
 }
 
 func TestIsNotFound(t *testing.T) {
