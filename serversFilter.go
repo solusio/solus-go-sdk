@@ -24,7 +24,7 @@ func (f *FilterServers) ByStatus(status string) *FilterServers {
 }
 
 // ByVirtualizationType filter Servers by virtualization type.
-func (f *FilterServers) ByVirtualizationType(virtualizationType VirtualizationTypeName) *FilterServers {
+func (f *FilterServers) ByVirtualizationType(virtualizationType VirtualizationType) *FilterServers {
 	f.add("filter[virtualization_type]", string(virtualizationType))
 	return f
 }

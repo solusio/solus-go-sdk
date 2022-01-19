@@ -10,16 +10,16 @@ type OsImageVersionsService service
 
 // OsImageVersion represents an OS image version.
 type OsImageVersion struct {
-	ID                 int                    `json:"id"`
-	VirtualizationType VirtualizationTypeName `json:"virtualization_type"`
-	Position           float64                `json:"position"`
-	Version            string                 `json:"version"`
-	URL                string                 `json:"url"`
-	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
-	OsImageID          int                    `json:"os_image_id"`
-	IsVisible          bool                   `json:"is_visible"`
-	IsSSHKeysSupported bool                   `json:"is_ssh_keys_supported"`
-	AvailablePlans     []ShortPlan            `json:"available_plans"`
+	ID                 int                `json:"id"`
+	VirtualizationType VirtualizationType `json:"virtualization_type"`
+	Position           float64            `json:"position"`
+	Version            string             `json:"version"`
+	URL                string             `json:"url"`
+	CloudInitVersion   CloudInitVersion   `json:"cloud_init_version,omitempty"`
+	OsImageID          int                `json:"os_image_id"`
+	IsVisible          bool               `json:"is_visible"`
+	IsSSHKeysSupported bool               `json:"is_ssh_keys_supported"`
+	AvailablePlans     []ShortPlan        `json:"available_plans"`
 }
 
 // ShortOsImageVersion represents only ID and name of OS image version.
@@ -64,7 +64,7 @@ const (
 
 // IsValidCloudInitVersion returns true if specified cloud-init version is valid.
 func IsValidCloudInitVersion(v string) bool {
-	m := map[CloudInitVersion]struct{}{
+	_, ok := map[CloudInitVersion]struct{}{
 		CloudInitVersionV0:         {},
 		CloudInitVersionCentOS6:    {},
 		CloudInitVersionDebian9:    {},
@@ -73,22 +73,20 @@ func IsValidCloudInitVersion(v string) bool {
 		CloudInitVersionV2Centos:   {},
 		CloudInitVersionV2Debian10: {},
 		CloudInitVersionCloudBase:  {},
-	}
-
-	_, ok := m[CloudInitVersion(v)]
+	}[CloudInitVersion(v)]
 	return ok
 }
 
 // OsImageVersionRequest represents available properties for creating a new OS image
 // version.
 type OsImageVersionRequest struct {
-	Position           float64                `json:"position,omitempty"`
-	Version            string                 `json:"version"`
-	VirtualizationType VirtualizationTypeName `json:"virtualization_type"`
-	URL                string                 `json:"url"`
-	CloudInitVersion   CloudInitVersion       `json:"cloud_init_version,omitempty"`
-	IsVisible          bool                   `json:"is_visible"`
-	AvailablePlans     []int                  `json:"available_plans,omitempty"`
+	Position           float64            `json:"position,omitempty"`
+	Version            string             `json:"version"`
+	VirtualizationType VirtualizationType `json:"virtualization_type"`
+	URL                string             `json:"url"`
+	CloudInitVersion   CloudInitVersion   `json:"cloud_init_version,omitempty"`
+	IsVisible          bool               `json:"is_visible"`
+	AvailablePlans     []int              `json:"available_plans,omitempty"`
 }
 
 type osImageVersionResponse struct {

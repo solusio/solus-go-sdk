@@ -11,32 +11,33 @@ type ServersService service
 
 // Server represents a server.
 type Server struct {
-	ID                    int                    `json:"id"`
-	Name                  string                 `json:"name"`
-	Description           string                 `json:"description"`
-	VirtualizationType    VirtualizationTypeName `json:"virtualization_type"`
-	UUID                  string                 `json:"uuid"`
-	Specifications        ServerSpecifications   `json:"specifications"`
-	Status                ServerStatus           `json:"status"`
-	IPs                   []IPBlockIPAddress     `json:"ips"`
-	Location              Location               `json:"location"`
-	Plan                  Plan                   `json:"plan"`
-	FQDNs                 []string               `json:"fqdns"`
-	BootMode              BootMode               `json:"boot_mode"`
-	IsSuspended           bool                   `json:"is_suspended"`
-	IsProcessing          bool                   `json:"is_processing"`
-	User                  User                   `json:"user"`
-	Project               Project                `json:"project"`
-	Usage                 ServerUsage            `json:"usage"`
-	BackupSettings        ServerBackupSettings   `json:"backup_settings"`
-	NextScheduledBackupAt string                 `json:"next_scheduled_backup_at"`
-	SSHKeys               []SSHKey               `json:"ssh_keys"`
-	CreatedAt             string                 `json:"created_at"`
+	ID                    int                  `json:"id"`
+	Name                  string               `json:"name"`
+	Description           string               `json:"description"`
+	VirtualizationType    VirtualizationType   `json:"virtualization_type"`
+	UUID                  string               `json:"uuid"`
+	Specifications        ServerSpecifications `json:"specifications"`
+	Status                ServerStatus         `json:"status"`
+	IPs                   []IPBlockIPAddress   `json:"ips"`
+	Location              Location             `json:"location"`
+	Plan                  Plan                 `json:"plan"`
+	FQDNs                 []string             `json:"fqdns"`
+	BootMode              BootMode             `json:"boot_mode"`
+	IsSuspended           bool                 `json:"is_suspended"`
+	IsProcessing          bool                 `json:"is_processing"`
+	User                  User                 `json:"user"`
+	Project               Project              `json:"project"`
+	Usage                 ServerUsage          `json:"usage"`
+	BackupSettings        ServerBackupSettings `json:"backup_settings"`
+	NextScheduledBackupAt string               `json:"next_scheduled_backup_at"`
+	SSHKeys               []SSHKey             `json:"ssh_keys"`
+	CreatedAt             string               `json:"created_at"`
 }
 
 // ServerStatus represents available server statuses.
 type ServerStatus string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ServerStatusNotExists indicates server didn't exists.
 	ServerStatusNotExists ServerStatus = "not exists"
@@ -62,6 +63,7 @@ const (
 // BootMode represents available server boot modes.
 type BootMode string
 
+//goland:noinspection GoUnusedConst
 const (
 	// BootModeDisk indicates booting from original disk.
 	BootModeDisk BootMode = "disk"
@@ -111,6 +113,7 @@ type ServerBackupSettingsSchedule struct {
 // types.
 type ServerBackupSettingsScheduleType string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ServerBackupSettingsScheduleTypeMonthly indicates backing up every month.
 	ServerBackupSettingsScheduleTypeMonthly ServerBackupSettingsScheduleType = "monthly"

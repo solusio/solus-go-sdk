@@ -18,7 +18,7 @@ func TestComputeResourcesService_SettingsUpdate(t *testing.T) {
 		Limits:              ComputeResourceSettingsLimits{},
 		Network:             ComputeResourceSettingsNetwork{},
 		BalanceStrategy:     ComputeResourceBalanceStrategyMostStorageAvailable,
-		VirtualizationTypes: []VirtualizationTypeName{VirtualizationTypeKVM, VirtualizationTypeVZ},
+		VirtualizationTypes: []VirtualizationType{VirtualizationTypeKVM, VirtualizationTypeVZ},
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
