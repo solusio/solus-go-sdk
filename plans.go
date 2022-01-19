@@ -12,7 +12,7 @@ type PlansService service
 type Plan struct {
 	ID                       int                         `json:"id"`
 	Name                     string                      `json:"name"`
-	VirtualizationType       VirtualizationTypeName      `json:"virtualization_type"`
+	VirtualizationType       VirtualizationType          `json:"virtualization_type"`
 	Params                   PlanParams                  `json:"params"`
 	StorageType              string                      `json:"storage_type"`
 	ImageFormat              string                      `json:"image_format"`
@@ -140,6 +140,7 @@ type TrafficPlanLimit struct {
 // limit.
 type TrafficPlanLimitUnit string
 
+//goland:noinspection GoUnusedConst
 const (
 	// TrafficPlanLimitUnitKB indicates kilobytes unit.
 	TrafficPlanLimitUnitKB TrafficPlanLimitUnit = "KB"
@@ -227,6 +228,7 @@ const (
 // PlanNetworkTotalTrafficType represent available total traffic types.
 type PlanNetworkTotalTrafficType string
 
+//goland:noinspection GoUnusedConst
 const (
 	// PlanNetworkTotalTrafficTypeSeparate indicates we should count incoming and
 	// outgoing traffic separately.
@@ -254,7 +256,7 @@ type PlanPrice struct {
 // PlanCreateRequest represents available properties for creating a new plan.
 type PlanCreateRequest struct {
 	Name                     string                      `json:"name"`
-	VirtualizationType       VirtualizationTypeName      `json:"virtualization_type"`
+	VirtualizationType       VirtualizationType          `json:"virtualization_type"`
 	Params                   PlanParams                  `json:"params"`
 	StorageType              StorageTypeName             `json:"storage_type"`
 	ImageFormat              ImageFormat                 `json:"image_format"`

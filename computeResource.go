@@ -6,16 +6,25 @@ import (
 	"net/http"
 )
 
-// VirtualizationTypeName represents available virtualization types.
-type VirtualizationTypeName string
+// VirtualizationType represents available virtualization types.
+type VirtualizationType string
 
 const (
 	// VirtualizationTypeKVM indicates KVM virtualization type.
-	VirtualizationTypeKVM VirtualizationTypeName = "kvm"
+	VirtualizationTypeKVM VirtualizationType = "kvm"
 
 	// VirtualizationTypeVZ indicates VZ virtualization type.
-	VirtualizationTypeVZ VirtualizationTypeName = "vz"
+	VirtualizationTypeVZ VirtualizationType = "vz"
 )
+
+// IsValidVirtualizationType returns true if specified virtualization type is valid.
+func IsValidVirtualizationType(v string) bool {
+	_, ok := map[VirtualizationType]struct{}{
+		VirtualizationTypeKVM: {},
+		VirtualizationTypeVZ:  {},
+	}[VirtualizationType(v)]
+	return ok
+}
 
 // ComputeResourcesService handles all available methods with compute
 // resources.
@@ -40,6 +49,7 @@ type ComputeResource struct {
 // ComputerResourceStatus represents available compute resource's statuses.
 type ComputerResourceStatus string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ComputeResourceStatusActive indicates compute resource is active and ready
 	// to handle requests.
@@ -68,6 +78,7 @@ const (
 // compute resource should be used.
 type ComputeResourceBalanceStrategy string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ComputeResourceBalanceStrategyRoundRobin indicates compute resource will
 	// be choosing by round-robin algorithm.
@@ -91,7 +102,7 @@ type ComputeResourceSettings struct {
 	Limits              ComputeResourceSettingsLimits  `json:"limits"`
 	Network             ComputeResourceSettingsNetwork `json:"network"`
 	BalanceStrategy     ComputeResourceBalanceStrategy `json:"balance_strategy"`
-	VirtualizationTypes []VirtualizationTypeName       `json:"virtualization_types"`
+	VirtualizationTypes []VirtualizationType           `json:"virtualization_types"`
 }
 
 // ComputeResourceSettingsLimits represents available compute resources limits
@@ -114,6 +125,7 @@ type ComputeResourceSettingsLimit struct {
 // compute resource.
 type ComputeResourceSettingsNetworkType string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ComputeResourceSettingsNetworkTypeRouted indicates virtual servers don't
 	// connect directly to the physical network. The compute resource's operating
@@ -140,7 +152,7 @@ type ComputeResourceSettingsNetwork struct {
 	Bridges []ComputeResourceSettingsNetworkBridge `json:"bridges"`
 }
 
-// ComputeResourceSettingsNetwork represents one of compute resource's network bridge.
+// ComputeResourceSettingsNetworkBridge represents one of compute resource's network bridge.
 type ComputeResourceSettingsNetworkBridge struct {
 	Type ComputeResourceSettingsNetworkType `json:"type"`
 	Name string                             `json:"name"`
@@ -172,6 +184,7 @@ type ComputeResourceNetwork struct {
 // installation during compute resource creating.
 type ComputeResourceAuthType string
 
+//goland:noinspection GoUnusedConst
 const (
 	// ComputeResourceAuthTypePassword indicates connect by password.
 	ComputeResourceAuthTypePassword ComputeResourceAuthType = "lpass"

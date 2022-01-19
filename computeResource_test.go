@@ -10,6 +10,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestIsValidVirtualizationType(t *testing.T) {
+	testCases := map[string]bool{
+		string(VirtualizationTypeKVM): true,
+		string(VirtualizationTypeVZ):  true,
+		"invalid":                     false,
+		"KVM":                         false,
+		"VZ":                          false,
+	}
+
+	for given, expected := range testCases {
+		t.Run(given, func(t *testing.T) {
+			assert.Equal(t, expected, IsValidVirtualizationType(given))
+		})
+	}
+}
+
 func TestComputeResourcesService_Create(t *testing.T) {
 	data := ComputerResourceCreateRequest{
 		Name:      "name",
