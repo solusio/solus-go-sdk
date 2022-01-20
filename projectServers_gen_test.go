@@ -27,7 +27,7 @@ func TestProjectServersResponse_Next(t *testing.T) {
 
 			if p == 3 {
 				writeJSON(t, w, http.StatusOK, ProjectServersResponse{
-					Data: []Server{
+					Data: []VirtualServer{
 						{
 							ID: int(p),
 						},
@@ -60,7 +60,7 @@ func TestProjectServersResponse_Next(t *testing.T) {
 						LastPage:    3,
 					},
 				},
-				Data: []Server{{ID: int(p)}},
+				Data: []VirtualServer{{ID: int(p)}},
 			})
 		})
 		defer s.Close()
@@ -80,7 +80,7 @@ func TestProjectServersResponse_Next(t *testing.T) {
 
 		i := 1
 		for resp.Next(context.Background()) {
-			require.Equal(t, []Server{{ID: i}}, resp.Data)
+			require.Equal(t, []VirtualServer{{ID: i}}, resp.Data)
 			i++
 		}
 		require.NoError(t, resp.err)

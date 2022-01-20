@@ -26,8 +26,8 @@ func TestServersResponse_Next(t *testing.T) {
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 			if p == 3 {
-				writeJSON(t, w, http.StatusOK, ServersResponse{
-					Data: []Server{
+				writeJSON(t, w, http.StatusOK, VirtualServersResponse{
+					Data: []VirtualServer{
 						{
 							ID: int(p),
 						},
@@ -50,7 +50,7 @@ func TestServersResponse_Next(t *testing.T) {
 			q.Set("page", strconv.Itoa(int(p)+1))
 			r.URL.RawQuery = q.Encode()
 
-			writeJSON(t, w, http.StatusOK, ServersResponse{
+			writeJSON(t, w, http.StatusOK, VirtualServersResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: r.URL.String(),
@@ -60,12 +60,12 @@ func TestServersResponse_Next(t *testing.T) {
 						LastPage:    3,
 					},
 				},
-				Data: []Server{{ID: int(p)}},
+				Data: []VirtualServer{{ID: int(p)}},
 			})
 		})
 		defer s.Close()
 
-		resp := ServersResponse{
+		resp := VirtualServersResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
 					Next: fmt.Sprintf("%s/servers?page=1", s.URL),
@@ -80,7 +80,7 @@ func TestServersResponse_Next(t *testing.T) {
 
 		i := 1
 		for resp.Next(context.Background()) {
-			require.Equal(t, []Server{{ID: i}}, resp.Data)
+			require.Equal(t, []VirtualServer{{ID: i}}, resp.Data)
 			i++
 		}
 		require.NoError(t, resp.err)
@@ -91,7 +91,7 @@ func TestServersResponse_Next(t *testing.T) {
 		t.Run("failed to make request", func(t *testing.T) {
 			asserter, addr := startBrokenTestServer(t)
 
-			resp := ServersResponse{
+			resp := VirtualServersResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: fmt.Sprintf("%s/servers?page=1", addr),
@@ -117,7 +117,7 @@ func TestServersResponse_Next(t *testing.T) {
 			})
 			defer s.Close()
 
-			resp := ServersResponse{
+			resp := VirtualServersResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: fmt.Sprintf("%s/servers?page=1", s.URL),
@@ -149,7 +149,7 @@ func TestServersResponse_Next(t *testing.T) {
 			})
 			defer s.Close()
 
-			resp := ServersResponse{
+			resp := VirtualServersResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: fmt.Sprintf("%s/servers?page=1", s.URL),

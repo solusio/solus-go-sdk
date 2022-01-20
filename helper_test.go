@@ -236,7 +236,7 @@ var fakePermission = Permission{
 	Name: "fake permission",
 }
 
-var fakeServer = Server{
+var fakeVirtualServer = VirtualServer{
 	ID:                 1,
 	Name:               "fake server",
 	Description:        "fake description",
@@ -314,7 +314,7 @@ var fakeBackup = Backup{
 	CreationMethod:    BackupCreationMethodAuto,
 	Status:            BackupStatusCreated,
 	Size:              1337,
-	ComputeResourceVM: fakeServer,
+	ComputeResourceVM: fakeVirtualServer,
 	BackupNode:        fakeBackupNode,
 	Creator:           fakeUser,
 	CreatedAt:         "1970-01-01T00:00:00.000000Z",
