@@ -52,6 +52,7 @@ type PlanParams struct {
 	VCPUUnits  int `json:"vcpu_units"`
 	VCPULimit  int `json:"vcpu_limit"`
 	IOPriority int `json:"io_priority"`
+	Swap       int `json:"swap"`
 }
 
 // PlanBackupSettings represents a plan's backup settings.
