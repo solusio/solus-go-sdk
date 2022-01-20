@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFilterServers(t *testing.T) {
-	f := FilterServers{}
+func TestFilterVirtualServers(t *testing.T) {
+	f := FilterVirtualServers{}
 
 	f.
 		ByUserID(1337).

@@ -32,11 +32,11 @@ func TestComputeResourcesService_ServersCreate(t *testing.T) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusCreated, fakeServer)
+		writeResponse(t, w, http.StatusCreated, fakeVirtualServer)
 	})
 	defer s.Close()
 
 	actual, err := createTestClient(t, s.URL).ComputeResources.ServersCreate(context.Background(), 42, data)
 	require.NoError(t, err)
-	require.Equal(t, fakeServer, actual)
+	require.Equal(t, fakeVirtualServer, actual)
 }

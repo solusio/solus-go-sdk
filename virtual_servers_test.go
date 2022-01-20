@@ -10,10 +10,83 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestServersService_List(t *testing.T) {
-	expected := ServersResponse{
-		Data: []Server{
-			fakeServer,
+func TestVirtualServerService_Create(t *testing.T) {
+	data := VirtualServerCreateRequest{
+		Name:     "foo",
+		BootMode: BootModeDisk,
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusCreated, fakeVirtualServer)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).VirtualServers.Create(context.Background(), data)
+	require.NoError(t, err)
+	require.Equal(t, fakeVirtualServer, actual)
+}
+
+func TestVirtualServersService_setDefaultsForCreateRequest(t *testing.T) {
+	cc := map[string]struct {
+		given    VirtualServerCreateRequest
+		expected VirtualServerCreateRequest
+	}{
+		"empty": {
+			expected: VirtualServerCreateRequest{
+				BootMode: BootModeDisk,
+			},
+		},
+
+		"not empty": {
+			given: VirtualServerCreateRequest{
+				Name:             "name",
+				BootMode:         BootModeRescue,
+				Description:      "description",
+				UserData:         "user data",
+				FQDNs:            []string{"fqdns"},
+				Password:         "password",
+				SSHKeys:          []int{1},
+				PlanID:           2,
+				ProjectID:        3,
+				LocationID:       4,
+				OSImageVersionID: 5,
+				ApplicationID:    6,
+				ApplicationData:  map[string]interface{}{"foo": "bar"},
+			},
+			expected: VirtualServerCreateRequest{
+				Name:             "name",
+				BootMode:         BootModeRescue,
+				Description:      "description",
+				UserData:         "user data",
+				FQDNs:            []string{"fqdns"},
+				Password:         "password",
+				SSHKeys:          []int{1},
+				PlanID:           2,
+				ProjectID:        3,
+				LocationID:       4,
+				OSImageVersionID: 5,
+				ApplicationID:    6,
+				ApplicationData:  map[string]interface{}{"foo": "bar"},
+			},
+		},
+	}
+
+	for name, c := range cc {
+		t.Run(name, func(t *testing.T) {
+			(&VirtualServersService{}).setDefaultsForCreateRequest(&c.given)
+			assert.Equal(t, c.expected, c.given)
+		})
+	}
+}
+
+func TestVirtualServersService_List(t *testing.T) {
+	expected := VirtualServersResponse{
+		Data: []VirtualServer{
+			fakeVirtualServer,
 		},
 	}
 
@@ -31,34 +104,34 @@ func TestServersService_List(t *testing.T) {
 	})
 	defer s.Close()
 
-	f := (&FilterServers{}).
+	f := (&FilterVirtualServers{}).
 		ByUserID(1).
 		ByComputeResourceID(2).
 		ByStatus("status").
 		ByVirtualizationType(VirtualizationTypeKVM)
 
-	actual, err := createTestClient(t, s.URL).Servers.List(context.Background(), f)
+	actual, err := createTestClient(t, s.URL).VirtualServers.List(context.Background(), f)
 	require.NoError(t, err)
 	actual.service = nil
 	require.Equal(t, expected, actual)
 }
 
-func TestServersService_Get(t *testing.T) {
+func TestVirtualServersService_Get(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
 
-		writeResponse(t, w, http.StatusOK, fakeServer)
+		writeResponse(t, w, http.StatusOK, fakeVirtualServer)
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Get(context.Background(), 10)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Get(context.Background(), 10)
 	require.NoError(t, err)
-	require.Equal(t, fakeServer, actual)
+	require.Equal(t, fakeVirtualServer, actual)
 }
 
-func TestServersService_Patch(t *testing.T) {
-	data := ServerUpdateRequest{
+func TestVirtualServersService_Patch(t *testing.T) {
+	data := VirtualServerUpdateRequest{
 		Name:        "name",
 		BootMode:    BootModeRescue,
 		Description: "description",
@@ -71,16 +144,16 @@ func TestServersService_Patch(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusOK, fakeServer)
+		writeResponse(t, w, http.StatusOK, fakeVirtualServer)
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Patch(context.Background(), 42, data)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Patch(context.Background(), 42, data)
 	require.NoError(t, err)
-	require.Equal(t, fakeServer, actual)
+	require.Equal(t, fakeVirtualServer, actual)
 }
 
-func TestServersService_Start(t *testing.T) {
+func TestVirtualServersService_Start(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/start", r.URL.Path)
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -89,12 +162,12 @@ func TestServersService_Start(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Start(context.Background(), 10)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Start(context.Background(), 10)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
 
-func TestServersService_Stop(t *testing.T) {
+func TestVirtualServersService_Stop(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/stop", r.URL.Path)
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -103,12 +176,12 @@ func TestServersService_Stop(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Stop(context.Background(), 10)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Stop(context.Background(), 10)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
 
-func TestServersService_Restart(t *testing.T) {
+func TestVirtualServersService_Restart(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/restart", r.URL.Path)
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -117,12 +190,12 @@ func TestServersService_Restart(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Restart(context.Background(), 10)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Restart(context.Background(), 10)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
 
-func TestServersService_Backup(t *testing.T) {
+func TestVirtualServersService_Backup(t *testing.T) {
 	t.Run("positive", func(t *testing.T) {
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, "/servers/10/backups", r.URL.Path)
@@ -132,7 +205,7 @@ func TestServersService_Backup(t *testing.T) {
 		})
 		defer s.Close()
 
-		actual, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
+		actual, err := createTestClient(t, s.URL).VirtualServers.Backup(context.Background(), 10)
 		require.NoError(t, err)
 		require.Equal(t, fakeBackup, actual)
 	})
@@ -141,7 +214,7 @@ func TestServersService_Backup(t *testing.T) {
 		t.Run("failed to make request", func(t *testing.T) {
 			asserter, addr := startBrokenTestServer(t)
 
-			_, err := createTestClient(t, addr).Servers.Backup(context.Background(), 10)
+			_, err := createTestClient(t, addr).VirtualServers.Backup(context.Background(), 10)
 			asserter(t, http.MethodPost, "/servers/10/backups", err)
 		})
 
@@ -153,17 +226,17 @@ func TestServersService_Backup(t *testing.T) {
 			})
 			defer s.Close()
 
-			_, err := createTestClient(t, s.URL).Servers.Backup(context.Background(), 10)
+			_, err := createTestClient(t, s.URL).VirtualServers.Backup(context.Background(), 10)
 			assert.EqualError(t, err, "HTTP POST servers/10/backups returns 400 status code")
 		})
 	})
 }
 
-func TestServersService_resize(t *testing.T) {
-	data := ServerResizeRequest{
+func TestVirtualServersService_resize(t *testing.T) {
+	data := ViretualServerResizeRequest{
 		PreserveDisk: true,
 		PlanID:       42,
-		BackupSettings: &ServerBackupSettings{
+		BackupSettings: &VirtualServerBackupSettings{
 			Enabled: true,
 		},
 	}
@@ -177,12 +250,12 @@ func TestServersService_resize(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Resize(context.Background(), 10, data)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Resize(context.Background(), 10, data)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
 
-func TestServersService_Delete(t *testing.T) {
+func TestVirtualServersService_Delete(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10", r.URL.Path)
 		assert.Equal(t, http.MethodDelete, r.Method)
@@ -191,12 +264,12 @@ func TestServersService_Delete(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.Delete(context.Background(), 10)
+	actual, err := createTestClient(t, s.URL).VirtualServers.Delete(context.Background(), 10)
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
 
-func TestServersService_SnapshotsCreate(t *testing.T) {
+func TestVirtualServersService_SnapshotsCreate(t *testing.T) {
 	data := SnapshotRequest{
 		Name: "name",
 	}
@@ -210,7 +283,7 @@ func TestServersService_SnapshotsCreate(t *testing.T) {
 	})
 	defer s.Close()
 
-	actual, err := createTestClient(t, s.URL).Servers.SnapshotsCreate(context.Background(), 10, data)
+	actual, err := createTestClient(t, s.URL).VirtualServers.SnapshotsCreate(context.Background(), 10, data)
 	require.NoError(t, err)
 	require.Equal(t, fakeSnapshot, actual)
 }

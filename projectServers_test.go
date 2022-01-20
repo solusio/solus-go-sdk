@@ -26,13 +26,13 @@ func TestProjectsService_ServersCreate(t *testing.T) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assertRequestBody(t, r, data)
 
-		writeResponse(t, w, http.StatusCreated, fakeServer)
+		writeResponse(t, w, http.StatusCreated, fakeVirtualServer)
 	})
 	defer s.Close()
 
 	actual, err := createTestClient(t, s.URL).Projects.ServersCreate(context.Background(), 42, data)
 	require.NoError(t, err)
-	require.Equal(t, fakeServer, actual)
+	require.Equal(t, fakeVirtualServer, actual)
 }
 
 func TestProjectsService_ServersListAll(t *testing.T) {
@@ -52,7 +52,7 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 
 			if p == 2 {
 				writeJSON(t, w, http.StatusOK, ProjectServersResponse{
-					Data: []Server{
+					Data: []VirtualServer{
 						{
 							ID: int(p),
 						},
@@ -85,7 +85,7 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 						LastPage:    2,
 					},
 				},
-				Data: []Server{{ID: int(p)}},
+				Data: []VirtualServer{{ID: int(p)}},
 			})
 		})
 		defer s.Close()
@@ -95,7 +95,7 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 		actual, err := c.Projects.ServersListAll(context.Background(), 1)
 		require.NoError(t, err)
 
-		require.Equal(t, []Server{
+		require.Equal(t, []VirtualServer{
 			{ID: 0},
 			{ID: 1},
 			{ID: 2},
@@ -118,8 +118,8 @@ func TestProjectsService_ServersListAll(t *testing.T) {
 
 func TestProjectsService_Servers(t *testing.T) {
 	expected := ProjectServersResponse{
-		Data: []Server{
-			fakeServer,
+		Data: []VirtualServer{
+			fakeVirtualServer,
 		},
 	}
 
