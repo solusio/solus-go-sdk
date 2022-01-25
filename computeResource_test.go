@@ -28,16 +28,17 @@ func TestIsValidVirtualizationType(t *testing.T) {
 
 func TestComputeResourcesService_Create(t *testing.T) {
 	data := ComputerResourceCreateRequest{
-		Name:      "name",
-		Host:      "host",
-		Login:     "login",
-		Port:      1,
-		Type:      "type",
-		Password:  "password",
-		Key:       "key",
-		AgentPort: 2,
-		IPBlocks:  []int{3, 4},
-		Locations: []int{5, 6},
+		Name:        "name",
+		Host:        "host",
+		Login:       "login",
+		Port:        1,
+		Type:        "type",
+		Password:    "password",
+		Key:         "key",
+		AgentPort:   2,
+		IPBlocks:    []int{3, 4},
+		Locations:   []int{5, 6},
+		LicenseType: LicenseTypeStandard,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,7 @@ func TestComputeResourcesService_Create(t *testing.T) {
 }
 
 func TestComputeResourcesService_Patch(t *testing.T) {
-	data := ComputerResourceCreateRequest{
+	data := ComputerResourceUpdateRequest{
 		Name:      "name",
 		Host:      "host",
 		Login:     "login",
