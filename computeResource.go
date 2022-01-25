@@ -26,6 +26,20 @@ func IsValidVirtualizationType(v string) bool {
 	return ok
 }
 
+// LicenseType represents available compute resource license types.
+type LicenseType string
+
+const (
+	// LicenseTypeStandard indicates Standard license type.
+	LicenseTypeStandard LicenseType = "standard"
+
+	// LicenseTypeMini indicates Mini license type.
+	LicenseTypeMini LicenseType = "mini"
+
+	// LicenseTypeMicro indicates Micro license type.
+	LicenseTypeMicro LicenseType = "micro"
+)
+
 // ComputeResourcesService handles all available methods with compute
 // resources.
 type ComputeResourcesService service
@@ -204,6 +218,24 @@ type ComputerResourceCreateRequest struct {
 	Type     ComputeResourceAuthType `json:"type,omitempty"`
 	Password string                  `json:"password,omitempty"`
 	// SSH private key
+	Key         string      `json:"key,omitempty"`
+	AgentPort   int         `json:"agent_port,omitempty"`
+	IPBlocks    []int       `json:"ip_blocks,omitempty"`
+	Locations   []int       `json:"locations,omitempty"`
+	LicenseType LicenseType `json:"license_type,omitempty"`
+}
+
+// ComputerResourceUpdateRequest represents available properties for updating a
+// compute resource.
+type ComputerResourceUpdateRequest struct {
+	Name  string `json:"name,omitempty"`
+	Host  string `json:"host,omitempty"`
+	Login string `json:"login,omitempty"`
+	// SSH port number
+	Port     int                     `json:"port,omitempty"`
+	Type     ComputeResourceAuthType `json:"type,omitempty"`
+	Password string                  `json:"password,omitempty"`
+	// SSH private key
 	Key       string `json:"key,omitempty"`
 	AgentPort int    `json:"agent_port,omitempty"`
 	IPBlocks  []int  `json:"ip_blocks,omitempty"`
@@ -281,7 +313,7 @@ func (s *ComputeResourcesService) Create(
 func (s *ComputeResourcesService) Patch(
 	ctx context.Context,
 	id int,
-	data ComputerResourceCreateRequest,
+	data ComputerResourceUpdateRequest,
 ) (ComputeResource, error) {
 	var resp computeResourceResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
