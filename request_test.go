@@ -411,7 +411,7 @@ func TestClient_asyncDelete(t *testing.T) {
 			defer s.Close()
 
 			_, err := createTestClient(t, s.URL).asyncDelete(context.Background(), "/foo")
-			assert.EqualError(t, err, `failed to decode "{": unexpected end of JSON input`)
+			assert.EqualError(t, err, `decode "{": unexpected end of JSON input`)
 		})
 
 		t.Run("task without id", func(t *testing.T) {
@@ -567,7 +567,7 @@ func TestClient_asyncPost(t *testing.T) {
 			defer s.Close()
 
 			_, err := createTestClient(t, s.URL).asyncPost(context.Background(), "/foo")
-			assert.EqualError(t, err, `failed to decode "{": unexpected end of JSON input`)
+			assert.EqualError(t, err, `decode "{": unexpected end of JSON input`)
 		})
 
 		t.Run("task without id", func(t *testing.T) {
@@ -824,6 +824,6 @@ func Test_unmarshal(t *testing.T) {
 		}
 
 		err := unmarshal([]byte("invalid"), &data)
-		assert.EqualError(t, err, `failed to decode "invalid": invalid character 'i' looking for beginning of value`)
+		assert.EqualError(t, err, `decode "invalid": invalid character 'i' looking for beginning of value`)
 	})
 }

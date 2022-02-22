@@ -304,7 +304,7 @@ func retry(fn retryFunc) error {
 
 func unmarshal(data []byte, v interface{}) error {
 	if err := json.Unmarshal(data, v); err != nil {
-		return fmt.Errorf("failed to decode %q: %w", data, err)
+		return fmt.Errorf("decode %q: %w", data, err)
 	}
 	return nil
 }

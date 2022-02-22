@@ -5,6 +5,7 @@ package solus
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -151,7 +152,7 @@ func NewClient(
 
 	c, err := a.Authenticate(client)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("authenticate: %w", err)
 	}
 
 	client.Credentials = c
@@ -202,5 +203,9 @@ func (c *Client) authLogin(ctx context.Context, data AuthLoginRequest) (AuthLogi
 	var resp struct {
 		Data AuthLoginResponse `json:"data"`
 	}
-	return resp.Data, unmarshal(body, &resp)
+
+	if err := unmarshal(body, &resp); err != nil {
+		return AuthLoginResponse{}, fmt.Errorf("unmarshal login response: %w", err)
+	}
+	return resp.Data, nil
 }

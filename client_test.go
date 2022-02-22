@@ -83,7 +83,7 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 	t.Run("negative", func(t *testing.T) {
 		t.Run("failed to make request", func(t *testing.T) {
 			_, err := NewClient(&url.URL{}, authenticator, SetRetryPolicy(0, 0))
-			require.EqualError(t, err, `Post "/auth/login": unsupported protocol scheme ""`)
+			require.EqualError(t, err, `authenticate: Post "/auth/login": unsupported protocol scheme ""`)
 		})
 
 		t.Run("invalid status", func(t *testing.T) {
@@ -96,7 +96,7 @@ func TestEmailAndPasswordAuthenticator_Authenticate(t *testing.T) {
 			require.NoError(t, err)
 
 			_, err = NewClient(u, authenticator)
-			require.EqualError(t, err, "HTTP POST auth/login returns 400 status code")
+			require.EqualError(t, err, "authenticate: HTTP POST auth/login returns 400 status code")
 		})
 	})
 }
