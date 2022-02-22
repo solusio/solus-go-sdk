@@ -33,5 +33,9 @@ jobs:
         uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: profile.cov
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+# Was broken, track progress here:
+# https://github.com/golangci/golangci-lint-action/issues/244
+#      - name: golangci-lint
+#        uses: golangci/golangci-lint-action@v2
+#        with:
+#          version: v1.42.1
