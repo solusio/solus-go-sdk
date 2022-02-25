@@ -1,6 +1,9 @@
 package solus
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+)
 
 // ActivityLogsEvent represents an Activity Logs event.
 type ActivityLogsEvent string
@@ -55,7 +58,7 @@ type ActivityLogs struct {
 	Event     ActivityLogsEvent `json:"event"`
 	UserEmail string            `json:"user_email"`
 	CreatedAt string            `json:"created_at"`
-	Data      interface{}       `json:"data"`
+	Data      json.RawMessage   `json:"data,omitempty"`
 }
 
 // ActivityLogsResponse represents an Activity Logs response.
