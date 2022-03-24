@@ -15,7 +15,7 @@ type Snapshot struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 
-	// Size a size of snapshot in Gb.
+	// Size a size of snapshot in GiB.
 	Size      float64        `json:"size"`
 	Status    SnapshotStatus `json:"status"`
 	CreatedAt string         `json:"created_at"`
