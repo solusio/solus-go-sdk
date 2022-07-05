@@ -59,16 +59,17 @@ var fakeComputeResourceInstallStep = ComputeResourceInstallStep{
 }
 
 var fakeIPBlock = IPBlock{
-	ID:      1,
-	Name:    "fake ip block",
-	Type:    IPv4,
-	Gateway: "192.0.2.254",
-	Netmask: "255.255.0.0",
-	Ns1:     "8.8.8.8",
-	Ns2:     "8.8.4.4",
-	From:    "192.0.2.1",
-	To:      "192.0.2.100",
-	Subnet:  16,
+	ID:       1,
+	Name:     "fake ip block",
+	Type:     IPv4,
+	ListType: IpBlockListTypeRange,
+	Gateway:  "192.0.2.254",
+	Netmask:  "255.255.0.0",
+	Ns1:      "8.8.8.8",
+	Ns2:      "8.8.4.4",
+	From:     "192.0.2.1",
+	To:       "192.0.2.100",
+	Subnet:   16,
 	ComputeResources: []ComputeResource{
 		fakeComputeResource,
 	},

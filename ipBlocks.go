@@ -13,6 +13,7 @@ type IPBlock struct {
 	ID               int                `json:"id"`
 	Name             string             `json:"name"`
 	Type             IPVersion          `json:"type"`
+	ListType         ListType           `json:"list_type"`
 	Gateway          string             `json:"gateway"`
 	Netmask          string             `json:"netmask"`
 	Ns1              string             `json:"ns_1"`
@@ -37,12 +38,24 @@ const (
 	IPv6 IPVersion = "IPv6"
 )
 
+// ListType represents the type of list of IP addresses
+type ListType string
+
+const (
+	// IpBlockListTypeRange indicates a range of IP addresses.
+	IpBlockListTypeRange ListType = "range"
+
+	// IpBlockListTypeSet indicates a set of IP addresses.
+	IpBlockListTypeSet ListType = "set"
+)
+
 // IPBlockRequest represents available properties for creating new or updating
 // existing IP block.
 type IPBlockRequest struct {
 	ComputeResources []int             `json:"compute_resources,omitempty"`
 	Name             string            `json:"name"`
 	Type             IPVersion         `json:"type"`
+	ListType         ListType          `json:"list_type"`
 	Gateway          string            `json:"gateway"`
 	Ns1              string            `json:"ns_1"`
 	Ns2              string            `json:"ns_2"`
