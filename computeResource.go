@@ -58,6 +58,7 @@ type ComputeResource struct {
 	Metrics   ComputeResourceMetrics  `json:"metrics"`
 	VMsCount  int                     `json:"vms_count"`
 	Version   string                  `json:"version"`
+	IsLocked  bool                    `json:"is_locked"`
 }
 
 // ComputerResourceStatus represents available compute resource's statuses.
@@ -240,6 +241,13 @@ type ComputerResourceUpdateRequest struct {
 	AgentPort int    `json:"agent_port,omitempty"`
 	IPBlocks  []int  `json:"ip_blocks,omitempty"`
 	Locations []int  `json:"locations,omitempty"`
+	IsLocked  bool   `json:"is_locked,omitempty"`
+}
+
+// ComputerResourcePatchRequest represents available properties for patching a
+// compute resource.
+type ComputerResourcePatchRequest struct {
+	IsLocked bool `json:"is_locked,omitempty"`
 }
 
 // SetupNetworkRequest represents available properties for setting up network for
@@ -309,11 +317,21 @@ func (s *ComputeResourcesService) Create(
 	return resp.Data, s.client.create(ctx, "compute_resources", data, &resp)
 }
 
+// Put updates specified compute resource.
+func (s *ComputeResourcesService) Put(
+	ctx context.Context,
+	id int,
+	data ComputerResourceUpdateRequest,
+) (ComputeResource, error) {
+	var resp computeResourceResponse
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
+}
+
 // Patch patches specified compute resource.
 func (s *ComputeResourcesService) Patch(
 	ctx context.Context,
 	id int,
-	data ComputerResourceUpdateRequest,
+	data ComputerResourcePatchRequest,
 ) (ComputeResource, error) {
 	var resp computeResourceResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
