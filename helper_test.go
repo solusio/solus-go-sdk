@@ -47,6 +47,7 @@ var fakeComputeResource = ComputeResource{
 	Locations: []Location{
 		fakeLocation,
 	},
+	IsLocked: false,
 }
 
 var fakeComputeResourceInstallStep = ComputeResourceInstallStep{
