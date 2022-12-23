@@ -244,12 +244,6 @@ type ComputerResourceUpdateRequest struct {
 	IsLocked  bool   `json:"is_locked,omitempty"`
 }
 
-// ComputerResourcePatchRequest represents available properties for patching a
-// compute resource.
-type ComputerResourcePatchRequest struct {
-	IsLocked bool `json:"is_locked,omitempty"`
-}
-
 // SetupNetworkRequest represents available properties for setting up network for
 // the compute resource.
 type SetupNetworkRequest struct {
@@ -317,21 +311,11 @@ func (s *ComputeResourcesService) Create(
 	return resp.Data, s.client.create(ctx, "compute_resources", data, &resp)
 }
 
-// Put updates specified compute resource.
-func (s *ComputeResourcesService) Put(
-	ctx context.Context,
-	id int,
-	data ComputerResourceUpdateRequest,
-) (ComputeResource, error) {
-	var resp computeResourceResponse
-	return resp.Data, s.client.update(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)
-}
-
 // Patch patches specified compute resource.
 func (s *ComputeResourcesService) Patch(
 	ctx context.Context,
 	id int,
-	data ComputerResourcePatchRequest,
+	data ComputerResourceUpdateRequest,
 ) (ComputeResource, error) {
 	var resp computeResourceResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("compute_resources/%d", id), data, &resp)

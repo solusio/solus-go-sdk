@@ -55,7 +55,7 @@ func TestComputeResourcesService_Create(t *testing.T) {
 	require.Equal(t, fakeComputeResource, actual)
 }
 
-func TestComputeResourcesService_Put(t *testing.T) {
+func TestComputeResourcesService_Patch(t *testing.T) {
 	data := ComputerResourceUpdateRequest{
 		Name:      "name",
 		Host:      "host",
@@ -68,25 +68,6 @@ func TestComputeResourcesService_Put(t *testing.T) {
 		IPBlocks:  []int{3, 4},
 		Locations: []int{5, 6},
 		IsLocked:  false,
-	}
-
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/compute_resources/42", r.URL.Path)
-		assert.Equal(t, http.MethodPut, r.Method)
-		assertRequestBody(t, r, data)
-
-		writeResponse(t, w, http.StatusOK, fakeComputeResource)
-	})
-	defer s.Close()
-
-	actual, err := createTestClient(t, s.URL).ComputeResources.Put(context.Background(), 42, data)
-	require.NoError(t, err)
-	require.Equal(t, fakeComputeResource, actual)
-}
-
-func TestComputeResourcesService_Patch(t *testing.T) {
-	data := ComputerResourcePatchRequest{
-		IsLocked: true,
 	}
 
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
