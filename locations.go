@@ -39,6 +39,12 @@ type LocationCreateRequest struct {
 	AvailablePlans   []int    `json:"available_plans,omitempty"`
 }
 
+// LocationPatchRequest represents available properties for patching an existing location.
+type LocationPatchRequest struct {
+	IsDefault bool `json:"is_default"`
+	IsVisible bool `json:"is_visible"`
+}
+
 // LocationsResponse represents paginated list of locations.
 // This cursor can be used for iterating over all available location.
 type LocationsResponse struct {
@@ -77,6 +83,12 @@ func (s *LocationsService) Get(ctx context.Context, id int) (Location, error) {
 func (s *LocationsService) Update(ctx context.Context, id int, data LocationCreateRequest) (Location, error) {
 	var resp locationResponse
 	return resp.Data, s.client.update(ctx, fmt.Sprintf("locations/%d", id), data, &resp)
+}
+
+// Patch specified location.
+func (s *LocationsService) Patch(ctx context.Context, id int, data LocationPatchRequest) (Location, error) {
+	var resp locationResponse
+	return resp.Data, s.client.patch(ctx, fmt.Sprintf("locations/%d", id), data, &resp)
 }
 
 // Delete deletes specified location.
