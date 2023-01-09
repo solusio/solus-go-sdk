@@ -1,5 +1,3 @@
-// Copyright 1999-2021. Plesk International GmbH. All rights reserved.
-
 package solus
 
 import (
@@ -7,7 +5,7 @@ import (
 	"fmt"
 )
 
-// StorageService handles all available methods with storages.
+// SnapshotsService handles all available methods with storages.
 type SnapshotsService service
 
 // Snapshot represents a snapshot.
