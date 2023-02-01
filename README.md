@@ -1,4 +1,4 @@
-SOLUS IO GoLang SDK
+SolusVM v2 GoLang SDK
 ===================
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/solusio/solus-go-sdk.svg)](https://pkg.go.dev/github.com/solusio/solus-go-sdk)
@@ -6,14 +6,14 @@ SOLUS IO GoLang SDK
 [![Report Card](https://goreportcard.com/badge/github.com/solusio/solus-go-sdk)](https://goreportcard.com/report/github.com/solusio/solus-go-sdk)
 [![Coverage Status](https://coveralls.io/repos/github/solusio/solus-go-sdk/badge.svg?branch=master)](https://coveralls.io/github/solusio/solus-go-sdk?branch=master)
 
-solus-go-sdk is a Go client for accessing [SOLUS IO API v1](https://docs.solus.io/api/)
+solus-go-sdk is a Go client for accessing [SolusVM v2 API](https://docs.solusvm.com/v2/api-reference/api.html)
 
-SOLUS IO is a virtual infrastructure management solution that facilitates
+SolusVM is a virtual infrastructure management solution that facilitates
 choice, simplicity, and performance for ISPs and enterprises. Offer blazing
 fast, on-demand VMs, a simple API, and an easy-to-use self-service control
 panel for your customers to unleash your full potential for growth.
 
-[Official site](https://www.solus.io/)
+[Official site](https://solusvm.com/)
 
 Usage
 -----
