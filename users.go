@@ -43,11 +43,12 @@ type UsersResponse struct {
 
 // UserCreateRequest represents available properties for creating a new user.
 type UserCreateRequest struct {
-	Password   string `json:"password,omitempty"`
-	Email      string `json:"email,omitempty"`
-	Status     string `json:"status,omitempty"`
-	LanguageID int    `json:"language_id,omitempty"`
-	Roles      []int  `json:"roles,omitempty"`
+	Password     string `json:"password,omitempty"`
+	Email        string `json:"email,omitempty"`
+	Status       string `json:"status,omitempty"`
+	LanguageID   int    `json:"language_id,omitempty"`
+	Roles        []int  `json:"roles,omitempty"`
+	LimitGroupID int    `json:"limit_group_id"`
 }
 
 // UserUpdateRequest represents available properties for updating exists user.
