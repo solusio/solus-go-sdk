@@ -28,9 +28,11 @@ type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	// CreatedAt for date in RFC3339Nano format
-	CreatedAt string     `json:"created_at"`
-	Status    UserStatus `json:"status"`
-	Roles     []Role     `json:"roles"`
+	CreatedAt     string     `json:"created_at"`
+	Status        UserStatus `json:"status"`
+	Roles         []Role     `json:"roles"`
+	BillingUserID int        `json:"billing_user_id"`
+	BillingToken  string     `json:"billing_token"`
 }
 
 // UsersResponse represents paginated list of users.
@@ -43,12 +45,14 @@ type UsersResponse struct {
 
 // UserCreateRequest represents available properties for creating a new user.
 type UserCreateRequest struct {
-	Password     string `json:"password,omitempty"`
-	Email        string `json:"email,omitempty"`
-	Status       string `json:"status,omitempty"`
-	LanguageID   int    `json:"language_id,omitempty"`
-	Roles        []int  `json:"roles,omitempty"`
-	LimitGroupID int    `json:"limit_group_id"`
+	Password      string `json:"password,omitempty"`
+	Email         string `json:"email,omitempty"`
+	Status        string `json:"status,omitempty"`
+	LanguageID    int    `json:"language_id,omitempty"`
+	Roles         []int  `json:"roles,omitempty"`
+	LimitGroupID  int    `json:"limit_group_id,omitempty"`
+	BillingUserID int    `json:"billing_user_id,omitempty"`
+	BillingToken  string `json:"billing_token,omitempty"`
 }
 
 // UserUpdateRequest represents available properties for updating exists user.
