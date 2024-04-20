@@ -85,19 +85,23 @@ type VirtualServerUsage struct {
 }
 
 type VirtualServerCreateRequest struct {
-	Name             string                 `json:"name"`
-	BootMode         BootMode               `json:"boot_mode"`
-	Description      string                 `json:"description,omitempty"`
-	UserData         string                 `json:"user_data,omitempty"`
-	FQDNs            []string               `json:"fqdns,omitempty"`
-	Password         string                 `json:"password,omitempty"`
-	SSHKeys          []int                  `json:"ssh_keys"`
-	PlanID           int                    `json:"plan"`
-	ProjectID        int                    `json:"project"`
-	LocationID       int                    `json:"location"`
-	OSImageVersionID int                    `json:"os,omitempty"`
-	ApplicationID    int                    `json:"application,omitempty"`
-	ApplicationData  map[string]interface{} `json:"applicationData,omitempty"`
+	Name                string                        `json:"name"`
+	BootMode            BootMode                      `json:"boot_mode"`
+	Description         string                        `json:"description,omitempty"`
+	UserData            string                        `json:"user_data,omitempty"`
+	FQDNs               []string                      `json:"fqdns,omitempty"`
+	Password            string                        `json:"password,omitempty"`
+	SSHKeys             []int                         `json:"ssh_keys"`
+	PlanID              int                           `json:"plan"`
+	ProjectID           int                           `json:"project"`
+	LocationID          int                           `json:"location"`
+	ComputeResourceID   int                           `json:"compute_resource,omitempty"`
+	OSImageVersionID    int                           `json:"os,omitempty"`
+	ApplicationID       int                           `json:"application,omitempty"`
+	ApplicationData     map[string]interface{}        `json:"applicationData,omitempty"`
+	AdditionalDisks     []AdditionalDiskCreateRequest `json:"additional_disks,omitempty"`
+	AdditionalIPCount   int                           `json:"additional_ip_count,omitempty"`
+	AdditionalIPv6Count int                           `json:"additional_ipv6_count,omitempty"`
 }
 
 // VirtualServerUpdateRequest represents available properties for updating an existing
