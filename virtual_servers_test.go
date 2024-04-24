@@ -233,7 +233,7 @@ func TestVirtualServersService_Backup(t *testing.T) {
 }
 
 func TestVirtualServersService_resize(t *testing.T) {
-	data := ViretualServerResizeRequest{
+	data := VirtualServerResizeRequest{
 		PreserveDisk: true,
 		PlanID:       42,
 		BackupSettings: &VirtualServerBackupSettings{

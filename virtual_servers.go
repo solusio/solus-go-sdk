@@ -92,7 +92,8 @@ type VirtualServerCreateRequest struct {
 	FQDNs               []string                      `json:"fqdns,omitempty"`
 	Password            string                        `json:"password,omitempty"`
 	SSHKeys             []int                         `json:"ssh_keys"`
-	PlanID              int                           `json:"plan"`
+	PlanID              int                           `json:"plan,omitempty"`
+	CustomPlan          *Plan                         `json:"custom_plan,omitempty"`
 	ProjectID           int                           `json:"project"`
 	LocationID          int                           `json:"location"`
 	ComputeResourceID   int                           `json:"compute_resource,omitempty"`
@@ -100,8 +101,10 @@ type VirtualServerCreateRequest struct {
 	ApplicationID       int                           `json:"application,omitempty"`
 	ApplicationData     map[string]interface{}        `json:"applicationData,omitempty"`
 	AdditionalDisks     []AdditionalDiskCreateRequest `json:"additional_disks,omitempty"`
-	AdditionalIPCount   int                           `json:"additional_ip_count,omitempty"`
-	AdditionalIPv6Count int                           `json:"additional_ipv6_count,omitempty"`
+	PrimaryIP           *string                       `json:"primary_ip,omitempty"`
+	IPTypes             []IPVersion                   `json:"ip_types,omitempty"`
+	AdditionalIPCount   *int                          `json:"additional_ip_count,omitempty"`
+	AdditionalIPv6Count *int                          `json:"additional_ipv6_count,omitempty"`
 }
 
 // VirtualServerUpdateRequest represents available properties for updating an existing
@@ -237,14 +240,14 @@ func (s *VirtualServersService) Backup(ctx context.Context, id int) (Backup, err
 	return resp.Data, unmarshal(body, &resp)
 }
 
-type ViretualServerResizeRequest struct {
+type VirtualServerResizeRequest struct {
 	PreserveDisk   bool                         `json:"preserve_disk"`
 	PlanID         int                          `json:"plan_id"`
 	BackupSettings *VirtualServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
 // Resize resizes specified virtual server.
-func (s *VirtualServersService) Resize(ctx context.Context, id int, data ViretualServerResizeRequest) (Task, error) {
+func (s *VirtualServersService) Resize(ctx context.Context, id int, data VirtualServerResizeRequest) (Task, error) {
 	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/resize", id), withBody(data))
 }
 
@@ -257,4 +260,10 @@ func (s *VirtualServersService) Delete(ctx context.Context, id int) (Task, error
 func (s *VirtualServersService) SnapshotsCreate(ctx context.Context, vmID int, data SnapshotRequest) (Snapshot, error) {
 	var resp snapshotResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("servers/%d/snapshots", vmID), data, &resp)
+}
+
+// Disks gets a list of disks for the specified virtual server.
+func (s *VirtualServersService) Disks(ctx context.Context, id int) ([]Disk, error) {
+	var resp disksResponse
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d/disks", id), &resp)
 }
