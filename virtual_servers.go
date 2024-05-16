@@ -105,6 +105,7 @@ type VirtualServerCreateRequest struct {
 	IPTypes             []IPVersion                   `json:"ip_types,omitempty"`
 	AdditionalIPCount   *int                          `json:"additional_ip_count,omitempty"`
 	AdditionalIPv6Count *int                          `json:"additional_ipv6_count,omitempty"`
+	MacAddress          *string                       `json:"mac_address,omitempty"`
 }
 
 // VirtualServerUpdateRequest represents available properties for updating an existing
