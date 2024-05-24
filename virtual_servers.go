@@ -106,6 +106,7 @@ type VirtualServerCreateRequest struct {
 	AdditionalIPCount   *int                          `json:"additional_ip_count,omitempty"`
 	AdditionalIPv6Count *int                          `json:"additional_ipv6_count,omitempty"`
 	MacAddress          *string                       `json:"mac_address,omitempty"`
+	Firmware            *string                       `json:"firmware,omitempty"`
 }
 
 // VirtualServerUpdateRequest represents available properties for updating an existing
