@@ -63,13 +63,57 @@ const (
 // BootMode represents available server boot modes.
 type BootMode string
 
-//goland:noinspection GoUnusedConst
+// Firmware represents available firmware.
+type Firmware string
+
+// DiskCacheMode represents available disk cache modes.
+type DiskCacheMode string
+
+// DiskDriver represents available disk drivers.
+type DiskDriver string
+
 const (
 	// BootModeDisk indicates booting from original disk.
 	BootModeDisk BootMode = "disk"
 
 	// BootModeRescue indicates booting from rescue ISO image.
 	BootModeRescue BootMode = "rescue"
+
+	// DiskCacheModeNone indicates no disk cache.
+	DiskCacheModeNone DiskCacheMode = "none"
+
+	// DiskCacheModeDefault indicates default disk cache.
+	DiskCacheModeDefault DiskCacheMode = "default"
+
+	// DiskCacheModeDirectSync indicates direct sync disk cache.
+	DiskCacheModeDirectSync DiskCacheMode = "directsync"
+
+	// DiskCacheModeWriteback indicates writeback disk cache.
+	DiskCacheModeWriteback DiskCacheMode = "writeback"
+
+	// DiskCacheModeWritethrough indicates writethrough disk cache.
+	DiskCacheModeWritethrough DiskCacheMode = "writethrough"
+
+	// DiskCacheModeUnsafe indicates unsafe disk cache.
+	DiskCacheModeUnsafe DiskCacheMode = "unsafe"
+
+	// DiskDriverSATA indicates SATA disk driver.
+	DiskDriverSATA DiskDriver = "sata"
+
+	// DiskDriverSCSI indicates SCSI disk driver.
+	DiskDriverSCSI DiskDriver = "scsi"
+
+	// DiskDriverIDE is IDE disk driver.
+	DiskDriverIDE DiskDriver = "ide"
+
+	// DiskDriverVirtIO indicates virtio disk driver.
+	DiskDriverVirtIO DiskDriver = "virtio"
+
+	// FirmwareBios indicates BIOS firmware.
+	FirmwareBios string = "bios"
+
+	// FirmwareEFI indicates EFI firmware.
+	FirmwareEFI string = "efi"
 )
 
 // VirtualServerSpecifications represent virtual server specification.
@@ -106,7 +150,7 @@ type VirtualServerCreateRequest struct {
 	AdditionalIPCount   *int                          `json:"additional_ip_count,omitempty"`
 	AdditionalIPv6Count *int                          `json:"additional_ipv6_count,omitempty"`
 	MacAddress          *string                       `json:"mac_address,omitempty"`
-	Firmware            *string                       `json:"firmware,omitempty"`
+	Firmware            *Firmware                     `json:"firmware,omitempty"`
 }
 
 // VirtualServerUpdateRequest represents available properties for updating an existing
@@ -118,6 +162,14 @@ type VirtualServerUpdateRequest struct {
 	UserData       string                       `json:"user_data,omitempty"`
 	FQDNs          []string                     `json:"fqdns,omitempty"`
 	BackupSettings *VirtualServerBackupSettings `json:"backup_settings,omitempty"`
+}
+
+// VirtualServerUpdateSettingsRequest represents available settings for updating an existing
+// virtual server.
+type VirtualServerUpdateSettingsRequest struct {
+	DiskCacheMode DiskCacheMode `json:"disk_cache_mode,omitempty"`
+	DiskDriver    DiskDriver    `json:"disk_driver,omitempty"`
+	Firmware      Firmware      `json:"firmware,omitempty" `
 }
 
 // VirtualServerBackupSettings represents virtual server backup settings.
@@ -209,6 +261,16 @@ func (s *VirtualServersService) Patch(
 ) (VirtualServer, error) {
 	var resp virtualServerResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d", id), data, &resp)
+}
+
+// UpdateSettings updates specified virtual server settings.
+func (s *VirtualServersService) UpdateSettings(
+	ctx context.Context,
+	id int,
+	data VirtualServerUpdateSettingsRequest,
+) (VirtualServer, error) {
+	var resp virtualServerResponse
+	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d/settings", id), data, &resp)
 }
 
 // Start starts specified virtual server.
