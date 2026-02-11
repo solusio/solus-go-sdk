@@ -11,7 +11,7 @@ type Disk struct {
 	IsPrimary  bool    `json:"is_primary"`
 	Name       string  `json:"name"`
 	Size       int     `json:"size"`
-	ActualSize int     `json:"actual_size"`
+	ActualSize float64 `json:"actual_size"`
 	Path       string  `json:"path"`
 	FullPath   string  `json:"full_path"`
 	Storage    Storage `json:"storage"`

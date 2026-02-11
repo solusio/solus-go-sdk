@@ -140,7 +140,9 @@ func (c *Client) syncDelete(ctx context.Context, path string) error {
 		return err
 	}
 
-	if code != http.StatusNoContent {
+	// Some Solus endpoints return 200 OK for DELETE (optionally with a JSON body),
+	// while others return 204 No Content. Treat both as success.
+	if code != http.StatusNoContent && code != http.StatusOK {
 		return newHTTPError(http.MethodDelete, path, code, body)
 	}
 	return nil
