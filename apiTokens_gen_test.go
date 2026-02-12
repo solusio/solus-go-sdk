@@ -21,7 +21,7 @@ func TestAPITokensResponse_Next(t *testing.T) {
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			p := atomic.LoadInt32(&page)
 
-			assert.Equal(t, "/apitokens", r.URL.Path)
+			assert.Equal(t, "/api_tokens", r.URL.Path)
 			assert.Equal(t, http.MethodGet, r.Method)
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
@@ -68,7 +68,7 @@ func TestAPITokensResponse_Next(t *testing.T) {
 		resp := APITokensResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
-					Next: fmt.Sprintf("%s/apitokens?page=1", s.URL),
+					Next: fmt.Sprintf("%s/api_tokens?page=1", s.URL),
 				},
 				Meta: ResponseMeta{
 					CurrentPage: 1,
@@ -94,7 +94,7 @@ func TestAPITokensResponse_Next(t *testing.T) {
 			resp := APITokensResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/apitokens?page=1", addr),
+						Next: fmt.Sprintf("%s/api_tokens?page=1", addr),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -105,12 +105,12 @@ func TestAPITokensResponse_Next(t *testing.T) {
 			}
 
 			resp.Next(context.Background())
-			asserter(t, http.MethodGet, "/apitokens?page=1", resp.Err())
+			asserter(t, http.MethodGet, "/api_tokens?page=1", resp.Err())
 		})
 
 		t.Run("invalid status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/apitokens", r.URL.Path)
+				assert.Equal(t, "/api_tokens", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 				w.WriteHeader(http.StatusBadRequest)
@@ -120,7 +120,7 @@ func TestAPITokensResponse_Next(t *testing.T) {
 			resp := APITokensResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/apitokens?page=1", s.URL),
+						Next: fmt.Sprintf("%s/api_tokens?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -132,14 +132,14 @@ func TestAPITokensResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/apitokens?page=1 returns 400 status code",
+				"HTTP GET %s/api_tokens?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
 
 		t.Run("failed to unmarshal", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/apitokens", r.URL.Path)
+				assert.Equal(t, "/api_tokens", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 
@@ -152,7 +152,7 @@ func TestAPITokensResponse_Next(t *testing.T) {
 			resp := APITokensResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/apitokens?page=1", s.URL),
+						Next: fmt.Sprintf("%s/api_tokens?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,

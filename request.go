@@ -57,7 +57,28 @@ func (c *Client) create(ctx context.Context, path string, data, resp interface{}
 		return newHTTPError(http.MethodPost, path, code, body)
 	}
 
-	return unmarshal(body, &resp)
+	if resp == nil || len(body) == 0 {
+		return nil
+	}
+
+	return unmarshal(body, resp)
+}
+
+func (c *Client) post(ctx context.Context, path string, data, resp interface{}) error {
+	body, code, err := c.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusOK {
+		return newHTTPError(http.MethodPost, path, code, body)
+	}
+
+	if resp == nil || len(body) == 0 {
+		return nil
+	}
+
+	return unmarshal(body, resp)
 }
 
 func (c *Client) list(ctx context.Context, path string, resp interface{}, opts ...requestOption) error {
@@ -140,8 +161,6 @@ func (c *Client) syncDelete(ctx context.Context, path string) error {
 		return err
 	}
 
-	// Some Solus endpoints return 200 OK for DELETE (optionally with a JSON body),
-	// while others return 204 No Content. Treat both as success.
 	if code != http.StatusNoContent && code != http.StatusOK {
 		return newHTTPError(http.MethodDelete, path, code, body)
 	}

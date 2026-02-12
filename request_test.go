@@ -86,6 +86,18 @@ func TestClient_create(t *testing.T) {
 		assert.Equal(t, expected, resp.Data)
 	})
 
+	t.Run("positive without response body", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/foo", r.URL.Path)
+			assert.Equal(t, http.MethodPost, r.Method)
+			w.WriteHeader(http.StatusCreated)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).create(context.Background(), "/foo", nil, nil)
+		require.NoError(t, err)
+	})
+
 	t.Run("negative", func(t *testing.T) {
 		t.Run("failed to make request", func(t *testing.T) {
 			err := createTestClient(t, "/").create(context.Background(), string([]rune{0x02}), nil, nil)
@@ -127,6 +139,87 @@ func TestClient_create(t *testing.T) {
 			defer s.Close()
 
 			err := createTestClient(t, s.URL).create(context.Background(), "/foo", nil, nil)
+			assert.EqualError(t, err, "HTTP POST /foo returns 422 status code with errors: fake error")
+
+			var e HTTPError
+			assert.ErrorAs(t, err, &e)
+			assert.Equal(t, expectedErrors, e.Errors)
+		})
+	})
+}
+
+func TestClient_post(t *testing.T) {
+	t.Run("positive", func(t *testing.T) {
+		expected := fakeData{1}
+
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/foo", r.URL.Path)
+			assert.Equal(t, http.MethodPost, r.Method)
+
+			writeResponse(t, w, http.StatusOK, expected)
+		})
+		defer s.Close()
+
+		var resp fakeDataResponse
+
+		err := createTestClient(t, s.URL).post(context.Background(), "/foo", nil, &resp)
+		require.NoError(t, err)
+		assert.Equal(t, expected, resp.Data)
+	})
+
+	t.Run("positive without response body", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/foo", r.URL.Path)
+			assert.Equal(t, http.MethodPost, r.Method)
+			w.WriteHeader(http.StatusOK)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).post(context.Background(), "/foo", nil, nil)
+		require.NoError(t, err)
+	})
+
+	t.Run("negative", func(t *testing.T) {
+		t.Run("failed to make request", func(t *testing.T) {
+			err := createTestClient(t, "/").post(context.Background(), string([]rune{0x02}), nil, nil)
+			assert.EqualError(
+				t,
+				err,
+				`failed to build HTTP request: parse "\x02": net/url: invalid control character in URL`,
+			)
+		})
+
+		t.Run("invalid status code", func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+
+				w.WriteHeader(http.StatusBadRequest)
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).post(context.Background(), "/foo", nil, nil)
+			assert.EqualError(t, err, "HTTP POST /foo returns 400 status code")
+		})
+
+		t.Run("422 unprocessable entity", func(t *testing.T) {
+			expectedErrors := map[string][]string{
+				"foo": {"fizz", "buzz"},
+				"bar": {"foo"},
+			}
+
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/foo", r.URL.Path)
+				assert.Equal(t, http.MethodPost, r.Method)
+
+				writeJSON(t, w, http.StatusUnprocessableEntity, map[string]interface{}{
+					"message": "fake error",
+					"errors":  expectedErrors,
+				})
+			})
+			defer s.Close()
+
+			err := createTestClient(t, s.URL).post(context.Background(), "/foo", nil, nil)
 			assert.EqualError(t, err, "HTTP POST /foo returns 422 status code with errors: fake error")
 
 			var e HTTPError

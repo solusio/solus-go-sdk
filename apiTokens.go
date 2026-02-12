@@ -12,7 +12,7 @@ type APITokensService service
 type APIToken struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
-	User      string `json:"user"`
+	User      User   `json:"user"`
 	CreatedAt string `json:"created_at"`
 }
 

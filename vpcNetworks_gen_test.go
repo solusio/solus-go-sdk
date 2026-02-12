@@ -21,7 +21,7 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			p := atomic.LoadInt32(&page)
 
-			assert.Equal(t, "/vpcnetworks", r.URL.Path)
+			assert.Equal(t, "/vpc_networks", r.URL.Path)
 			assert.Equal(t, http.MethodGet, r.Method)
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
@@ -68,7 +68,7 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 		resp := VPCNetworksResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
-					Next: fmt.Sprintf("%s/vpcnetworks?page=1", s.URL),
+					Next: fmt.Sprintf("%s/vpc_networks?page=1", s.URL),
 				},
 				Meta: ResponseMeta{
 					CurrentPage: 1,
@@ -94,7 +94,7 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 			resp := VPCNetworksResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworks?page=1", addr),
+						Next: fmt.Sprintf("%s/vpc_networks?page=1", addr),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -105,12 +105,12 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 			}
 
 			resp.Next(context.Background())
-			asserter(t, http.MethodGet, "/vpcnetworks?page=1", resp.Err())
+			asserter(t, http.MethodGet, "/vpc_networks?page=1", resp.Err())
 		})
 
 		t.Run("invalid status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/vpcnetworks", r.URL.Path)
+				assert.Equal(t, "/vpc_networks", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 				w.WriteHeader(http.StatusBadRequest)
@@ -120,7 +120,7 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 			resp := VPCNetworksResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworks?page=1", s.URL),
+						Next: fmt.Sprintf("%s/vpc_networks?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -132,14 +132,14 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/vpcnetworks?page=1 returns 400 status code",
+				"HTTP GET %s/vpc_networks?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
 
 		t.Run("failed to unmarshal", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/vpcnetworks", r.URL.Path)
+				assert.Equal(t, "/vpc_networks", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 
@@ -152,7 +152,7 @@ func TestVPCNetworksResponse_Next(t *testing.T) {
 			resp := VPCNetworksResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworks?page=1", s.URL),
+						Next: fmt.Sprintf("%s/vpc_networks?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -179,7 +179,7 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			p := atomic.LoadInt32(&page)
 
-			assert.Equal(t, "/vpcnetworkips", r.URL.Path)
+			assert.Equal(t, "/vpc_networks/10/ips", r.URL.Path)
 			assert.Equal(t, http.MethodGet, r.Method)
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
@@ -226,7 +226,7 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 		resp := VPCNetworkIPsResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
-					Next: fmt.Sprintf("%s/vpcnetworkips?page=1", s.URL),
+					Next: fmt.Sprintf("%s/vpc_networks/10/ips?page=1", s.URL),
 				},
 				Meta: ResponseMeta{
 					CurrentPage: 1,
@@ -252,7 +252,7 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 			resp := VPCNetworkIPsResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworkips?page=1", addr),
+						Next: fmt.Sprintf("%s/vpc_networks/10/ips?page=1", addr),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -263,12 +263,12 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 			}
 
 			resp.Next(context.Background())
-			asserter(t, http.MethodGet, "/vpcnetworkips?page=1", resp.Err())
+			asserter(t, http.MethodGet, "/vpc_networks/10/ips?page=1", resp.Err())
 		})
 
 		t.Run("invalid status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/vpcnetworkips", r.URL.Path)
+				assert.Equal(t, "/vpc_networks/10/ips", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 				w.WriteHeader(http.StatusBadRequest)
@@ -278,7 +278,7 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 			resp := VPCNetworkIPsResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworkips?page=1", s.URL),
+						Next: fmt.Sprintf("%s/vpc_networks/10/ips?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -290,14 +290,14 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/vpcnetworkips?page=1 returns 400 status code",
+				"HTTP GET %s/vpc_networks/10/ips?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
 
 		t.Run("failed to unmarshal", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/vpcnetworkips", r.URL.Path)
+				assert.Equal(t, "/vpc_networks/10/ips", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 
@@ -310,7 +310,7 @@ func TestVPCNetworkIPsResponse_Next(t *testing.T) {
 			resp := VPCNetworkIPsResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/vpcnetworkips?page=1", s.URL),
+						Next: fmt.Sprintf("%s/vpc_networks/10/ips?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,

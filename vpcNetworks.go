@@ -80,12 +80,12 @@ type VPCNetworkIPsAddRequest struct {
 
 // VPCNetworkAttachRequest represents a request to attach VPC network to servers.
 type VPCNetworkAttachRequest struct {
-	ServersIDs []int `json:"servers_ids"`
+	ServerIDs []int `json:"servers_ids"`
 }
 
 // VPCNetworkDetachRequest represents a request to detach VPC network from servers.
 type VPCNetworkDetachRequest struct {
-	ServersIDs []int `json:"servers_ids"`
+	ServerIDs []int `json:"servers_ids"`
 }
 
 // VPCNetworksResponse represents paginated list of VPC networks.
@@ -155,12 +155,12 @@ func (s *VPCNetworksService) AddIPs(ctx context.Context, id int, data VPCNetwork
 
 // Attach attaches VPC network to servers.
 func (s *VPCNetworksService) Attach(ctx context.Context, id int, data VPCNetworkAttachRequest) error {
-	return s.client.create(ctx, fmt.Sprintf("vpc_networks/%d/attach", id), data, nil)
+	return s.client.post(ctx, fmt.Sprintf("vpc_networks/%d/attach", id), data, nil)
 }
 
 // Detach detaches VPC network from servers.
 func (s *VPCNetworksService) Detach(ctx context.Context, id int, data VPCNetworkDetachRequest) error {
-	return s.client.create(ctx, fmt.Sprintf("vpc_networks/%d/detach", id), data, nil)
+	return s.client.post(ctx, fmt.Sprintf("vpc_networks/%d/detach", id), data, nil)
 }
 
 // ListIPs lists IP addresses in VPC network.
