@@ -1,6 +1,6 @@
 package solus
 
-// FilterVPCNetworks represent available filters for fetching list of VPC networks.
+// FilterVPCNetworks represents available filters for fetching list of VPC networks.
 type FilterVPCNetworks struct {
 	filter
 }

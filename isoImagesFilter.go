@@ -1,6 +1,6 @@
 package solus
 
-// FilterISOImages represent available filters for fetching list of ISO images.
+// FilterISOImages represents available filters for fetching list of ISO images.
 type FilterISOImages struct {
 	filter
 }

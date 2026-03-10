@@ -1,6 +1,6 @@
 package solus
 
-// FilterLanguages represent available filters for fetching list of languages.
+// FilterLanguages represents available filters for fetching list of languages.
 type FilterLanguages struct {
 	filter
 }

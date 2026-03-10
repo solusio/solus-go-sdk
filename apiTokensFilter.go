@@ -1,6 +1,6 @@
 package solus
 
-// FilterAPITokens represent available filters for fetching list of API tokens.
+// FilterAPITokens represents available filters for fetching list of API tokens.
 type FilterAPITokens struct {
 	filter
 }

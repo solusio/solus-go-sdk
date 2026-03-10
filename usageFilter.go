@@ -1,6 +1,6 @@
 package solus
 
-// FilterUsage represent available filters for fetching usage statistics.
+// FilterUsage represents available filters for fetching usage statistics.
 type FilterUsage struct {
 	filter
 }
