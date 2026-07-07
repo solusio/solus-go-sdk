@@ -52,6 +52,10 @@ const (
 type BackupStatus string
 
 const (
+	// BackupStatusCreating indicates backup is being created.
+	// Some API versions may return this status instead of in_progress.
+	BackupStatusCreating BackupStatus = "creating"
+
 	// BackupStatusPending indicates backup is still not processing and waits until
 	// it will be dispatched.
 	BackupStatusPending BackupStatus = "pending"

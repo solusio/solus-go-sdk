@@ -2,6 +2,7 @@ package solus
 
 import (
 	"context"
+	"fmt"
 )
 
 // ApplicationsService handles all available methods with applications.
@@ -80,6 +81,14 @@ func (s *ApplicationsService) Create(ctx context.Context, data ApplicationCreate
 		Data Application `json:"data"`
 	}
 	return resp.Data, s.client.create(ctx, "applications", data, &resp)
+}
+
+// Update updates an existing application.
+func (s *ApplicationsService) Update(ctx context.Context, id int, data ApplicationCreateRequest) (Application, error) {
+	var resp struct {
+		Data Application `json:"data"`
+	}
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("applications/%d", id), data, &resp)
 }
 
 // List lists all applications.

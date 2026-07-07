@@ -181,6 +181,25 @@ func TestVirtualServersService_Stop(t *testing.T) {
 	require.Equal(t, fakeTask, actual)
 }
 
+func TestVirtualServersService_StopWithRequest(t *testing.T) {
+	req := VirtualServerStopRequest{
+		Force: true,
+	}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/servers/10/stop", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		assertRequestBody(t, r, req)
+
+		writeResponse(t, w, http.StatusOK, fakeTask)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).VirtualServers.StopWithRequest(context.Background(), 10, req)
+	require.NoError(t, err)
+	require.Equal(t, fakeTask, actual)
+}
+
 func TestVirtualServersService_Restart(t *testing.T) {
 	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/servers/10/restart", r.URL.Path)

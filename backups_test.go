@@ -11,6 +11,7 @@ import (
 
 func TestBackup_IsFinished(t *testing.T) {
 	testCases := map[BackupStatus]bool{
+		BackupStatusCreating:   false,
 		BackupStatusPending:    false,
 		BackupStatusInProgress: false,
 		BackupStatusFailed:     true,
@@ -41,16 +42,33 @@ func TestBackupsService_Get(t *testing.T) {
 }
 
 func TestBackupsService_Delete(t *testing.T) {
-	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "/backups/10", r.URL.Path)
-		assert.Equal(t, http.MethodDelete, r.Method)
+	t.Run("no_content", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/backups/10", r.URL.Path)
+			assert.Equal(t, http.MethodDelete, r.Method)
 
-		w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusNoContent)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).Backups.Delete(context.Background(), 10)
+		require.NoError(t, err)
 	})
-	defer s.Close()
 
-	err := createTestClient(t, s.URL).Backups.Delete(context.Background(), 10)
-	require.NoError(t, err)
+	t.Run("ok_with_body", func(t *testing.T) {
+		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/backups/10", r.URL.Path)
+			assert.Equal(t, http.MethodDelete, r.Method)
+
+			w.WriteHeader(http.StatusOK)
+			_, err := w.Write([]byte(`[10]`))
+			require.NoError(t, err)
+		})
+		defer s.Close()
+
+		err := createTestClient(t, s.URL).Backups.Delete(context.Background(), 10)
+		require.NoError(t, err)
+	})
 }
 
 func TestBackupsService_Restore(t *testing.T) {

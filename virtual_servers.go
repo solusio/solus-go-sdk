@@ -278,9 +278,19 @@ func (s *VirtualServersService) Start(ctx context.Context, id int) (Task, error)
 	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/start", id))
 }
 
+// VirtualServerStopRequest represents the request body for stopping a virtual server.
+type VirtualServerStopRequest struct {
+	Force bool `json:"force,omitempty"`
+}
+
 // Stop stops specified virtual server.
 func (s *VirtualServersService) Stop(ctx context.Context, id int) (Task, error) {
 	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/stop", id))
+}
+
+// StopWithRequest stops specified virtual server with additional options.
+func (s *VirtualServersService) StopWithRequest(ctx context.Context, id int, req VirtualServerStopRequest) (Task, error) {
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/stop", id), withBody(req))
 }
 
 // Restart restarts specified virtual server.

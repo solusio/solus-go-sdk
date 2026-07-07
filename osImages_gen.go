@@ -13,22 +13,22 @@ import (
 //
 // Examples:
 //
-//	ctx, cancelFunc := context.WithTimeout(context.Background(), 30 * time.Second)
-//	defer cancelFunc()
+//		ctx, cancelFunc := context.WithTimeout(context.Background(), 30 * time.Second)
+//		defer cancelFunc()
 //
-//  for {
-//		for _, datum := range resp.Data {
-//			doSmthWithDatum(datum)
+//	 for {
+//			for _, datum := range resp.Data {
+//				doSmthWithDatum(datum)
+//			}
+//
+//			if !resp.Next(ctx) {
+//				break
+//			}
 //		}
 //
-//		if !resp.Next(ctx) {
-//			break
+//	 if resp.Err() != nil {
+//			handleAnError(resp.Err())
 //		}
-//	}
-//
-//  if resp.Err() != nil {
-//		handleAnError(resp.Err())
-//	}
 func (r *OsImagesResponse) Next(ctx context.Context) bool {
 	if (r.Meta.LastPage == r.Meta.CurrentPage) || (r.err != nil) {
 		return false

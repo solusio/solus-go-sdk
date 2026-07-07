@@ -14,20 +14,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestVirtualServersResponse_Next(t *testing.T) {
+func TestLanguagesResponse_Next(t *testing.T) {
 	t.Run("positive", func(t *testing.T) {
 		page := int32(1)
 
 		s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 			p := atomic.LoadInt32(&page)
 
-			assert.Equal(t, "/servers", r.URL.Path)
+			assert.Equal(t, "/languages", r.URL.Path)
 			assert.Equal(t, http.MethodGet, r.Method)
 			assert.Equal(t, strconv.Itoa(int(p)), r.URL.Query().Get("page"))
 
 			if p == 3 {
-				writeJSON(t, w, http.StatusOK, VirtualServersResponse{
-					Data: []VirtualServer{
+				writeJSON(t, w, http.StatusOK, LanguagesResponse{
+					Data: []Language{
 						{
 							ID: int(p),
 						},
@@ -50,7 +50,7 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 			q.Set("page", strconv.Itoa(int(p)+1))
 			r.URL.RawQuery = q.Encode()
 
-			writeJSON(t, w, http.StatusOK, VirtualServersResponse{
+			writeJSON(t, w, http.StatusOK, LanguagesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
 						Next: r.URL.String(),
@@ -60,15 +60,15 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 						LastPage:    3,
 					},
 				},
-				Data: []VirtualServer{{ID: int(p)}},
+				Data: []Language{{ID: int(p)}},
 			})
 		})
 		defer s.Close()
 
-		resp := VirtualServersResponse{
+		resp := LanguagesResponse{
 			paginatedResponse: paginatedResponse{
 				Links: ResponseLinks{
-					Next: fmt.Sprintf("%s/servers?page=1", s.URL),
+					Next: fmt.Sprintf("%s/languages?page=1", s.URL),
 				},
 				Meta: ResponseMeta{
 					CurrentPage: 1,
@@ -80,7 +80,7 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 
 		i := 1
 		for resp.Next(context.Background()) {
-			require.Equal(t, []VirtualServer{{ID: i}}, resp.Data)
+			require.Equal(t, []Language{{ID: i}}, resp.Data)
 			i++
 		}
 		require.NoError(t, resp.err)
@@ -91,10 +91,10 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 		t.Run("failed to make request", func(t *testing.T) {
 			asserter, addr := startBrokenTestServer(t)
 
-			resp := VirtualServersResponse{
+			resp := LanguagesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/servers?page=1", addr),
+						Next: fmt.Sprintf("%s/languages?page=1", addr),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -105,22 +105,22 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 			}
 
 			resp.Next(context.Background())
-			asserter(t, http.MethodGet, "/servers?page=1", resp.Err())
+			asserter(t, http.MethodGet, "/languages?page=1", resp.Err())
 		})
 
 		t.Run("invalid status code", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/servers", r.URL.Path)
+				assert.Equal(t, "/languages", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 				w.WriteHeader(http.StatusBadRequest)
 			})
 			defer s.Close()
 
-			resp := VirtualServersResponse{
+			resp := LanguagesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/servers?page=1", s.URL),
+						Next: fmt.Sprintf("%s/languages?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,
@@ -132,14 +132,14 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 
 			resp.Next(context.Background())
 			assert.EqualError(t, resp.Err(), fmt.Sprintf(
-				"HTTP GET %s/servers?page=1 returns 400 status code",
+				"HTTP GET %s/languages?page=1 returns 400 status code",
 				s.URL,
 			))
 		})
 
 		t.Run("failed to unmarshal", func(t *testing.T) {
 			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, "/servers", r.URL.Path)
+				assert.Equal(t, "/languages", r.URL.Path)
 				assert.Equal(t, http.MethodGet, r.Method)
 				assert.Equal(t, strconv.Itoa(1), r.URL.Query().Get("page"))
 
@@ -149,10 +149,10 @@ func TestVirtualServersResponse_Next(t *testing.T) {
 			})
 			defer s.Close()
 
-			resp := VirtualServersResponse{
+			resp := LanguagesResponse{
 				paginatedResponse: paginatedResponse{
 					Links: ResponseLinks{
-						Next: fmt.Sprintf("%s/servers?page=1", s.URL),
+						Next: fmt.Sprintf("%s/languages?page=1", s.URL),
 					},
 					Meta: ResponseMeta{
 						CurrentPage: 1,

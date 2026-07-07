@@ -29,7 +29,7 @@ import (
 //	 if resp.Err() != nil {
 //			handleAnError(resp.Err())
 //		}
-func (r *ActivityLogsResponse) Next(ctx context.Context) bool {
+func (r *APITokensResponse) Next(ctx context.Context) bool {
 	if (r.Meta.LastPage == r.Meta.CurrentPage) || (r.err != nil) {
 		return false
 	}

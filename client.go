@@ -26,12 +26,15 @@ type Client struct {
 
 	Account           *AccountService
 	ActivityLogs      *ActivityLogsService
+	APITokens         *APITokensService
 	Applications      *ApplicationsService
 	BackupNodes       *BackupNodesService
 	Backups           *BackupsService
 	ComputeResources  *ComputeResourcesService
 	IPBlocks          *IPBlocksService
 	Icons             *IconsService
+	ISOImages         *ISOImagesService
+	Languages         *LanguagesService
 	License           *LicenseService
 	Locations         *LocationsService
 	OsImageVersions   *OsImageVersionsService
@@ -45,10 +48,13 @@ type Client struct {
 	Settings          *SettingsService
 	Snapshots         *SnapshotsService
 	Storage           *StorageService
+	StorageTags       *StorageTagsService
 	StorageTypes      *StorageTypesService
 	Tasks             *TasksService
+	Usage             *UsageService
 	Users             *UsersService
 	VirtualServers    *VirtualServersService
+	VPCNetworks       *VPCNetworksService
 }
 
 type service struct {
@@ -162,12 +168,15 @@ func NewClient(
 
 	client.Account = (*AccountService)(&client.s)
 	client.ActivityLogs = (*ActivityLogsService)(&client.s)
+	client.APITokens = (*APITokensService)(&client.s)
 	client.Applications = (*ApplicationsService)(&client.s)
 	client.BackupNodes = (*BackupNodesService)(&client.s)
 	client.Backups = (*BackupsService)(&client.s)
 	client.ComputeResources = (*ComputeResourcesService)(&client.s)
 	client.IPBlocks = (*IPBlocksService)(&client.s)
 	client.Icons = (*IconsService)(&client.s)
+	client.ISOImages = (*ISOImagesService)(&client.s)
+	client.Languages = (*LanguagesService)(&client.s)
 	client.License = (*LicenseService)(&client.s)
 	client.Locations = (*LocationsService)(&client.s)
 	client.OsImageVersions = (*OsImageVersionsService)(&client.s)
@@ -181,10 +190,13 @@ func NewClient(
 	client.Settings = (*SettingsService)(&client.s)
 	client.Snapshots = (*SnapshotsService)(&client.s)
 	client.Storage = (*StorageService)(&client.s)
+	client.StorageTags = (*StorageTagsService)(&client.s)
 	client.StorageTypes = (*StorageTypesService)(&client.s)
 	client.Tasks = (*TasksService)(&client.s)
+	client.Usage = (*UsageService)(&client.s)
 	client.Users = (*UsersService)(&client.s)
 	client.VirtualServers = (*VirtualServersService)(&client.s)
+	client.VPCNetworks = (*VPCNetworksService)(&client.s)
 
 	return client, nil
 }
