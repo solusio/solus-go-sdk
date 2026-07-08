@@ -71,12 +71,14 @@ type SettingsTheme struct {
 
 // SettingsNetworkRules represents network rules settings.
 type SettingsNetworkRules struct {
-	ARP       bool `json:"arp,omitempty"`
-	DHCP      bool `json:"dhcp,omitempty"`
-	CloudInit bool `json:"cloud_init,omitempty"`
-	SMTP      bool `json:"smtp,omitempty"`
-	ICMP      bool `json:"icmp,omitempty"`
-	ICMPReply bool `json:"icmp_reply"`
+	ARP        bool `json:"arp,omitempty"`
+	DHCP       bool `json:"dhcp,omitempty"`
+	CloudInit  bool `json:"cloud_init,omitempty"`
+	SMTP       bool `json:"smtp,omitempty"`
+	ICMP       bool `json:"icmp,omitempty"`
+	ICMPReply  bool `json:"icmp_reply"`
+	IPSpoofing bool `json:"ip_spoofing"`
+	Portmapper bool `json:"portmapper"`
 }
 
 // SettingsNotifications represents notification settings.
