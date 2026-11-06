@@ -258,9 +258,12 @@ func TestPlansService_setCreateRequestDefaults(t *testing.T) {
 
 func TestPlansService_Update(t *testing.T) {
 	data := PlanUpdateRequest{
-		Name:               "name",
-		IsVisible:          true,
-		IsSnapshotsEnabled: true,
+		AvailableLocations:       []int{1},
+		AvailableOsImageVersions: []int{2},
+		AvailableApplications:    []int{3},
+		Name:                     "name",
+		IsVisible:                true,
+		IsSnapshotsEnabled:       true,
 		Limits: PlanUpdateLimits{
 			NetworkIncomingBandwidth: BandwidthPlanLimit{
 				IsEnabled: true,

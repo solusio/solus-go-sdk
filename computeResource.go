@@ -44,6 +44,16 @@ const (
 // resources.
 type ComputeResourcesService service
 
+// ShortComputeResource represents the compute resource embedded in a server response.
+type ShortComputeResource struct {
+	ID              int                    `json:"id"`
+	Name            string                 `json:"name"`
+	Host            string                 `json:"host"`
+	Capabilities    map[string]interface{} `json:"capabilities"`
+	IsInMaintenance bool                   `json:"is_in_maintenance"`
+	Storages        []Storage              `json:"storages"`
+}
+
 // ComputeResource represents a compute resource.
 // The compute resource is a server where virtual machines will be running.
 type ComputeResource struct {

@@ -32,7 +32,7 @@ type VirtualServer struct {
 	BackupSettings        VirtualServerBackupSettings `json:"backup_settings"`
 	NextScheduledBackupAt string                      `json:"next_scheduled_backup_at"`
 	SSHKeys               []SSHKey                    `json:"ssh_keys"`
-	ComputeResource       ComputeResource             `json:"compute_resource"`
+	ComputeResource       ShortComputeResource        `json:"compute_resource"`
 	Settings              VirtualServerSettings       `json:"settings"`
 	CreatedAt             string                      `json:"created_at"`
 }
@@ -267,6 +267,8 @@ func (s *VirtualServersService) Patch(
 }
 
 // UpdateSettings updates specified virtual server settings.
+//
+// Deprecated: use UpdateSettingsTask. This endpoint returns a task, not a server.
 func (s *VirtualServersService) UpdateSettings(
 	ctx context.Context,
 	id int,
@@ -355,16 +357,21 @@ type VirtualServerSettings struct {
 
 // VirtualServerPatchRequest distinguishes omitted fields from explicit empty values.
 // User data changes update stored initialization data; they do not rerun cloud-init.
+// The API rejects empty user data; use nil to leave it unchanged.
 type VirtualServerPatchRequest struct {
-	Name           *string                      `json:"name,omitempty"`
-	Description    *string                      `json:"description,omitempty"`
-	UserData       *string                      `json:"user_data,omitempty"`
-	FQDNs          *[]string                    `json:"fqdns,omitempty"`
-	BootMode       *BootMode                    `json:"boot_mode,omitempty"`
+	Name        *string   `json:"name,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	UserData    *string   `json:"user_data,omitempty"`
+	FQDNs       *[]string `json:"fqdns,omitempty"`
+	BootMode    *BootMode `json:"boot_mode,omitempty"`
+	// BackupSettings replaces the entire backup configuration. When non-nil,
+	// provide a complete block with a valid schedule and limit, even to disable backups.
 	BackupSettings *VirtualServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
-// PatchFields updates only the specified fields, including explicit empty strings or lists.
+// PatchFields updates the specified top-level fields. Description and FQDNs can
+// be cleared with an empty string and an empty slice. UserData cannot be cleared.
+// BackupSettings replaces the entire backup block rather than merging its fields.
 func (s *VirtualServersService) PatchFields(ctx context.Context, id int, data VirtualServerPatchRequest) (VirtualServer, error) {
 	var resp virtualServerResponse
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d", id), data, &resp)
@@ -377,8 +384,8 @@ func (s *VirtualServersService) UpdateSettingsTask(ctx context.Context, id int, 
 	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d/settings", id), data, &resp)
 }
 
-// MarshalJSON includes enabled=false for an explicitly managed backup block without
-// changing the legacy partial-update behavior of VirtualServerBackupSettings.
+// MarshalJSON includes enabled=false when a complete backup block is provided.
+// The existing VirtualServerUpdateRequest encoding is retained for compatibility.
 func (r VirtualServerPatchRequest) MarshalJSON() ([]byte, error) {
 	type alias VirtualServerPatchRequest
 	type managedBackup struct {

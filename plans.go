@@ -2,7 +2,6 @@ package solus
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 )
 
@@ -313,6 +312,8 @@ type PlanCreateRequest struct {
 }
 
 // PlanUpdateRequest represents available properties for updating an existing plan.
+// Updates replace the plan configuration, including availability lists. Callers
+// must include the lists they want to retain; omitted or empty lists clear them.
 type PlanUpdateRequest struct {
 	Name                     string                      `json:"name"`
 	Limits                   PlanUpdateLimits            `json:"limits"`
@@ -389,6 +390,8 @@ func (*PlansService) setCreateRequestDefaults(data *PlanCreateRequest) {
 }
 
 // Update updates specified plan.
+// This is a replacement (PUT), so include all configuration and availability
+// lists that should be retained.
 func (s *PlansService) Update(ctx context.Context, id int, data PlanUpdateRequest) (Plan, error) {
 	s.setUpdateRequestDefaults(&data)
 	var resp planResponse
@@ -412,28 +415,4 @@ func (*PlansService) setUpdateRequestDefaults(data *PlanUpdateRequest) {
 // Delete deletes specified plan.
 func (s *PlansService) Delete(ctx context.Context, id int) error {
 	return s.client.syncDelete(ctx, fmt.Sprintf("plans/%d", id))
-}
-
-// MarshalJSON preserves the difference between an omitted availability list and
-// an explicit empty list, which clears that restriction in Solus.
-func (r PlanUpdateRequest) MarshalJSON() ([]byte, error) {
-	type alias PlanUpdateRequest
-	return json.Marshal(struct {
-		alias
-		Locations    *[]int `json:"available_locations,omitempty"`
-		Images       *[]int `json:"available_os_image_versions,omitempty"`
-		Applications *[]int `json:"available_applications,omitempty"`
-	}{
-		alias:        alias(r),
-		Locations:    optionalPlanIDs(r.AvailableLocations),
-		Images:       optionalPlanIDs(r.AvailableOsImageVersions),
-		Applications: optionalPlanIDs(r.AvailableApplications),
-	})
-}
-
-func optionalPlanIDs(ids []int) *[]int {
-	if ids == nil {
-		return nil
-	}
-	return &ids
 }
