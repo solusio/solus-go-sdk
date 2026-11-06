@@ -51,7 +51,7 @@ type ShortComputeResource struct {
 	Host            string                 `json:"host"`
 	Capabilities    map[string]interface{} `json:"capabilities"`
 	IsInMaintenance bool                   `json:"is_in_maintenance"`
-	Storages        []Storage              `json:"storages"`
+	Storages        []ShortStorage         `json:"storages"`
 }
 
 // ComputeResource represents a compute resource.

@@ -325,7 +325,7 @@ func TestVirtualServerReadHardwareSettings(t *testing.T) {
 	assert.Equal(t, ShortComputeResource{
 		ID: 15, Name: "compute", Host: "compute.example.com",
 		Capabilities:    map[string]interface{}{"kvm": true, "os_name": "linux"},
-		IsInMaintenance: true, Storages: []Storage{{ID: 7}},
+		IsInMaintenance: true, Storages: []ShortStorage{{ID: 7}},
 	}, vm.ComputeResource)
 	assert.Equal(t, VirtualServerSettings{
 		MacAddress: "02:00:00:00:00:01", Firmware: "efi", DiskCacheMode: "none", DiskDriver: "virtio",
@@ -415,4 +415,59 @@ func TestVirtualServerPatchOmittedFieldsJSON(t *testing.T) {
 	raw, err := json.Marshal(VirtualServerPatchRequest{})
 	require.NoError(t, err)
 	assert.JSONEq(t, `{}`, string(raw))
+}
+
+func TestVirtualServersEmbeddedStorageCredentials(t *testing.T) {
+	for _, credentials := range []string{"[]", "{}", "null"} {
+		for _, operation := range []string{"Get", "List", "Patch", "PatchFields"} {
+			t.Run(operation+"/"+credentials, func(t *testing.T) {
+				vmJSON := fmt.Sprintf(`{"id":42,"compute_resource":{"id":15,"storages":[{"id":7,"name":null,"type":{"name":"lvm","formats":["raw"]},"status":"active","credentials":%s}]}}`, credentials)
+				s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					body := `{"data":` + vmJSON + `}`
+					if operation == "List" {
+						assert.Equal(t, http.MethodGet, r.Method)
+						assert.Equal(t, "/servers", r.URL.Path)
+						body = `{"data":[{"id":1},` + vmJSON + `]}`
+					} else {
+						assert.Equal(t, "/servers/42", r.URL.Path)
+						if operation == "Get" {
+							assert.Equal(t, http.MethodGet, r.Method)
+						} else {
+							assert.Equal(t, http.MethodPatch, r.Method)
+						}
+					}
+					_, err := io.WriteString(w, body)
+					assert.NoError(t, err)
+				})
+				defer s.Close()
+				service := createTestClient(t, s.URL).VirtualServers
+				var vm VirtualServer
+				var err error
+				switch operation {
+				case "Get":
+					vm, err = service.Get(context.Background(), 42)
+				case "List":
+					var page VirtualServersResponse
+					page, err = service.List(context.Background(), &FilterVirtualServers{})
+					require.NoError(t, err)
+					require.Len(t, page.Data, 2)
+					vm = page.Data[1]
+				case "Patch":
+					vm, err = service.Patch(context.Background(), 42, VirtualServerUpdateRequest{Description: "updated"})
+				case "PatchFields":
+					description := "updated"
+					vm, err = service.PatchFields(context.Background(), 42, VirtualServerPatchRequest{Description: &description})
+				}
+				require.NoError(t, err)
+				assert.Equal(t, 42, vm.ID)
+				require.Len(t, vm.ComputeResource.Storages, 1)
+				storage := vm.ComputeResource.Storages[0]
+				assert.Equal(t, 7, storage.ID)
+				assert.Empty(t, storage.Name)
+				assert.Equal(t, "active", storage.Status)
+				assert.Equal(t, StorageType{Name: StorageTypeNameLVM, Formats: []ImageFormat{ImageFormatRaw}}, storage.Type)
+			})
+		}
+	}
 }

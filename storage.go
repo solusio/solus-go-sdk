@@ -8,6 +8,16 @@ import (
 // SnapshotsService handles all available methods with snapshots.
 type StorageService service
 
+// ShortStorage represents storage embedded in a compute resource summary.
+// Credentials are intentionally excluded: the API can return an object, an empty
+// array, or null for that field, and server reads do not need credential data.
+type ShortStorage struct {
+	ID     int         `json:"id"`
+	Name   string      `json:"name"`
+	Type   StorageType `json:"type"`
+	Status string      `json:"status"`
+}
+
 // Storage represents a storage.
 type Storage struct {
 	ID                      int                    `json:"id"`
