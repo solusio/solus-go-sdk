@@ -2,8 +2,12 @@ package solus
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -305,4 +309,165 @@ func TestVirtualServersService_SnapshotsCreate(t *testing.T) {
 	actual, err := createTestClient(t, s.URL).VirtualServers.SnapshotsCreate(context.Background(), 10, data)
 	require.NoError(t, err)
 	require.Equal(t, fakeSnapshot, actual)
+}
+
+func TestVirtualServerReadHardwareSettings(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		assert.Equal(t, "/servers/42", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		_, err := io.WriteString(w, `{"data":{"id":42,"compute_resource":{"id":15,"name":"compute","host":"compute.example.com","capabilities":{"kvm":true,"os_name":"linux"},"is_in_maintenance":true,"storages":[{"id":7}]},"settings":{"mac_address":"02:00:00:00:00:01","firmware":"efi","disk_cache_mode":"none","disk_driver":"virtio"}}}`)
+		assert.NoError(t, err)
+	})
+	defer s.Close()
+	vm, err := createTestClient(t, s.URL).VirtualServers.Get(context.Background(), 42)
+	require.NoError(t, err)
+	assert.Equal(t, ShortComputeResource{
+		ID: 15, Name: "compute", Host: "compute.example.com",
+		Capabilities:    map[string]interface{}{"kvm": true, "os_name": "linux"},
+		IsInMaintenance: true, Storages: []ShortStorage{{ID: 7}},
+	}, vm.ComputeResource)
+	assert.Equal(t, VirtualServerSettings{
+		MacAddress: "02:00:00:00:00:01", Firmware: "efi", DiskCacheMode: "none", DiskDriver: "virtio",
+	}, vm.Settings)
+}
+
+func TestVirtualServerPatchFieldsHTTP(t *testing.T) {
+	for _, status := range []int{http.StatusOK, http.StatusUnprocessableEntity} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPatch, r.Method)
+				assert.Equal(t, "/servers/42", r.URL.Path)
+				body, err := io.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.JSONEq(t, `{"description":"","user_data":"#cloud-config","fqdns":[]}`, string(body))
+				writeResponse(t, w, status, VirtualServer{ID: 42})
+			})
+			defer s.Close()
+			empty, names, userData := "", []string{}, "#cloud-config"
+			vm, err := createTestClient(t, s.URL).VirtualServers.PatchFields(context.Background(), 42,
+				VirtualServerPatchRequest{Description: &empty, UserData: &userData, FQDNs: &names})
+			if status == http.StatusOK {
+				require.NoError(t, err)
+				assert.Equal(t, 42, vm.ID)
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
+}
+
+func TestVirtualServerUpdateSettingsTaskHTTP(t *testing.T) {
+	for _, status := range []int{http.StatusOK, http.StatusUnprocessableEntity} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodPatch, r.Method)
+				assert.Equal(t, "/servers/42/settings", r.URL.Path)
+				body, err := io.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.JSONEq(t, `{"firmware":"efi"}`, string(body))
+				writeResponse(t, w, status, Task{ID: 123, Status: TaskStatusQueued})
+			})
+			defer s.Close()
+			task, err := createTestClient(t, s.URL).VirtualServers.UpdateSettingsTask(context.Background(), 42,
+				VirtualServerUpdateSettingsRequest{Firmware: "efi"})
+			if status == http.StatusOK {
+				require.NoError(t, err)
+				assert.Equal(t, 123, task.ID)
+				assert.False(t, task.IsFinished())
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
+}
+
+func TestVirtualServerPatchBackupSettingsJSON(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		t.Run(strconv.FormatBool(enabled), func(t *testing.T) {
+			empty, names := "", []string{}
+			raw, err := json.Marshal(VirtualServerPatchRequest{
+				Description: &empty, FQDNs: &names,
+				BackupSettings: &VirtualServerBackupSettings{
+					Enabled: enabled,
+					Schedule: VirtualServerBackupSettingsSchedule{
+						Type: ServerBackupSettingsScheduleTypeWeekly,
+						Time: VirtualServerBackupSettingsScheduleTime{Hour: 3, Minutes: 30},
+						Days: []int{1, 3},
+					},
+					Limit: UnitPlanLimit{IsEnabled: true, Limit: 5, Unit: PlanLimitUnits},
+				},
+			})
+			require.NoError(t, err)
+			assert.JSONEq(t, fmt.Sprintf(`{
+                "description":"", "fqdns":[],
+                "backup_settings":{
+                    "enabled":%t,
+                    "schedule":{"type":"weekly","time":{"hour":3,"minutes":30},"days":[1,3]},
+                    "limit":{"is_enabled":true,"limit":5,"unit":"units"}
+                }
+            }`, enabled), string(raw))
+		})
+	}
+}
+
+func TestVirtualServerPatchOmittedFieldsJSON(t *testing.T) {
+	raw, err := json.Marshal(VirtualServerPatchRequest{})
+	require.NoError(t, err)
+	assert.JSONEq(t, `{}`, string(raw))
+}
+
+func TestVirtualServersEmbeddedStorageCredentials(t *testing.T) {
+	for _, credentials := range []string{"[]", "{}", "null"} {
+		for _, operation := range []string{"Get", "List", "Patch", "PatchFields"} {
+			t.Run(operation+"/"+credentials, func(t *testing.T) {
+				vmJSON := fmt.Sprintf(`{"id":42,"compute_resource":{"id":15,"storages":[{"id":7,"name":null,"type":{"name":"lvm","formats":["raw"]},"status":"active","credentials":%s}]}}`, credentials)
+				s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					body := `{"data":` + vmJSON + `}`
+					if operation == "List" {
+						assert.Equal(t, http.MethodGet, r.Method)
+						assert.Equal(t, "/servers", r.URL.Path)
+						body = `{"data":[{"id":1},` + vmJSON + `]}`
+					} else {
+						assert.Equal(t, "/servers/42", r.URL.Path)
+						if operation == "Get" {
+							assert.Equal(t, http.MethodGet, r.Method)
+						} else {
+							assert.Equal(t, http.MethodPatch, r.Method)
+						}
+					}
+					_, err := io.WriteString(w, body)
+					assert.NoError(t, err)
+				})
+				defer s.Close()
+				service := createTestClient(t, s.URL).VirtualServers
+				var vm VirtualServer
+				var err error
+				switch operation {
+				case "Get":
+					vm, err = service.Get(context.Background(), 42)
+				case "List":
+					var page VirtualServersResponse
+					page, err = service.List(context.Background(), &FilterVirtualServers{})
+					require.NoError(t, err)
+					require.Len(t, page.Data, 2)
+					vm = page.Data[1]
+				case "Patch":
+					vm, err = service.Patch(context.Background(), 42, VirtualServerUpdateRequest{Description: "updated"})
+				case "PatchFields":
+					description := "updated"
+					vm, err = service.PatchFields(context.Background(), 42, VirtualServerPatchRequest{Description: &description})
+				}
+				require.NoError(t, err)
+				assert.Equal(t, 42, vm.ID)
+				require.Len(t, vm.ComputeResource.Storages, 1)
+				storage := vm.ComputeResource.Storages[0]
+				assert.Equal(t, 7, storage.ID)
+				assert.Empty(t, storage.Name)
+				assert.Equal(t, "active", storage.Status)
+				assert.Equal(t, StorageType{Name: StorageTypeNameLVM, Formats: []ImageFormat{ImageFormatRaw}}, storage.Type)
+			})
+		}
+	}
 }

@@ -2,6 +2,7 @@ package solus
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -31,6 +32,8 @@ type VirtualServer struct {
 	BackupSettings        VirtualServerBackupSettings `json:"backup_settings"`
 	NextScheduledBackupAt string                      `json:"next_scheduled_backup_at"`
 	SSHKeys               []SSHKey                    `json:"ssh_keys"`
+	ComputeResource       ShortComputeResource        `json:"compute_resource"`
+	Settings              VirtualServerSettings       `json:"settings"`
 	CreatedAt             string                      `json:"created_at"`
 }
 
@@ -264,6 +267,8 @@ func (s *VirtualServersService) Patch(
 }
 
 // UpdateSettings updates specified virtual server settings.
+//
+// Deprecated: use UpdateSettingsTask. This endpoint returns a task, not a server.
 func (s *VirtualServersService) UpdateSettings(
 	ctx context.Context,
 	id int,
@@ -340,4 +345,62 @@ func (s *VirtualServersService) SnapshotsCreate(ctx context.Context, vmID int, d
 func (s *VirtualServersService) Disks(ctx context.Context, id int) ([]Disk, error) {
 	var resp disksResponse
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d/disks", id), &resp)
+}
+
+// VirtualServerSettings contains the persistent hardware settings returned by GET servers/{id}.
+type VirtualServerSettings struct {
+	MacAddress    string        `json:"mac_address"`
+	Firmware      Firmware      `json:"firmware"`
+	DiskCacheMode DiskCacheMode `json:"disk_cache_mode"`
+	DiskDriver    DiskDriver    `json:"disk_driver"`
+}
+
+// VirtualServerPatchRequest distinguishes omitted fields from explicit empty values.
+// User data changes update stored initialization data; they do not rerun cloud-init.
+// The API rejects empty user data; use nil to leave it unchanged.
+type VirtualServerPatchRequest struct {
+	Name        *string   `json:"name,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	UserData    *string   `json:"user_data,omitempty"`
+	FQDNs       *[]string `json:"fqdns,omitempty"`
+	BootMode    *BootMode `json:"boot_mode,omitempty"`
+	// BackupSettings replaces the entire backup configuration. When non-nil,
+	// provide a complete block with a valid schedule and limit, even to disable backups.
+	BackupSettings *VirtualServerBackupSettings `json:"backup_settings,omitempty"`
+}
+
+// PatchFields updates the specified top-level fields. Description and FQDNs can
+// be cleared with an empty string and an empty slice. UserData cannot be cleared.
+// BackupSettings replaces the entire backup block rather than merging its fields.
+func (s *VirtualServersService) PatchFields(ctx context.Context, id int, data VirtualServerPatchRequest) (VirtualServer, error) {
+	var resp virtualServerResponse
+	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d", id), data, &resp)
+}
+
+// UpdateSettingsTask updates hardware settings and returns the asynchronous task.
+// UpdateSettings is retained for compatibility with existing callers.
+func (s *VirtualServersService) UpdateSettingsTask(ctx context.Context, id int, data VirtualServerUpdateSettingsRequest) (Task, error) {
+	var resp taskResponse
+	return resp.Data, s.client.patch(ctx, fmt.Sprintf("servers/%d/settings", id), data, &resp)
+}
+
+// MarshalJSON includes enabled=false when a complete backup block is provided.
+// The existing VirtualServerUpdateRequest encoding is retained for compatibility.
+func (r VirtualServerPatchRequest) MarshalJSON() ([]byte, error) {
+	type alias VirtualServerPatchRequest
+	type managedBackup struct {
+		VirtualServerBackupSettings
+		Enabled bool `json:"enabled"`
+	}
+	var backups *managedBackup
+	if r.BackupSettings != nil {
+		backups = &managedBackup{
+			VirtualServerBackupSettings: *r.BackupSettings,
+			Enabled:                     r.BackupSettings.Enabled,
+		}
+	}
+	return json.Marshal(struct {
+		alias
+		BackupSettings *managedBackup `json:"backup_settings,omitempty"`
+	}{alias: alias(r), BackupSettings: backups})
 }

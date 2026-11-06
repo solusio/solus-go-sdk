@@ -312,6 +312,8 @@ type PlanCreateRequest struct {
 }
 
 // PlanUpdateRequest represents available properties for updating an existing plan.
+// Updates replace the plan configuration, including availability lists. Callers
+// must include the lists they want to retain; omitted or empty lists clear them.
 type PlanUpdateRequest struct {
 	Name                     string                      `json:"name"`
 	Limits                   PlanUpdateLimits            `json:"limits"`
@@ -388,6 +390,8 @@ func (*PlansService) setCreateRequestDefaults(data *PlanCreateRequest) {
 }
 
 // Update updates specified plan.
+// This is a replacement (PUT), so include all configuration and availability
+// lists that should be retained.
 func (s *PlansService) Update(ctx context.Context, id int, data PlanUpdateRequest) (Plan, error) {
 	s.setUpdateRequestDefaults(&data)
 	var resp planResponse
