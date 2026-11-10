@@ -303,6 +303,26 @@ func (s *VirtualServersService) Restart(ctx context.Context, id int) (Task, erro
 	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/restart", id))
 }
 
+// Suspend suspends specified virtual server.
+func (s *VirtualServersService) Suspend(ctx context.Context, id int) (Task, error) {
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/suspend", id))
+}
+
+// Resume resumes specified virtual server.
+func (s *VirtualServersService) Resume(ctx context.Context, id int) (Task, error) {
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/resume", id))
+}
+
+// ResetUsage resets specified virtual server network usage limits.
+func (s *VirtualServersService) ResetUsage(ctx context.Context, id int) (Task, error) {
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/reset_usage", id))
+}
+
+// InstallGuestTools installs guest tools on specified virtual server.
+func (s *VirtualServersService) InstallGuestTools(ctx context.Context, id int) (Task, error) {
+	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/install_guest_tools", id))
+}
+
 // Backup backing up specified virtual server.
 func (s *VirtualServersService) Backup(ctx context.Context, id int) (Backup, error) {
 	path := fmt.Sprintf("servers/%d/backups", id)
@@ -325,9 +345,125 @@ type VirtualServerResizeRequest struct {
 	BackupSettings *VirtualServerBackupSettings `json:"backup_settings,omitempty"`
 }
 
+// VirtualServerReinstallRequest represents available properties for reinstalling
+// an existing virtual server.
+type VirtualServerReinstallRequest struct {
+	OSImageVersionID int                    `json:"os,omitempty"`
+	ApplicationID    int                    `json:"application,omitempty"`
+	ApplicationData  map[string]interface{} `json:"application_data,omitempty"`
+	SSHKeys          []int                  `json:"ssh_keys,omitempty"`
+	UserData         string                 `json:"user_data,omitempty"`
+}
+
+// VirtualServerResetPasswordRequest represents available properties for
+// resetting a virtual server root password.
+type VirtualServerResetPasswordRequest struct {
+	SendPasswordToCurrentUser *bool `json:"send_password_to_current_user,omitempty"`
+}
+
+// VirtualServerLimit represents a single virtual server limit and its usage.
+type VirtualServerLimit struct {
+	Name  string `json:"name"`
+	Limit struct {
+		Limit     int    `json:"limit"`
+		IsEnabled bool   `json:"is_enabled"`
+		Unit      string `json:"unit"`
+	} `json:"limit"`
+	Used       int  `json:"used"`
+	IsExceeded bool `json:"is_exceeded"`
+}
+
+// VirtualServerAdditionalIPsUpdateRequest represents request payload for
+// updating virtual server additional IP addresses.
+type VirtualServerAdditionalIPsUpdateRequest struct {
+	PrimaryID int `json:"primary_id"`
+}
+
+// VirtualServerAdditionalIPsCreateRequest represents request payload for
+// creating additional IP addresses for a virtual server.
+type VirtualServerAdditionalIPsCreateRequest struct {
+	Count   int       `json:"count,omitempty"`
+	Type    IPVersion `json:"type,omitempty"`
+	IP      string    `json:"ip,omitempty"`
+	Delayed *bool     `json:"delayed,omitempty"`
+}
+
+// VirtualServerAdditionalIPsDeleteRequest represents request payload for
+// deleting additional IP addresses from a virtual server.
+type VirtualServerAdditionalIPsDeleteRequest struct {
+	IDs     []int `json:"ids"`
+	Delayed *bool `json:"delayed,omitempty"`
+}
+
+// AdditionalDiskUpdateRequest represents request payload for updating a server
+// additional disk.
+type AdditionalDiskUpdateRequest struct {
+	Name string `json:"name"`
+}
+
+// AdditionalDiskDeleteRequest represents request payload for deleting a server
+// additional disk.
+type AdditionalDiskDeleteRequest struct {
+	Delayed *bool `json:"delayed,omitempty"`
+}
+
+// AdditionalDiskResizeRequest represents request payload for resizing a server
+// additional disk.
+type AdditionalDiskResizeRequest struct {
+	Size    int   `json:"size"`
+	Delayed *bool `json:"delayed,omitempty"`
+}
+
 // Resize resizes specified virtual server.
 func (s *VirtualServersService) Resize(ctx context.Context, id int, data VirtualServerResizeRequest) (Task, error) {
 	return s.client.asyncPost(ctx, fmt.Sprintf("servers/%d/resize", id), withBody(data))
+}
+
+// Reinstall reinstalls specified virtual server.
+func (s *VirtualServersService) Reinstall(
+	ctx context.Context,
+	id int,
+	data VirtualServerReinstallRequest,
+) (VirtualServer, error) {
+	path := fmt.Sprintf("servers/%d/reinstall", id)
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return VirtualServer{}, err
+	}
+
+	if code != http.StatusOK {
+		return VirtualServer{}, newHTTPError(http.MethodPost, path, code, body)
+	}
+
+	var resp virtualServerResponse
+	return resp.Data, unmarshal(body, &resp)
+}
+
+// ResetPassword resets root password for specified virtual server.
+func (s *VirtualServersService) ResetPassword(
+	ctx context.Context,
+	id int,
+	data VirtualServerResetPasswordRequest,
+) (string, error) {
+	path := fmt.Sprintf("servers/%d/reset_password", id)
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return "", err
+	}
+
+	if code != http.StatusOK {
+		return "", newHTTPError(http.MethodPost, path, code, body)
+	}
+
+	var resp struct {
+		Data struct {
+			Password string `json:"password"`
+		} `json:"data"`
+	}
+	if err := unmarshal(body, &resp); err != nil {
+		return "", err
+	}
+	return resp.Data.Password, nil
 }
 
 // Delete deletes specified virtual server.
@@ -335,10 +471,202 @@ func (s *VirtualServersService) Delete(ctx context.Context, id int) (Task, error
 	return s.client.asyncDelete(ctx, fmt.Sprintf("servers/%d", id))
 }
 
+// IPsCreate creates additional IP addresses for specified virtual server.
+func (s *VirtualServersService) IPsCreate(
+	ctx context.Context,
+	id int,
+	data VirtualServerAdditionalIPsCreateRequest,
+) (Task, error) {
+	path := fmt.Sprintf("servers/%d/ips", id)
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusCreated {
+		return Task{}, newHTTPError(http.MethodPost, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
+}
+
+// IPsUpdate updates additional IP addresses for specified virtual server.
+func (s *VirtualServersService) IPsUpdate(
+	ctx context.Context,
+	id int,
+	data VirtualServerAdditionalIPsUpdateRequest,
+) (Task, error) {
+	path := fmt.Sprintf("servers/%d/ips", id)
+	body, code, err := s.client.request(ctx, http.MethodPut, path, withBody(data))
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(http.MethodPut, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
+}
+
+// IPsDelete deletes additional IP addresses from specified virtual server.
+func (s *VirtualServersService) IPsDelete(
+	ctx context.Context,
+	serverID int,
+	data VirtualServerAdditionalIPsDeleteRequest,
+) ([]int, error) {
+	path := fmt.Sprintf("servers/%d/ips", serverID)
+	body, code, err := s.client.request(ctx, http.MethodDelete, path, withBody(data))
+	if err != nil {
+		return nil, err
+	}
+	if code != http.StatusOK {
+		return nil, newHTTPError(http.MethodDelete, path, code, body)
+	}
+	var resp struct {
+		Data struct {
+			IDs []int `json:"ids"`
+		} `json:"data"`
+	}
+	if err := unmarshal(body, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data.IDs, nil
+}
+
+// IPDelete deletes a specific additional IP address from specified virtual server.
+func (s *VirtualServersService) IPDelete(ctx context.Context, serverID, ipID int) (Task, error) {
+	path := fmt.Sprintf("servers/%d/ips/%d", serverID, ipID)
+	body, code, err := s.client.request(ctx, http.MethodDelete, path)
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(http.MethodDelete, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
+}
+
 // SnapshotsCreate creates a snapshot for the specified virtual server.
 func (s *VirtualServersService) SnapshotsCreate(ctx context.Context, vmID int, data SnapshotRequest) (Snapshot, error) {
 	var resp snapshotResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("servers/%d/snapshots", vmID), data, &resp)
+}
+
+// Snapshots gets a list of snapshots for the specified virtual server.
+func (s *VirtualServersService) Snapshots(ctx context.Context, id int) ([]Snapshot, error) {
+	var resp struct {
+		Data []Snapshot `json:"data"`
+	}
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d/snapshots", id), &resp)
+}
+
+// Backups gets a list of backups for the specified virtual server.
+func (s *VirtualServersService) Backups(ctx context.Context, id int) ([]Backup, error) {
+	var resp struct {
+		Data []Backup `json:"data"`
+	}
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d/backups", id), &resp)
+}
+
+// Limits gets a list of limits for the specified virtual server.
+func (s *VirtualServersService) Limits(ctx context.Context, id int) ([]VirtualServerLimit, error) {
+	var resp struct {
+		Data []VirtualServerLimit `json:"data"`
+	}
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("servers/%d/limits", id), &resp)
+}
+
+// DisksCreate adds an additional disk to specified virtual server.
+func (s *VirtualServersService) DisksCreate(
+	ctx context.Context,
+	id int,
+	data AdditionalDiskCreateRequest,
+) (Task, error) {
+	path := fmt.Sprintf("servers/%d/disks", id)
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusCreated {
+		return Task{}, newHTTPError(http.MethodPost, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
+}
+
+// DiskUpdate updates an additional disk for specified virtual server.
+func (s *VirtualServersService) DiskUpdate(
+	ctx context.Context,
+	serverID, diskID int,
+	data AdditionalDiskUpdateRequest,
+) ([]Disk, error) {
+	path := fmt.Sprintf("servers/%d/disks/%d", serverID, diskID)
+	body, code, err := s.client.request(ctx, http.MethodPut, path, withBody(data))
+	if err != nil {
+		return nil, err
+	}
+	if code != http.StatusOK {
+		return nil, newHTTPError(http.MethodPut, path, code, body)
+	}
+	var resp disksResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data, nil
+}
+
+// DiskDelete deletes an additional disk from specified virtual server.
+func (s *VirtualServersService) DiskDelete(
+	ctx context.Context,
+	serverID, diskID int,
+	data AdditionalDiskDeleteRequest,
+) (Task, error) {
+	path := fmt.Sprintf("servers/%d/disks/%d", serverID, diskID)
+	body, code, err := s.client.request(ctx, http.MethodDelete, path, withBody(data))
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(http.MethodDelete, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
+}
+
+// DiskResize resizes an additional disk for specified virtual server.
+func (s *VirtualServersService) DiskResize(
+	ctx context.Context,
+	serverID, diskID int,
+	data AdditionalDiskResizeRequest,
+) (Task, error) {
+	path := fmt.Sprintf("servers/%d/disks/%d/resize", serverID, diskID)
+	body, code, err := s.client.request(ctx, http.MethodPost, path, withBody(data))
+	if err != nil {
+		return Task{}, err
+	}
+	if code != http.StatusOK {
+		return Task{}, newHTTPError(http.MethodPost, path, code, body)
+	}
+	var resp taskResponse
+	if err := unmarshal(body, &resp); err != nil {
+		return Task{}, err
+	}
+	return resp.Data, nil
 }
 
 // Disks gets a list of disks for the specified virtual server.
