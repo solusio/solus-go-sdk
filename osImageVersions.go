@@ -2,6 +2,7 @@ package solus
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -20,6 +21,8 @@ type OsImageVersion struct {
 	IsVisible          bool               `json:"is_visible"`
 	IsSSHKeysSupported bool               `json:"is_ssh_keys_supported"`
 	AvailablePlans     []ShortPlan        `json:"available_plans"`
+	VSDiskDriver       *string            `json:"vs_disk_driver"`
+	VSFirmware         *string            `json:"vs_firmware"`
 }
 
 // ShortOsImageVersion represents only ID and name of OS image version.
@@ -80,13 +83,28 @@ func IsValidCloudInitVersion(v string) bool {
 // OsImageVersionRequest represents available properties for creating a new OS image
 // version.
 type OsImageVersionRequest struct {
-	Position           float64            `json:"position,omitempty"`
-	Version            string             `json:"version"`
-	VirtualizationType VirtualizationType `json:"virtualization_type"`
-	URL                string             `json:"url"`
-	CloudInitVersion   CloudInitVersion   `json:"cloud_init_version,omitempty"`
-	IsVisible          bool               `json:"is_visible"`
-	AvailablePlans     []int              `json:"available_plans,omitempty"`
+	Position            float64            `json:"position,omitempty"`
+	Version             string             `json:"version"`
+	VirtualizationType  VirtualizationType `json:"virtualization_type"`
+	URL                 string             `json:"url"`
+	CloudInitVersion    CloudInitVersion   `json:"cloud_init_version,omitempty"`
+	IsVisible           bool               `json:"is_visible"`
+	AvailablePlans      []int              `json:"available_plans,omitempty"`
+	VSDiskDriver        *string            `json:"vs_disk_driver,omitempty"`
+	VSFirmware          *string            `json:"vs_firmware,omitempty"`
+	IncludeVSDiskDriver bool               `json:"-"`
+}
+
+// MarshalJSON preserves an explicitly included nullable disk driver.
+func (r OsImageVersionRequest) MarshalJSON() ([]byte, error) {
+	type plain OsImageVersionRequest
+	if !r.IncludeVSDiskDriver {
+		return json.Marshal(plain(r))
+	}
+	return json.Marshal(struct {
+		plain
+		VSDiskDriver *string `json:"vs_disk_driver"`
+	}{plain: plain(r), VSDiskDriver: r.VSDiskDriver})
 }
 
 type osImageVersionResponse struct {
