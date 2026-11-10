@@ -5,6 +5,15 @@ import (
 	"fmt"
 )
 
+// ComputeResourceInstallStepRequest represents properties for creating/updating
+// a compute resource install step.
+type ComputeResourceInstallStepRequest struct {
+	Title      string                           `json:"title"`
+	Status     ComputeResourceInstallStepStatus `json:"status"`
+	StatusText string                           `json:"status_text"`
+	Progress   int                              `json:"progress"`
+}
+
 // ComputeResourceInstallStep represents a compute resource install step.
 type ComputeResourceInstallStep struct {
 	ID                int                              `json:"id"`
@@ -37,4 +46,29 @@ func (s *ComputeResourcesService) InstallSteps(ctx context.Context, id int) ([]C
 		Data []ComputeResourceInstallStep `json:"data"`
 	}
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/install_steps", id), &resp)
+}
+
+// InstallStepCreate creates an install step for the specified compute resource.
+func (s *ComputeResourcesService) InstallStepCreate(
+	ctx context.Context,
+	id int,
+	data ComputeResourceInstallStepRequest,
+) (ComputeResourceInstallStep, error) {
+	var resp struct {
+		Data ComputeResourceInstallStep `json:"data"`
+	}
+	return resp.Data, s.client.create(ctx, fmt.Sprintf("compute_resources/%d/install_steps", id), data, &resp)
+}
+
+// InstallStepUpdate updates an install step for the specified compute resource.
+func (s *ComputeResourcesService) InstallStepUpdate(
+	ctx context.Context,
+	id int,
+	stepID int,
+	data ComputeResourceInstallStepRequest,
+) (ComputeResourceInstallStep, error) {
+	var resp struct {
+		Data ComputeResourceInstallStep `json:"data"`
+	}
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("compute_resources/%d/install_steps/%d", id, stepID), data, &resp)
 }

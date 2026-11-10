@@ -32,3 +32,11 @@ func (s *ComputeResourcesService) ServersCreate(
 	var resp virtualServerResponse
 	return resp.Data, s.client.create(ctx, fmt.Sprintf("compute_resources/%d/servers", id), data, &resp)
 }
+
+// ServersList lists servers for the specified compute resource.
+func (s *ComputeResourcesService) ServersList(ctx context.Context, id int) ([]VirtualServer, error) {
+	var resp struct {
+		Data []VirtualServer `json:"data"`
+	}
+	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/servers", id), &resp)
+}

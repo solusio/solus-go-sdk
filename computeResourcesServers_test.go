@@ -40,3 +40,19 @@ func TestComputeResourcesService_ServersCreate(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, fakeVirtualServer, actual)
 }
+
+func TestComputeResourcesService_ServersList(t *testing.T) {
+	expected := []VirtualServer{fakeVirtualServer}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/compute_resources/42/servers", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		writeResponse(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).ComputeResources.ServersList(context.Background(), 42)
+	require.NoError(t, err)
+	require.Equal(t, expected, actual)
+}
