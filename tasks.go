@@ -3,6 +3,7 @@ package solus
 import (
 	"context"
 	"fmt"
+	"net/http"
 )
 
 // TasksService handles all available methods with tasks.
@@ -197,4 +198,32 @@ func (s *TasksService) List(ctx context.Context, filter *FilterTasks) (TasksResp
 func (s *TasksService) Get(ctx context.Context, id int) (Task, error) {
 	var resp taskResponse
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("tasks/%d", id), &resp)
+}
+
+// Cancel cancels a task.
+func (s *TasksService) Cancel(ctx context.Context, id int) error {
+	return s.postNoContent(ctx, fmt.Sprintf("tasks/%d/cancel", id))
+}
+
+// Retry retries a failed task.
+func (s *TasksService) Retry(ctx context.Context, id int) error {
+	return s.postNoContent(ctx, fmt.Sprintf("tasks/%d/retry", id))
+}
+
+// Requeue requeues a queued task.
+func (s *TasksService) Requeue(ctx context.Context, id int) error {
+	return s.postNoContent(ctx, fmt.Sprintf("tasks/%d/requeue", id))
+}
+
+func (s *TasksService) postNoContent(ctx context.Context, path string) error {
+	body, code, err := s.client.request(ctx, http.MethodPost, path)
+	if err != nil {
+		return err
+	}
+
+	if code != http.StatusNoContent {
+		return newHTTPError(http.MethodPost, path, code, body)
+	}
+
+	return nil
 }

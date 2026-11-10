@@ -14,6 +14,13 @@ type ComputeResourceStorageCreateRequest struct {
 	IsAvailableForBalancing bool            `json:"is_available_for_balancing"`
 }
 
+// ComputeResourceStorageUpdateRequest represents available properties for
+// updating a storage on a compute resource.
+type ComputeResourceStorageUpdateRequest struct {
+	IsAvailableForBalancing bool `json:"is_available_for_balancing"`
+	StorageTagID            int  `json:"storage_tag_id,omitempty"`
+}
+
 // StorageCreate creates a new storage for the specified compute resource.
 func (s *ComputeResourcesService) StorageCreate(
 	ctx context.Context,
@@ -30,4 +37,17 @@ func (s *ComputeResourcesService) StorageList(ctx context.Context, id int) ([]St
 		Data []Storage `json:"data"`
 	}
 	return resp.Data, s.client.get(ctx, fmt.Sprintf("compute_resources/%d/storages", id), &resp)
+}
+
+// StorageUpdate updates a storage on the specified compute resource.
+func (s *ComputeResourcesService) StorageUpdate(
+	ctx context.Context,
+	id int,
+	storageID int,
+	data ComputeResourceStorageUpdateRequest,
+) ([]Storage, error) {
+	var resp struct {
+		Data []Storage `json:"data"`
+	}
+	return resp.Data, s.client.update(ctx, fmt.Sprintf("compute_resources/%d/storages/%d", id, storageID), data, &resp)
 }

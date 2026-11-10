@@ -76,3 +76,39 @@ func TestTasksService_Get(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, fakeTask, actual)
 }
+
+func TestTasksService_Cancel(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/tasks/10/cancel", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Tasks.Cancel(context.Background(), 10)
+	require.NoError(t, err)
+}
+
+func TestTasksService_Retry(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/tasks/10/retry", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Tasks.Retry(context.Background(), 10)
+	require.NoError(t, err)
+}
+
+func TestTasksService_Requeue(t *testing.T) {
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/tasks/10/requeue", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	defer s.Close()
+
+	err := createTestClient(t, s.URL).Tasks.Requeue(context.Background(), 10)
+	require.NoError(t, err)
+}

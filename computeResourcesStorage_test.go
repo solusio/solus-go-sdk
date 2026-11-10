@@ -48,3 +48,24 @@ func TestComputeResourcesService_StorageList(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
+
+func TestComputeResourcesService_StorageUpdate(t *testing.T) {
+	data := ComputeResourceStorageUpdateRequest{
+		IsAvailableForBalancing: true,
+		StorageTagID:            11,
+	}
+	expected := []Storage{fakeStorage}
+
+	s := startTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/compute_resources/42/storages/5", r.URL.Path)
+		assert.Equal(t, http.MethodPut, r.Method)
+		assertRequestBody(t, r, data)
+
+		writeResponse(t, w, http.StatusOK, expected)
+	})
+	defer s.Close()
+
+	actual, err := createTestClient(t, s.URL).ComputeResources.StorageUpdate(context.Background(), 42, 5, data)
+	require.NoError(t, err)
+	require.Equal(t, expected, actual)
+}
